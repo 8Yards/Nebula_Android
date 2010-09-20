@@ -1,0 +1,13 @@
+Nebula - Android Group Communication Application
+
+Nebula will be an application that offers group communication among its users. 
+It will run over SIP to make its integration into IMS possible. The main scope 
+of Nebula is to provide support for different ways of communications within a 
+user defined group including video call, conference, instant messaging etc. 
+Group management can be based on various criteria e.g. context awareness, 
+geographical location or availability. Our team, along with the SALCAS team, 
+will deliver two distributions of Nebula, one for Android and another for Linux 
+respectively. The aim is to make the group communication interoperable between 
+above mentioned distributions. In the Android version, Nebula users will be able 
+to manage the address book by adding the contacts manually or importing them from 
+phone address book along with exporting/importing contacts to/from other users.

@@ -149,13 +149,6 @@ public class SIPClient implements SipListener {
 
 		// Create ViaHeaders
 		ArrayList viaHeaders = new ArrayList();
-		//String ipAddress = udpListeningPoint.getIPAddress();
-		//ViaHeader viaHeader = headerFactory.createViaHeader(sipServerIP, sipServerPort,
-		ViaHeader viaHeader = headerFactory.createViaHeader(myIP, myPort,
-				transport , null);
-
-		// add via headers
-		viaHeaders.add(viaHeader);
 
 		// Create a new CallId header
 		CallIdHeader callIdHeader = sipProvider.getNewCallId();
@@ -232,13 +225,6 @@ public class SIPClient implements SipListener {
 
 		// Create ViaHeaders
 		ArrayList viaHeaders = new ArrayList();
-		//String ipAddress = udpListeningPoint.getIPAddress();
-		//ViaHeader viaHeader = headerFactory.createViaHeader(sipServerIP, sipServerPort,
-		ViaHeader viaHeader = headerFactory.createViaHeader(myIP, myPort,
-				transport , null);
-
-		// add via headers
-		viaHeaders.add(viaHeader);
 
 		// Create ContentTypeHeader
 		ContentTypeHeader contentTypeHeader = headerFactory

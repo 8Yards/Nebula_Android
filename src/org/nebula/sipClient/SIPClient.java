@@ -10,56 +10,32 @@ import java.text.ParseException;
 import java.util.*;
 
 /**
- * This class is a UAC template.
- * 
- * @author M. Ranganathan
+ * Class for the SIP Client
+ * @author Nebula
  */
-
 public class SIPClient implements SipListener {
-
 	private static SipProvider sipProvider;
-
 	private static AddressFactory addressFactory;
-
 	private static MessageFactory messageFactory;
-
 	private static HeaderFactory headerFactory;
-
 	private static SipStack sipStack;
-
 	private ContactHeader contactHeader;
-
 	private ClientTransaction Tid;
-
 	private Dialog dialog;
-
-	private boolean byeTaskRunning;
-
-    // Save the created ACK request, to respond to retransmitted 2xx
-    private Request ackRequest;
-    
+    private Request ackRequest;// Save the created ACK request, to respond to retransmitted 2xx
     private String sipServerIP = "130.229.159.97";//"130.229.144.30";//
-    
     private Integer sipServerPort = 5060;//5061;//
-    
     private String sipServerName = "Server";
-    
     private String myIP;
-    
     private Integer myPort;
-    
     private String mySIPName;
-    
     private String mySIPDomain;
-    
     private ListeningPoint localUDPListeningPoint;
-
-	private Response response;
-
-	private boolean timeOut;
-
 	private String transport = "udp";
-    
+	
+	/*
+	 * simply to test the SIP Client
+	 */
 	public static void main(String args[]) throws Exception {
 		Request request;
 		Response response;
@@ -85,7 +61,14 @@ public class SIPClient implements SipListener {
 		System.out.println("End!");
 	}
 	
-    public SIPClient(String fromIPAddress, Integer fromPort, String fromName, String fromDomain) throws Exception {//, String fromSIPAddress) throws Exception {
+	/*
+	 * Constructor
+	 * @param	fromIPAddress	IP address of the client
+	 * @param	fromPort		port used by of the client
+	 * @param	fromName		sip name of the client
+	 * @param	fromDomain		sip domain of the client
+	 */
+    public SIPClient(String fromIPAddress, Integer fromPort, String fromName, String fromDomain) throws Exception {
     	this.myIP = fromIPAddress;
     	this.myPort = fromPort;
     	this.mySIPName = fromName;
@@ -109,7 +92,12 @@ public class SIPClient implements SipListener {
 	    System.out.println("\n jain sip stack started on " + fromIPAddress + ":" + fromPort + "/" + ListeningPoint.UDP);
 	    sipProvider.addSipListener(this);
     }
-    
+
+	/*
+	 * Sends a SIP request
+	 * @param	request		The SIP request to be sent
+	 * @result	response	SIP response
+	 */
     public synchronized Response send(Request request) throws Exception {
 	    // Create the client transaction.
 	    //ClientTransaction registerTid = 
@@ -129,7 +117,15 @@ public class SIPClient implements SipListener {
 	    return null;
 	    //return this.response();
     }
-    
+
+	/*
+	 * Prepares a SIP REFER message
+	 * @param	toUser				name of the SIP recipient
+	 * @param	toUserDomain		domain of the SIP recipient
+	 * @param	referSIPID			name of the resource
+	 * @param	referSIPDomain		domain of the resource
+	 * @return	request				request ready to be sent
+	 */
     public Request refer(String toUser, String toUserDomain, String referSIPID, String referSIPDomain) throws Exception {
     	// create >From Header
 		SipURI fromAddress = addressFactory.createSipURI(this.mySIPName,
@@ -206,7 +202,13 @@ public class SIPClient implements SipListener {
 		
 		return request;
     }
-    
+
+	/*
+	 * Prepares a SIP INVITE message
+	 * @param	toUser				name of the SIP recipient
+	 * @param	toUserDomain		domain of the SIP recipient
+	 * @return	request				request ready to be sent
+	 */
     public Request invite(String toUser, String toUserDomain) throws Exception {
     	// create >From Header
 		SipURI fromAddress = addressFactory.createSipURI(this.mySIPName,
@@ -308,7 +310,11 @@ public class SIPClient implements SipListener {
 		
 		return request;
     }
-    
+
+	/*
+	 * Prepares a SIP REGISTER message
+	 * @return	request				request ready to be sent
+	 */
     public Request register() throws Exception {
     	// create >From Header
 	    SipURI fromAddress = addressFactory.createSipURI(mySIPName, 
@@ -374,23 +380,19 @@ public class SIPClient implements SipListener {
 	    
 	    return request;
     }
-    
+
+	/*
+	 * Sends a SIP BYE message
+	 */
     public void bye() throws Exception {
     	Request byeRequest = this.dialog.createRequest(Request.BYE);
     	ClientTransaction ct = sipProvider.getNewClientTransaction(byeRequest);
 		dialog.sendRequest(ct);
     }
-    
-    public Response response() {
-    	this.response = null;
-    	this.timeOut = false;
-    	while(this.response == null || !this.timeOut){}//System.out.print(".");}
-    	
-    	if(this.timeOut)
-    		return null;
-    	return this.response;
-    }
 
+    /*
+     * Handles the bye task
+     */
 	class ByeTask  extends TimerTask {
 		Dialog dialog;
 		public ByeTask(Dialog dialog)  {
@@ -408,6 +410,9 @@ public class SIPClient implements SipListener {
 		}
 	}
 
+	/*
+	 * Sends a SIP CANCEL message 
+	 */
 	public void sendCancel() {
 		try {
 			System.out.println("Sending cancel");
@@ -420,6 +425,10 @@ public class SIPClient implements SipListener {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.sip.SipListener#processRequest(javax.sip.RequestEvent)
+	 */
 	public void processRequest(RequestEvent requestReceivedEvent) {
 		Request request = requestReceivedEvent.getRequest();
 		ServerTransaction serverTransactionId = requestReceivedEvent
@@ -448,12 +457,15 @@ public class SIPClient implements SipListener {
 		}
 	}
 
+	/*
+	 * Processes a BYE request
+	 * @param	request					The request
+	 * @param	serverTransactionId		to identity the transaction
+	 */
 	public void processBye(Request request,
 			ServerTransaction serverTransactionId) {
 		try {
-			System.out.println("shootist:  got a bye .");
 			if (serverTransactionId == null) {
-				System.out.println("shootist:  null TID.");
 				return;
 			}
 			Dialog dialog = serverTransactionId.getDialog();
@@ -466,10 +478,13 @@ public class SIPClient implements SipListener {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 			System.exit(0);
-
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.sip.SipListener#processResponse(javax.sip.ResponseEvent)
+	 */
 	public synchronized void processResponse(ResponseEvent responseReceivedEvent) {
 		System.out.println("Got a response");
 		Response response = (Response) responseReceivedEvent.getResponse();
@@ -492,12 +507,6 @@ public class SIPClient implements SipListener {
 			}			
 			return;
 		}
-		
-		// If the caller is supposed to send the bye
-		/*if (!byeTaskRunning) {
-			byeTaskRunning = true;
-			new Timer().schedule(new ByeTask(dialog), 4000) ;
-		}*/
 		
 		if(tid.getState() == TransactionState.COMPLETED)
 			notify();
@@ -537,11 +546,18 @@ public class SIPClient implements SipListener {
 		}
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.sip.SipListener#processTimeout(javax.sip.TimeoutEvent)
+	 */
 	public void processTimeout(javax.sip.TimeoutEvent timeoutEvent) {
-		this.timeOut = true;
 		System.out.println("Transaction Time out");
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.sip.SipListener#processIOException(javax.sip.IOExceptionEvent)
+	 */
 	public void processIOException(IOExceptionEvent exceptionEvent) {
 		System.out.println("IOException happened for "
 				+ exceptionEvent.getHost() + " port = "
@@ -549,11 +565,19 @@ public class SIPClient implements SipListener {
 
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.sip.SipListener#processTransactionTerminated(javax.sip.TransactionTerminatedEvent)
+	 */
 	public void processTransactionTerminated(
 			TransactionTerminatedEvent transactionTerminatedEvent) {
 		System.out.println("Transaction terminated event recieved");
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * @see javax.sip.SipListener#processDialogTerminated(javax.sip.DialogTerminatedEvent)
+	 */
 	public void processDialogTerminated(
 			DialogTerminatedEvent dialogTerminatedEvent) {
 		System.out.println("dialogTerminatedEvent");

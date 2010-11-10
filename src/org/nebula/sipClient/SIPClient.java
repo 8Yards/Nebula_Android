@@ -32,7 +32,7 @@ public class SIPClient implements SipListener {
 	private ClientTransaction Tid;
 	private Dialog dialog;
     private Request ackRequest;// Save the created ACK request, to respond to retransmitted 2xx
-    private String sipServerIP = "192.16.124.211";//"130.229.144.30";//
+    private String sipServerIP = "130.229.159.113";//"130.229.144.30";//
     private Integer sipServerPort = 5060;//5061;//
     /**
 	 * @return the sipProvider

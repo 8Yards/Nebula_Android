@@ -1,4 +1,4 @@
-package org.nebula.sipClient;
+package org.nebula;
 
 import java.text.ParseException;
 
@@ -9,26 +9,36 @@ import javax.sip.SipException;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-public class SIPTest implements SIPInterface {
+import org.nebula.sipClient.*;
+
+import android.app.Activity;
+import android.os.Bundle;
+import android.util.Log;
+
+public class SIPTest extends Activity implements SIPInterface {
 	private SIPClient sip;
 	
-	
-	/*
-	 * simply to test the SIP Client
-	 */
-	public void main(String args[]) throws Exception {
+	@Override
+	public void onCreate(Bundle savedInstanceState) {
 		Request request;
 		Response response;
 		
-		System.out.println("Start!");
-		SIPClient sip = new SIPClient("130.229.159.113", 5075, "michel", "130.229.159.113", "michel", this);
+		Log.v("nebula", "Start!");
+		SIPClient sip;
+		try {
+			sip = new SIPClient("130.229.143.63", 5054, "testSIP", "130.229.159.113", "testSIP", this);
 
-		request = sip.register();
-		response = sip.send(request);
-		if(response.getStatusCode() == Response.UNAUTHORIZED)
-			System.out.println("Authentication problem");
+			request = sip.register();
+			response = sip.send(request);
+			if(response.getStatusCode() == Response.UNAUTHORIZED)
+				System.out.println("Authentication problem");
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
-		
+		Log.v("nebula", "waiting..");
 		
 		boolean wait = true;
 		while(wait){}
@@ -54,7 +64,7 @@ public class SIPTest implements SIPInterface {
 		ServerTransaction serverTransactionId = requestReceivedEvent
 				.getServerTransaction();
 
-		System.out.println("\n\nRequest " + request.getMethod()
+		Log.v("nebula", "\n\nRequest " + request.getMethod()
 				+ " received at " + SIPClient.getSipStack().getStackName()
 				+ " with server transaction id " + serverTransactionId);
 		

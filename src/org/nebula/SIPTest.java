@@ -26,14 +26,22 @@ public class SIPTest extends Activity implements SIPInterface {
 		Log.v("nebula", "Start!");
 		SIPClient sip;
 		try {
-			sip = new SIPClient("130.229.143.63", 5054, "testSIP", "130.229.159.113", "testSIP", this);
+			Log.v("nebula", "1");
+			sip = new SIPClient("130.229.143.176", 5054, "michel", "192.16.124.217", "michel", this);
 
+			Log.v("nebula", "2");
 			request = sip.register();
+			Log.v("nebula", "3");
 			response = sip.send(request);
-			if(response.getStatusCode() == Response.UNAUTHORIZED)
+			Log.v("nebula", "4");
+			if(response.getStatusCode() == Response.UNAUTHORIZED) {
+				Log.v("nebula", "unauthorized");				
 				System.out.println("Authentication problem");
+			}
+			Log.v("nebula", "5");
 			
 		} catch (Exception e) {
+			Log.v("nebula", "6");
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
@@ -70,6 +78,23 @@ public class SIPTest extends Activity implements SIPInterface {
 		
 		if (request.getMethod().equals(Request.BYE))
 			sip.processBye(request, serverTransactionId);
+		else if (request.getMethod().equals(Request.INVITE)) {
+			try {
+				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(100, request) );
+				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(101, request) );
+				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(180, request) );
+				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(200, request) );
+			} catch (SipException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (InvalidArgumentException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		else {
 			try {
 				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(202,request) );

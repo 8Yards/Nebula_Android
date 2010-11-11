@@ -2,6 +2,7 @@ package org.nebula.sipClient;
 
 import gov.nist.javax.sip.header.WWWAuthenticate;
 import gov.nist.javax.sip.message.SIPRequest;
+import gov.nist.javax.sip.message.SIPResponse;
 
 import javax.sip.*;
 import javax.sip.address.*;
@@ -32,7 +33,7 @@ public class SIPClient implements SipListener {
 	private ClientTransaction Tid;
 	private Dialog dialog;
     private Request ackRequest;// Save the created ACK request, to respond to retransmitted 2xx
-    private String sipServerIP = "130.229.159.113";//"130.229.144.30";//
+    private String sipServerIP = "192.16.124.217";//"130.229.144.30";//
     private Integer sipServerPort = 5060;//5061;//
     /**
 	 * @return the sipProvider
@@ -765,6 +766,21 @@ public class SIPClient implements SipListener {
 	    
 	    return request;
     }
+    
+    /*public Request ok(String toSIPName, String toDomain) throws Exception {
+    	// create Request URI
+	    SipURI requestURI = addressFactory.createSipURI(toSIPName, toDomain);
+	    
+	    Response response;
+	    
+	    tid.sendResponse( messageFactory.createResponse( 202, request ) );
+	    
+    	Request request = messageFactory.createRequest(requestURI, 
+	    		Request.OK, callIdHeader, cSeqHeader, fromHeader, 
+	    		toHeader, viaHeaders, maxForwards);
+    	Request.
+    	return return;
+    }*/
 
 	/*
 	 * Sends a SIP BYE message

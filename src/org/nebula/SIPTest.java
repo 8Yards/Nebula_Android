@@ -2,6 +2,7 @@ package org.nebula;
 
 import java.text.ParseException;
 
+import javax.sip.Dialog;
 import javax.sip.InvalidArgumentException;
 import javax.sip.RequestEvent;
 import javax.sip.ServerTransaction;
@@ -17,6 +18,7 @@ import android.util.Log;
 
 public class SIPTest extends Activity implements SIPInterface {
 	private SIPClient sip;
+	private Dialog dialog;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -27,7 +29,7 @@ public class SIPTest extends Activity implements SIPInterface {
 		SIPClient sip;
 		try {
 			Log.v("nebula", "1");
-			sip = new SIPClient("130.229.143.176", 5054, "michel", "192.16.124.217", "michel", this);
+			sip = new SIPClient("130.229.143.176", 5054, "michel", "192.16.124.217", "123", this);
 
 			Log.v("nebula", "2");
 			request = sip.register();
@@ -39,6 +41,9 @@ public class SIPTest extends Activity implements SIPInterface {
 				System.out.println("Authentication problem");
 			}
 			Log.v("nebula", "5");
+			
+			/*request = sip.invite("michel", "192.16.124.217");
+			response = sip.send(request);*/
 			
 		} catch (Exception e) {
 			Log.v("nebula", "6");
@@ -80,10 +85,22 @@ public class SIPTest extends Activity implements SIPInterface {
 			sip.processBye(request, serverTransactionId);
 		else if (request.getMethod().equals(Request.INVITE)) {
 			try {
+				/*Log.v("nebula", "send 100");
 				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(100, request) );
-				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(101, request) );
+				Log.v("nebula", "send 101");
+				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(101, request) );*/
+				Log.v("nebula", "send 180");
+				dialog = serverTransactionId.getDialog();
 				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(180, request) );
+				Log.v("nebula", "send 200");
 				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(200, request) );
+
+		        /*long lserverTransactionId = requestReceivedEvent.getTransactionId();
+				sip.getSipProvider().sendResponse(lserverTransactionId, Response.RINGING);
+				sip.getSipProvider().se
+                Thread.sleep(500);
+                sip.getSipProvider().sendResponse(lserverTransactionId, Response.OK);*/
+				Log.v("nebula", "done");
 			} catch (SipException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

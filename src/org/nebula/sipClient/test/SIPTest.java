@@ -113,13 +113,28 @@ public class SIPTest extends Activity implements SIPInterface {
 			response.addHeader(contactHeader);
 			
 			byte[] content = request.getRawContent();
-			/*String content = "v=0\r\n"
+			/*
+			 * http://en.wikipedia.org/wiki/Session_Description_Protocol
+			 * Some examples
+			 * String content = "v=0\r\n"
                         + "o=4855 13760799956958020 13760799956958020"
                         + " IN IP4  129.6.55.78\r\n" + "s=mysession session\r\n"
                         + "p=+46 8 52018010\r\n" + "c=IN IP4  129.6.55.78\r\n"
                         + "t=0 0\r\n" + "m=audio 6022 RTP/AVP 0 4 18\r\n"
                         + "a=rtpmap:0 PCMU/8000\r\n" + "a=rtpmap:4 G723/8000\r\n"
                         + "a=rtpmap:18 G729A/8000\r\n" + "a=ptime:20\r\n";*/
+			/*
+			 * Captured from Linphone
+			 * String content = "v=0\r\n"
+					+ "o=prajwol 123456 654321 IN IP4 130.229.159.113\r\n"
+					+ "s=A conversation\r\n"
+					+ "c=IN IP4 130.229.159.113\r\n"
+					+ "t=0 0\r\n"
+					+ "m=audio 7078 RTP/AVP 0 101\r\n"
+					+ "a=rtpmap:0 PCMU/8000/1\r\n"
+					+ "a=rtpmap:101 telephone-event/8000/1\r\n"
+					+ "m=video 0 RTP/AVP 0\r\n";*/
+			
 			if (content != null) {
 			    ContentTypeHeader contentTypeHeader =
 				headerFactory.createContentTypeHeader("application", "sdp");

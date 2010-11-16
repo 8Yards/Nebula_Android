@@ -94,39 +94,53 @@ public class SIPTest extends Activity implements SIPInterface {
 			
 			if (request.getMethod().equals(Request.BYE))
 				sip.processBye(request, serverTransactionId);
-			else if (request.getMethod().equals(Request.INVITE)) {
-				/*Log.v("nebula", "send 100");
-				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(100, request) );
-				Log.v("nebula", "send 101");
-				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(101, request) );*/
-				Log.v("nebula", "send 180");
-				//dialog = serverTransactionId.getDialog();
-				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(Response.RINGING, request) );
-				Thread.sleep(1000);
-				Log.v("nebula", "send 200");
-				HeaderFactory headerFactory = SIPClient.getHeaderFactory();
-				Response response = SIPClient.getMessageFactory().createResponse(Response.OK, request);
-				Address address = SIPClient.getAddressFactory().createAddress(myName+" <sip:"
-						+ myAddress + ":" + myPort + ">");
-				ContactHeader contactHeader = headerFactory
-						.createContactHeader(address);
-				response.addHeader(contactHeader);
-				serverTransactionId.sendResponse( response );
-
-		        /*long lserverTransactionId = requestReceivedEvent.getTransactionId();
-				sip.getSipProvider().sendResponse(lserverTransactionId, Response.RINGING);
-				sip.getSipProvider().se
-                Thread.sleep(500);
-                sip.getSipProvider().sendResponse(lserverTransactionId, Response.OK);*/
-				Log.v("nebula", "done");
-			}
-			else {
+			else if (request.getMethod().equals(Request.INVITE))
+				inviteRequest(request, serverTransactionId);
+			else
 				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(202,request) );
-			}
 		} catch (Exception e1) {
-			// TODO Auto-generated catch block
 			e1.printStackTrace();
 			System.exit(-1);
+		}
+	}
+
+	private void inviteRequest(Request request, ServerTransaction st) {
+		/*Log.v("nebula", "send 100");
+		serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(100, request) );
+		Log.v("nebula", "send 101");
+		serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(101, request) );*/
+		Log.v("nebula", "send 180");
+		//dialog = serverTransactionId.getDialog();
+		
+		try {
+			st.sendResponse( SIPClient.getMessageFactory().createResponse(Response.RINGING, request) );
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		inviteRespond(request, st);
+		
+        /*long lserverTransactionId = requestReceivedEvent.getTransactionId();
+		sip.getSipProvider().sendResponse(lserverTransactionId, Response.RINGING);
+		sip.getSipProvider().se
+        Thread.sleep(500);
+        sip.getSipProvider().sendResponse(lserverTransactionId, Response.OK);*/
+		Log.v("nebula", "done");
+	}
+
+	private void inviteRespond(Request request, ServerTransaction st) {
+		try {
+			Thread.sleep(1000);
+			Log.v("nebula", "send 200");
+			HeaderFactory headerFactory = SIPClient.getHeaderFactory();
+			Response response = SIPClient.getMessageFactory().createResponse(Response.OK, request);
+			Address address = SIPClient.getAddressFactory().createAddress(myName+" <sip:"
+					+ myAddress + ":" + myPort + ">");
+			ContactHeader contactHeader = headerFactory
+					.createContactHeader(address);
+			response.addHeader(contactHeader);
+			st.sendResponse( response );
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
 	}
 }

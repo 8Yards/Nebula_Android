@@ -9,6 +9,8 @@ import javax.sip.address.*;
 import javax.sip.header.*;
 import javax.sip.message.*;
 
+import android.util.Log;
+
 import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -33,8 +35,8 @@ public class SIPClient implements SipListener {
 	private ClientTransaction Tid;
 	private Dialog dialog;
     private Request ackRequest;// Save the created ACK request, to respond to retransmitted 2xx
-    private String sipServerIP = "192.16.124.217";//"130.229.144.30";//
-    private Integer sipServerPort = 5060;//5061;//
+    private String sipServerIP = "130.229.142.108";
+    private Integer sipServerPort = 5060;
     /**
 	 * @return the sipProvider
 	 */

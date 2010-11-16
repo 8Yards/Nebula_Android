@@ -1,17 +1,11 @@
 package org.nebula;
 
-import java.text.ParseException;
-import java.util.Timer;
-
 import javax.sip.Dialog;
-import javax.sip.InvalidArgumentException;
 import javax.sip.RequestEvent;
 import javax.sip.ServerTransaction;
-import javax.sip.SipException;
-import javax.sip.TransactionAlreadyExistsException;
-import javax.sip.TransactionUnavailableException;
 import javax.sip.address.Address;
 import javax.sip.header.ContactHeader;
+import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.HeaderFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -24,18 +18,13 @@ import android.util.Log;
 
 public class SIPTest extends Activity implements SIPInterface {
 	private SIPClient sip;
-	private Dialog dialog;
 	private String myName = "Michel";
 	private String myAddress = "130.229.157.39";
 	private int myPort = 5060;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		Request request;
-		Response response;
-		
 		Log.v("nebula", "Start!");
-		SIPClient sip;
 		try {
 			Log.v("nebula", "1");
 			sip = new SIPClient(myAddress, myPort, myName, myAddress, "123", this);
@@ -56,7 +45,6 @@ public class SIPTest extends Activity implements SIPInterface {
 			
 		} catch (Exception e) {
 			Log.v("nebula", "6");
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		
@@ -138,6 +126,15 @@ public class SIPTest extends Activity implements SIPInterface {
 			ContactHeader contactHeader = headerFactory
 					.createContactHeader(address);
 			response.addHeader(contactHeader);
+			
+			byte[] content = request.getRawContent();
+			if (content != null) {
+			    ContentTypeHeader contentTypeHeader =
+				headerFactory.createContentTypeHeader("application", "sdp");
+			    System.out.println("response = " + response);
+			    response.setContent(content, contentTypeHeader);
+			}
+			
 			st.sendResponse( response );
 		} catch (Exception e) {
 			e.printStackTrace();

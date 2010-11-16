@@ -1,17 +1,9 @@
 package org.nebula.sipClient;
 
-import gov.nist.javax.sip.header.WWWAuthenticate;
-import gov.nist.javax.sip.message.SIPRequest;
-import gov.nist.javax.sip.message.SIPResponse;
-
 import javax.sip.*;
 import javax.sip.address.*;
 import javax.sip.header.*;
 import javax.sip.message.*;
-
-import android.util.Log;
-
-import java.io.IOException;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;

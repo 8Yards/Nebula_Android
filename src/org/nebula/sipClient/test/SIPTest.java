@@ -1,6 +1,5 @@
-package org.nebula;
+package org.nebula.sipClient.test;
 
-import javax.sip.Dialog;
 import javax.sip.RequestEvent;
 import javax.sip.ServerTransaction;
 import javax.sip.address.Address;
@@ -68,7 +67,7 @@ public class SIPTest extends Activity implements SIPInterface {
 		System.out.println("End!");
 	}
 
-	public void sipRequest(RequestEvent requestReceivedEvent) {
+	public void processRequest(RequestEvent requestReceivedEvent) {
 		try {
 			Request request = requestReceivedEvent.getRequest();
 			ServerTransaction serverTransactionId = requestReceivedEvent
@@ -83,7 +82,7 @@ public class SIPTest extends Activity implements SIPInterface {
 			if (request.getMethod().equals(Request.BYE))
 				sip.processBye(request, serverTransactionId);
 			else if (request.getMethod().equals(Request.INVITE))
-				inviteRequest(request, serverTransactionId);
+				processInvite(request, serverTransactionId);
 			else
 				serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(202,request) );
 		} catch (Exception e1) {
@@ -92,7 +91,7 @@ public class SIPTest extends Activity implements SIPInterface {
 		}
 	}
 
-	private void inviteRequest(Request request, ServerTransaction st) {
+	private void processInvite(Request request, ServerTransaction st) {
 		/*Log.v("nebula", "send 100");
 		serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(100, request) );
 		Log.v("nebula", "send 101");
@@ -105,17 +104,14 @@ public class SIPTest extends Activity implements SIPInterface {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		inviteRespond(request, st);
+		processInviteOK(request, st);
+		//processInviteCancel(request, st);
+		//processBusyHere(request, st);
 		
-        /*long lserverTransactionId = requestReceivedEvent.getTransactionId();
-		sip.getSipProvider().sendResponse(lserverTransactionId, Response.RINGING);
-		sip.getSipProvider().se
-        Thread.sleep(500);
-        sip.getSipProvider().sendResponse(lserverTransactionId, Response.OK);*/
 		Log.v("nebula", "done");
 	}
 
-	private void inviteRespond(Request request, ServerTransaction st) {
+	private void processInviteOK(Request request, ServerTransaction st) {
 		try {
 			Thread.sleep(1000);
 			Log.v("nebula", "send 200");
@@ -128,6 +124,13 @@ public class SIPTest extends Activity implements SIPInterface {
 			response.addHeader(contactHeader);
 			
 			byte[] content = request.getRawContent();
+			/*String content = "v=0\r\n"
+                        + "o=4855 13760799956958020 13760799956958020"
+                        + " IN IP4  129.6.55.78\r\n" + "s=mysession session\r\n"
+                        + "p=+46 8 52018010\r\n" + "c=IN IP4  129.6.55.78\r\n"
+                        + "t=0 0\r\n" + "m=audio 6022 RTP/AVP 0 4 18\r\n"
+                        + "a=rtpmap:0 PCMU/8000\r\n" + "a=rtpmap:4 G723/8000\r\n"
+                        + "a=rtpmap:18 G729A/8000\r\n" + "a=ptime:20\r\n";*/
 			if (content != null) {
 			    ContentTypeHeader contentTypeHeader =
 				headerFactory.createContentTypeHeader("application", "sdp");

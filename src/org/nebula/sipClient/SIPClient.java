@@ -29,313 +29,6 @@ public class SIPClient implements SipListener {
     private Request ackRequest;// Save the created ACK request, to respond to retransmitted 2xx
     private String sipServerIP = "130.229.142.108";
     private Integer sipServerPort = 5060;
-    /**
-	 * @return the sipProvider
-	 */
-	public static SipProvider getSipProvider() {
-		return sipProvider;
-	}
-
-	/**
-	 * @param sipProvider the sipProvider to set
-	 */
-	public static void setSipProvider(SipProvider sipProvider) {
-		SIPClient.sipProvider = sipProvider;
-	}
-
-	/**
-	 * @return the addressFactory
-	 */
-	public static AddressFactory getAddressFactory() {
-		return addressFactory;
-	}
-
-	/**
-	 * @param addressFactory the addressFactory to set
-	 */
-	public static void setAddressFactory(AddressFactory addressFactory) {
-		SIPClient.addressFactory = addressFactory;
-	}
-
-	/**
-	 * @return the messageFactory
-	 */
-	public static MessageFactory getMessageFactory() {
-		return messageFactory;
-	}
-
-	/**
-	 * @param messageFactory the messageFactory to set
-	 */
-	public static void setMessageFactory(MessageFactory messageFactory) {
-		SIPClient.messageFactory = messageFactory;
-	}
-
-	/**
-	 * @return the headerFactory
-	 */
-	public static HeaderFactory getHeaderFactory() {
-		return headerFactory;
-	}
-
-	/**
-	 * @param headerFactory the headerFactory to set
-	 */
-	public static void setHeaderFactory(HeaderFactory headerFactory) {
-		SIPClient.headerFactory = headerFactory;
-	}
-
-	/**
-	 * @return the sipStack
-	 */
-	public static SipStack getSipStack() {
-		return sipStack;
-	}
-
-	/**
-	 * @param sipStack the sipStack to set
-	 */
-	public static void setSipStack(SipStack sipStack) {
-		SIPClient.sipStack = sipStack;
-	}
-
-	/**
-	 * @return the request
-	 */
-	public Request getRequest() {
-		return request;
-	}
-
-	/**
-	 * @param request the request to set
-	 */
-	public void setRequest(Request request) {
-		this.request = request;
-	}
-
-	/**
-	 * @return the contactHeader
-	 */
-	public ContactHeader getContactHeader() {
-		return contactHeader;
-	}
-
-	/**
-	 * @param contactHeader the contactHeader to set
-	 */
-	public void setContactHeader(ContactHeader contactHeader) {
-		this.contactHeader = contactHeader;
-	}
-
-	/**
-	 * @return the tid
-	 */
-	public ClientTransaction getTid() {
-		return Tid;
-	}
-
-	/**
-	 * @param tid the tid to set
-	 */
-	public void setTid(ClientTransaction tid) {
-		Tid = tid;
-	}
-
-	/**
-	 * @return the dialog
-	 */
-	public Dialog getDialog() {
-		return dialog;
-	}
-
-	/**
-	 * @param dialog the dialog to set
-	 */
-	public void setDialog(Dialog dialog) {
-		this.dialog = dialog;
-	}
-
-	/**
-	 * @return the ackRequest
-	 */
-	public Request getAckRequest() {
-		return ackRequest;
-	}
-
-	/**
-	 * @param ackRequest the ackRequest to set
-	 */
-	public void setAckRequest(Request ackRequest) {
-		this.ackRequest = ackRequest;
-	}
-
-	/**
-	 * @return the sipServerIP
-	 */
-	public String getSipServerIP() {
-		return sipServerIP;
-	}
-
-	/**
-	 * @param sipServerIP the sipServerIP to set
-	 */
-	public void setSipServerIP(String sipServerIP) {
-		this.sipServerIP = sipServerIP;
-	}
-
-	/**
-	 * @return the sipServerPort
-	 */
-	public Integer getSipServerPort() {
-		return sipServerPort;
-	}
-
-	/**
-	 * @param sipServerPort the sipServerPort to set
-	 */
-	public void setSipServerPort(Integer sipServerPort) {
-		this.sipServerPort = sipServerPort;
-	}
-
-	/**
-	 * @return the sipServerName
-	 */
-	public String getSipServerName() {
-		return sipServerName;
-	}
-
-	/**
-	 * @param sipServerName the sipServerName to set
-	 */
-	public void setSipServerName(String sipServerName) {
-		this.sipServerName = sipServerName;
-	}
-
-	/**
-	 * @return the myIP
-	 */
-	public String getMyIP() {
-		return myIP;
-	}
-
-	/**
-	 * @param myIP the myIP to set
-	 */
-	public void setMyIP(String myIP) {
-		this.myIP = myIP;
-	}
-
-	/**
-	 * @return the myPort
-	 */
-	public Integer getMyPort() {
-		return myPort;
-	}
-
-	/**
-	 * @param myPort the myPort to set
-	 */
-	public void setMyPort(Integer myPort) {
-		this.myPort = myPort;
-	}
-
-	/**
-	 * @return the mySIPName
-	 */
-	public String getMySIPName() {
-		return mySIPName;
-	}
-
-	/**
-	 * @param mySIPName the mySIPName to set
-	 */
-	public void setMySIPName(String mySIPName) {
-		this.mySIPName = mySIPName;
-	}
-
-	/**
-	 * @return the mySIPDomain
-	 */
-	public String getMySIPDomain() {
-		return mySIPDomain;
-	}
-
-	/**
-	 * @param mySIPDomain the mySIPDomain to set
-	 */
-	public void setMySIPDomain(String mySIPDomain) {
-		this.mySIPDomain = mySIPDomain;
-	}
-
-	/**
-	 * @return the localUDPListeningPoint
-	 */
-	public ListeningPoint getLocalUDPListeningPoint() {
-		return localUDPListeningPoint;
-	}
-
-	/**
-	 * @param localUDPListeningPoint the localUDPListeningPoint to set
-	 */
-	public void setLocalUDPListeningPoint(ListeningPoint localUDPListeningPoint) {
-		this.localUDPListeningPoint = localUDPListeningPoint;
-	}
-
-	/**
-	 * @return the transport
-	 */
-	public String getTransport() {
-		return transport;
-	}
-
-	/**
-	 * @param transport the transport to set
-	 */
-	public void setTransport(String transport) {
-		this.transport = transport;
-	}
-
-	/**
-	 * @return the myPassword
-	 */
-	public String getMyPassword() {
-		return myPassword;
-	}
-
-	/**
-	 * @param myPassword the myPassword to set
-	 */
-	public void setMyPassword(String myPassword) {
-		this.myPassword = myPassword;
-	}
-
-	/**
-	 * @return the response
-	 */
-	public Response getResponse() {
-		return response;
-	}
-
-	/**
-	 * @param response the response to set
-	 */
-	public void setResponse(Response response) {
-		this.response = response;
-	}
-
-	/**
-	 * @return the sipint
-	 */
-	public SIPInterface getSipint() {
-		return sipint;
-	}
-
-	/**
-	 * @param sipint the sipint to set
-	 */
-	public void setSipint(SIPInterface sipint) {
-		this.sipint = sipint;
-	}
 
 	private String sipServerName = "Server";
     private String myIP;
@@ -347,38 +40,6 @@ public class SIPClient implements SipListener {
 	private String myPassword;
 	private Response response;
 	private SIPInterface sipint;
-	
-	public static String digest(String nonce, String realm, String username, String password, 
-			String uri, String method) {
-		String response;
-		String ha1;
-		String ha2;
-		
-		ha1 = md5(username +":"+ realm +":"+ password);
-		ha2 = md5(method +":"+ uri);
-		
-		response = md5(ha1 +":"+ nonce +":"+ ha2);
-		
-		return response;
-	}
-	
-	public static String md5(String plaintext) {
-		MessageDigest m = null;
-		try {
-			m = MessageDigest.getInstance("MD5");
-		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		m.reset();
-		m.update(plaintext.getBytes());
-		BigInteger bigInt = new BigInteger(1, m.digest());
-		String hashtext = bigInt.toString(16);
-		// Now we need to zero pad it if you actually want the full 32 chars.
-		while(hashtext.length() < 32 )
-			hashtext = "0"+hashtext;
-		return hashtext;
-	}
 	
 	/*
 	 * Constructor
@@ -414,6 +75,38 @@ public class SIPClient implements SipListener {
 	    System.out.println("\n jain sip stack started on " + fromIPAddress + ":" + fromPort + "/" + ListeningPoint.UDP);
 	    sipProvider.addSipListener(this);
     }
+	
+	public static String digest(String nonce, String realm, String username, String password, 
+			String uri, String method) {
+		String response;
+		String ha1;
+		String ha2;
+		
+		ha1 = md5(username +":"+ realm +":"+ password);
+		ha2 = md5(method +":"+ uri);
+		
+		response = md5(ha1 +":"+ nonce +":"+ ha2);
+		
+		return response;
+	}
+	
+	public static String md5(String plaintext) {
+		MessageDigest m = null;
+		try {
+			m = MessageDigest.getInstance("MD5");
+		} catch (NoSuchAlgorithmException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		m.reset();
+		m.update(plaintext.getBytes());
+		BigInteger bigInt = new BigInteger(1, m.digest());
+		String hashtext = bigInt.toString(16);
+		// Now we need to zero pad it if you actually want the full 32 chars.
+		while(hashtext.length() < 32 )
+			hashtext = "0"+hashtext;
+		return hashtext;
+	}
 
 	/*
 	 * Sends a SIP request
@@ -760,21 +453,6 @@ public class SIPClient implements SipListener {
 	    
 	    return request;
     }
-    
-    /*public Request ok(String toSIPName, String toDomain) throws Exception {
-    	// create Request URI
-	    SipURI requestURI = addressFactory.createSipURI(toSIPName, toDomain);
-	    
-	    Response response;
-	    
-	    tid.sendResponse( messageFactory.createResponse( 202, request ) );
-	    
-    	Request request = messageFactory.createRequest(requestURI, 
-	    		Request.OK, callIdHeader, cSeqHeader, fromHeader, 
-	    		toHeader, viaHeaders, maxForwards);
-    	Request.
-    	return return;
-    }*/
 
 	/*
 	 * Sends a SIP BYE message
@@ -825,7 +503,7 @@ public class SIPClient implements SipListener {
 	 * @see javax.sip.SipListener#processRequest(javax.sip.RequestEvent)
 	 */
 	public void processRequest(RequestEvent requestReceivedEvent) {
-		sipint.sipRequest(requestReceivedEvent);
+		sipint.processRequest(requestReceivedEvent);
 	}
 
 	/*
@@ -953,5 +631,314 @@ public class SIPClient implements SipListener {
 			DialogTerminatedEvent dialogTerminatedEvent) {
 		System.out.println("dialogTerminatedEvent");
 
+	}
+	
+
+    /**
+	 * @return the sipProvider
+	 */
+	public static SipProvider getSipProvider() {
+		return sipProvider;
+	}
+
+	/**
+	 * @param sipProvider the sipProvider to set
+	 */
+	public static void setSipProvider(SipProvider sipProvider) {
+		SIPClient.sipProvider = sipProvider;
+	}
+
+	/**
+	 * @return the addressFactory
+	 */
+	public static AddressFactory getAddressFactory() {
+		return addressFactory;
+	}
+
+	/**
+	 * @param addressFactory the addressFactory to set
+	 */
+	public static void setAddressFactory(AddressFactory addressFactory) {
+		SIPClient.addressFactory = addressFactory;
+	}
+
+	/**
+	 * @return the messageFactory
+	 */
+	public static MessageFactory getMessageFactory() {
+		return messageFactory;
+	}
+
+	/**
+	 * @param messageFactory the messageFactory to set
+	 */
+	public static void setMessageFactory(MessageFactory messageFactory) {
+		SIPClient.messageFactory = messageFactory;
+	}
+
+	/**
+	 * @return the headerFactory
+	 */
+	public static HeaderFactory getHeaderFactory() {
+		return headerFactory;
+	}
+
+	/**
+	 * @param headerFactory the headerFactory to set
+	 */
+	public static void setHeaderFactory(HeaderFactory headerFactory) {
+		SIPClient.headerFactory = headerFactory;
+	}
+
+	/**
+	 * @return the sipStack
+	 */
+	public static SipStack getSipStack() {
+		return sipStack;
+	}
+
+	/**
+	 * @param sipStack the sipStack to set
+	 */
+	public static void setSipStack(SipStack sipStack) {
+		SIPClient.sipStack = sipStack;
+	}
+
+	/**
+	 * @return the request
+	 */
+	public Request getRequest() {
+		return request;
+	}
+
+	/**
+	 * @param request the request to set
+	 */
+	public void setRequest(Request request) {
+		this.request = request;
+	}
+
+	/**
+	 * @return the contactHeader
+	 */
+	public ContactHeader getContactHeader() {
+		return contactHeader;
+	}
+
+	/**
+	 * @param contactHeader the contactHeader to set
+	 */
+	public void setContactHeader(ContactHeader contactHeader) {
+		this.contactHeader = contactHeader;
+	}
+
+	/**
+	 * @return the tid
+	 */
+	public ClientTransaction getTid() {
+		return Tid;
+	}
+
+	/**
+	 * @param tid the tid to set
+	 */
+	public void setTid(ClientTransaction tid) {
+		Tid = tid;
+	}
+
+	/**
+	 * @return the dialog
+	 */
+	public Dialog getDialog() {
+		return dialog;
+	}
+
+	/**
+	 * @param dialog the dialog to set
+	 */
+	public void setDialog(Dialog dialog) {
+		this.dialog = dialog;
+	}
+
+	/**
+	 * @return the ackRequest
+	 */
+	public Request getAckRequest() {
+		return ackRequest;
+	}
+
+	/**
+	 * @param ackRequest the ackRequest to set
+	 */
+	public void setAckRequest(Request ackRequest) {
+		this.ackRequest = ackRequest;
+	}
+
+	/**
+	 * @return the sipServerIP
+	 */
+	public String getSipServerIP() {
+		return sipServerIP;
+	}
+
+	/**
+	 * @param sipServerIP the sipServerIP to set
+	 */
+	public void setSipServerIP(String sipServerIP) {
+		this.sipServerIP = sipServerIP;
+	}
+
+	/**
+	 * @return the sipServerPort
+	 */
+	public Integer getSipServerPort() {
+		return sipServerPort;
+	}
+
+	/**
+	 * @param sipServerPort the sipServerPort to set
+	 */
+	public void setSipServerPort(Integer sipServerPort) {
+		this.sipServerPort = sipServerPort;
+	}
+
+	/**
+	 * @return the sipServerName
+	 */
+	public String getSipServerName() {
+		return sipServerName;
+	}
+
+	/**
+	 * @param sipServerName the sipServerName to set
+	 */
+	public void setSipServerName(String sipServerName) {
+		this.sipServerName = sipServerName;
+	}
+
+	/**
+	 * @return the myIP
+	 */
+	public String getMyIP() {
+		return myIP;
+	}
+
+	/**
+	 * @param myIP the myIP to set
+	 */
+	public void setMyIP(String myIP) {
+		this.myIP = myIP;
+	}
+
+	/**
+	 * @return the myPort
+	 */
+	public Integer getMyPort() {
+		return myPort;
+	}
+
+	/**
+	 * @param myPort the myPort to set
+	 */
+	public void setMyPort(Integer myPort) {
+		this.myPort = myPort;
+	}
+
+	/**
+	 * @return the mySIPName
+	 */
+	public String getMySIPName() {
+		return mySIPName;
+	}
+
+	/**
+	 * @param mySIPName the mySIPName to set
+	 */
+	public void setMySIPName(String mySIPName) {
+		this.mySIPName = mySIPName;
+	}
+
+	/**
+	 * @return the mySIPDomain
+	 */
+	public String getMySIPDomain() {
+		return mySIPDomain;
+	}
+
+	/**
+	 * @param mySIPDomain the mySIPDomain to set
+	 */
+	public void setMySIPDomain(String mySIPDomain) {
+		this.mySIPDomain = mySIPDomain;
+	}
+
+	/**
+	 * @return the localUDPListeningPoint
+	 */
+	public ListeningPoint getLocalUDPListeningPoint() {
+		return localUDPListeningPoint;
+	}
+
+	/**
+	 * @param localUDPListeningPoint the localUDPListeningPoint to set
+	 */
+	public void setLocalUDPListeningPoint(ListeningPoint localUDPListeningPoint) {
+		this.localUDPListeningPoint = localUDPListeningPoint;
+	}
+
+	/**
+	 * @return the transport
+	 */
+	public String getTransport() {
+		return transport;
+	}
+
+	/**
+	 * @param transport the transport to set
+	 */
+	public void setTransport(String transport) {
+		this.transport = transport;
+	}
+
+	/**
+	 * @return the myPassword
+	 */
+	public String getMyPassword() {
+		return myPassword;
+	}
+
+	/**
+	 * @param myPassword the myPassword to set
+	 */
+	public void setMyPassword(String myPassword) {
+		this.myPassword = myPassword;
+	}
+
+	/**
+	 * @return the response
+	 */
+	public Response getResponse() {
+		return response;
+	}
+
+	/**
+	 * @param response the response to set
+	 */
+	public void setResponse(Response response) {
+		this.response = response;
+	}
+
+	/**
+	 * @return the sipint
+	 */
+	public SIPInterface getSipint() {
+		return sipint;
+	}
+
+	/**
+	 * @param sipint the sipint to set
+	 */
+	public void setSipint(SIPInterface sipint) {
+		this.sipint = sipint;
 	}
 }

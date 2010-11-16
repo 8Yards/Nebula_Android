@@ -95,8 +95,8 @@ public class SIPClient implements SipListener {
 		try {
 			m = MessageDigest.getInstance("MD5");
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
+			System.exit(-1);
 		}
 		m.reset();
 		m.update(plaintext.getBytes());
@@ -162,8 +162,8 @@ public class SIPClient implements SipListener {
 						AuthorizationHeader ah = headerFactory.createAuthorizationHeader(authorization);
 						r.addHeader(ah);
 					} catch (ParseException e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						System.exit(-1);
 					}
 					
 					try {
@@ -178,8 +178,8 @@ public class SIPClient implements SipListener {
 						
 						//wait();
 					} catch (Exception e) {
-						// TODO Auto-generated catch block
 						e.printStackTrace();
+						System.exit(-1);
 					}
 					
 				}
@@ -221,7 +221,7 @@ public class SIPClient implements SipListener {
 		SipURI requestURI = addressFactory.createSipURI(toUser, sipServerIP+":"+sipServerPort);
 
 		// Create ViaHeaders
-		ArrayList viaHeaders = new ArrayList();
+		ArrayList<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
 		//String ipAddress = udpListeningPoint.getIPAddress();
 		//ViaHeader viaHeader = headerFactory.createViaHeader(sipServerIP, sipServerPort,
 		ViaHeader viaHeader = headerFactory.createViaHeader(myIP, myPort,
@@ -304,7 +304,7 @@ public class SIPClient implements SipListener {
 		SipURI requestURI = addressFactory.createSipURI(toUser, sipServerIP+":"+sipServerPort);
 
 		// Create ViaHeaders
-		ArrayList viaHeaders = new ArrayList();
+		ArrayList<ViaHeader> viaHeaders = new ArrayList<ViaHeader>();
 		//String ipAddress = udpListeningPoint.getIPAddress();
 		//ViaHeader viaHeader = headerFactory.createViaHeader(sipServerIP, sipServerPort,
 		ViaHeader viaHeader = headerFactory.createViaHeader(myIP, myPort,

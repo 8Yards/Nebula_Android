@@ -25,10 +25,8 @@ public class SIPTest extends Activity implements SIPInterface {
 	public void onCreate(Bundle savedInstanceState) {
 		Log.v("nebula", "Start!");
 		try {
-			Log.v("nebula", "1");
 			sip = new SIPClient(myAddress, myPort, myName, myAddress, "123", this);
-
-			Log.v("nebula", "2");
+			
 			/*request = sip.register();
 			Log.v("nebula", "3");
 			response = sip.send(request);
@@ -37,10 +35,18 @@ public class SIPTest extends Activity implements SIPInterface {
 				Log.v("nebula", "unauthorized");				
 				System.out.println("Authentication problem");
 			}*/
-			Log.v("nebula", "5");
+			
+			/*request = sip.invite("nina", "130.229.159.97");
+			response = sip.send(request);
+			sip.bye();*/
+			
+			/*request = sip.refer("nina", "130.229.159.97", "sdfdsf", "baba.com");
+			response = sip.send(request);*/
 			
 			/*request = sip.invite("michel", "192.16.124.217");
 			response = sip.send(request);*/
+			
+			//System.out.println(response);
 			
 		} catch (Exception e) {
 			Log.v("nebula", "6");
@@ -51,19 +57,6 @@ public class SIPTest extends Activity implements SIPInterface {
 		
 		boolean wait = true;
 		while(wait){}
-		
-/*
-		request = sip.invite("nina", "130.229.159.97");
-
-		response = sip.send(request);
-		
-		sip.bye();*/
-		
-		/*request = sip.refer("nina", "130.229.159.97", "sdfdsf", "baba.com");
-
-		response = sip.send(request);*/
-		
-		//System.out.println(response);
 		System.out.println("End!");
 	}
 
@@ -92,10 +85,6 @@ public class SIPTest extends Activity implements SIPInterface {
 	}
 
 	private void processInvite(Request request, ServerTransaction st) {
-		/*Log.v("nebula", "send 100");
-		serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(100, request) );
-		Log.v("nebula", "send 101");
-		serverTransactionId.sendResponse( SIPClient.getMessageFactory().createResponse(101, request) );*/
 		Log.v("nebula", "send 180");
 		//dialog = serverTransactionId.getDialog();
 		

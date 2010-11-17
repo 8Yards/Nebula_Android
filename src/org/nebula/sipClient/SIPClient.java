@@ -4,6 +4,9 @@ import javax.sip.*;
 import javax.sip.address.*;
 import javax.sip.header.*;
 import javax.sip.message.*;
+
+import android.util.Log;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -27,7 +30,7 @@ public class SIPClient implements SipListener {
 	private ClientTransaction Tid;
 	private Dialog dialog;
     private Request ackRequest;// Save the created ACK request, to respond to retransmitted 2xx
-    private String sipServerIP = "130.229.142.108";
+    private String sipServerIP = "192.16.124.211";
     private Integer sipServerPort = 5060;
 
 	private String sipServerName = "Server";
@@ -118,11 +121,14 @@ public class SIPClient implements SipListener {
 	    //ClientTransaction registerTid = 
 	    //	sipProvider.getNewClientTransaction(request);
 
+    	Log.v("nebula", "send a request");
+    	Log.v("nebula", request.toString());
+    	
 		// Create the client transaction.
     	Request r = (Request)request.clone();
 		Tid = sipProvider.getNewClientTransaction(request);
 	
-		System.out.println(request);
+		//System.out.println(request);
 
 		dialog = Tid.getDialog();
 		

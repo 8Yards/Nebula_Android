@@ -35,6 +35,21 @@ public class SIPTest extends Activity implements SIPInterface {
 			Log.v("nebula", myAddress);
 			sip = new SIPClient(myAddress, myPort, myName, myAddress, "sujan", this);
 			
+			Request request = sip.register();
+			Log.v("nebula", "1");
+			Response response = sip.send(request);
+			Log.v("nebula", "2");
+			
+			Log.v("nebula", Integer.toString(response.getStatusCode()));
+			
+			if(response.getStatusCode() == 200) {
+				Log.v("nebula", "unauthorized");
+			}
+			else {
+				Log.v("nebula", "unauthorized");			
+			}
+			
+			
 			/*request = sip.register();
 			Log.v("nebula", "3");
 			response = sip.send(request);

@@ -134,10 +134,14 @@ public class SIPClient implements SipListener {
 		
 	    // send the request out.
 	    Tid.sendRequest();
-		if(request.getMethod().equals("REGISTER"))
+		if(request.getMethod().equals("REGISTER")) {
+	    	Log.v("nebula", "wait for register");
 	    	wait();
+		}
+    	Log.v("nebula", "done waiting");
 
 		if (response.getStatusCode() == Response.UNAUTHORIZED) {
+	    	Log.v("nebula", "unauthorized?");
 			String nonce;
 			String realm;
 			
@@ -550,6 +554,9 @@ public class SIPClient implements SipListener {
 		System.out.println("Response received : Status Code = "
 				+ response.getStatusCode() + " " + cseq);
 		System.out.println(response);
+		
+		if(tid.getState() == TransactionState.COMPLETED)
+			notify();
 			
 		if (tid == null) {
 			// RFC3261: MUST respond to every 2xx
@@ -563,9 +570,6 @@ public class SIPClient implements SipListener {
 			}			
 			return;
 		}
-		
-		if(tid.getState() == TransactionState.COMPLETED)
-			notify();
 			
 		System.out.println("transaction state is " + tid.getState());
 		System.out.println("Dialog = " + tid.getDialog());

@@ -23,17 +23,17 @@ import android.util.Log;
 public class SIPTest extends Activity implements SIPInterface {
 	private SIPClient sip;
 	private String myName = "sujan";
-	private String myAddress = "130.229.159.100";
+	private String myPassword = "sujan";
+	private String myAddress;// = "130.229.147.206";
 	private int myPort = 5062;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		Log.v("nebula", "Start!");
 		try {
-			Log.v("nebula", myAddress);
 			myAddress = getLocalIpAddress();
 			Log.v("nebula", myAddress);
-			sip = new SIPClient(myAddress, myPort, myName, myAddress, "sujan", this);
+			sip = new SIPClient(myAddress, myPort, myName, myAddress, myPassword, this);
 			
 			Request request = sip.register();
 			Log.v("nebula", "1");
@@ -43,7 +43,7 @@ public class SIPTest extends Activity implements SIPInterface {
 			Log.v("nebula", Integer.toString(response.getStatusCode()));
 			
 			if(response.getStatusCode() == 200) {
-				Log.v("nebula", "unauthorized");
+				Log.v("nebula", "authorized");
 			}
 			else {
 				Log.v("nebula", "unauthorized");			
@@ -72,14 +72,10 @@ public class SIPTest extends Activity implements SIPInterface {
 			//System.out.println(response);
 			
 		} catch (Exception e) {
-			Log.v("nebula", "6");
+			Log.v("nebula", "Error");
 			e.printStackTrace();
 		}
 		
-		Log.v("nebula", "waiting..");
-		
-		boolean wait = true;
-		while(wait){}
 		System.out.println("End!");
 	}
 	

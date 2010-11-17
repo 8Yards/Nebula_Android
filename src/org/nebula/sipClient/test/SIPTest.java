@@ -1,5 +1,10 @@
 package org.nebula.sipClient.test;
 
+import java.net.InetAddress;
+import java.net.NetworkInterface;
+import java.net.SocketException;
+import java.util.Enumeration;
+
 import javax.sip.RequestEvent;
 import javax.sip.ServerTransaction;
 import javax.sip.address.Address;
@@ -17,15 +22,18 @@ import android.util.Log;
 
 public class SIPTest extends Activity implements SIPInterface {
 	private SIPClient sip;
-	private String myName = "Michel";
-	private String myAddress = "130.229.157.39";
-	private int myPort = 5060;
+	private String myName = "sujan";
+	private String myAddress = "130.229.159.100";
+	private int myPort = 5062;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		Log.v("nebula", "Start!");
 		try {
-			sip = new SIPClient(myAddress, myPort, myName, myAddress, "123", this);
+			Log.v("nebula", myAddress);
+			myAddress = getLocalIpAddress();
+			Log.v("nebula", myAddress);
+			sip = new SIPClient(myAddress, myPort, myName, myAddress, "sujan", this);
 			
 			/*request = sip.register();
 			Log.v("nebula", "3");
@@ -58,6 +66,23 @@ public class SIPTest extends Activity implements SIPInterface {
 		boolean wait = true;
 		while(wait){}
 		System.out.println("End!");
+	}
+	
+	public String getLocalIpAddress() {
+	    try {
+	        for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
+	            NetworkInterface intf = en.nextElement();
+	            for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
+	                InetAddress inetAddress = enumIpAddr.nextElement();
+	                if (!inetAddress.isLoopbackAddress()) {
+	                    return inetAddress.getHostAddress().toString();
+	                }
+	            }
+	        }
+	    } catch (SocketException ex) {
+	        Log.e("nebula", ex.toString());
+	    }
+	    return null;
 	}
 
 	public void processRequest(RequestEvent requestReceivedEvent) {

@@ -98,7 +98,7 @@ public class Test extends Activity {
 					e.printStackTrace();
 				}
 			}
-		});
+		});*/
 	}
 	
 	public String getLocalIpAddress() {

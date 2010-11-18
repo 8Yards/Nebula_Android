@@ -1,4 +1,4 @@
-package org.nebula.sipClient.test;
+package org.nebula.test;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -14,69 +14,91 @@ import javax.sip.header.HeaderFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
-import org.nebula.sipClient.*;
+import org.nebula.sipClient.SIPClient;
+import org.nebula.test.R;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 
-public class SIPTest extends Activity implements SIPInterface {
-	private SIPClient sip;
-	private String myName = "sujan";
-	private String myPassword = "sujan";
-	private String myAddress;// = "130.229.147.206";
-	private int myPort = 5062;
+public class Test extends Activity {    
+	Intent intentRecord;
+	Intent intentPlay;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		Log.v("nebula", "Start!");
-		try {
-			myAddress = getLocalIpAddress();
-			Log.v("nebula", myAddress);
-			sip = new SIPClient(myAddress, myPort, myName, myAddress, myPassword, this);
-			
-			Request request = sip.register();
-			Log.v("nebula", "1");
-			Response response = sip.send(request);
-			Log.v("nebula", "2");
-			
-			Log.v("nebula", Integer.toString(response.getStatusCode()));
-			
-			if(response.getStatusCode() == 200) {
-				Log.v("nebula", "authorized");
-			}
-			else {
-				Log.v("nebula", "unauthorized");			
-			}
-			
-			
-			/*request = sip.register();
-			Log.v("nebula", "3");
-			response = sip.send(request);
-			Log.v("nebula", "4");
-			if(response.getStatusCode() == Response.UNAUTHORIZED) {
-				Log.v("nebula", "unauthorized");				
-				System.out.println("Authentication problem");
-			}*/
-			
-			/*request = sip.invite("nina", "130.229.159.97");
-			response = sip.send(request);
-			sip.bye();*/
-			
-			/*request = sip.refer("nina", "130.229.159.97", "sdfdsf", "baba.com");
-			response = sip.send(request);*/
-			
-			/*request = sip.invite("michel", "192.16.124.217");
-			response = sip.send(request);*/
-			
-			//System.out.println(response);
-			
-		} catch (Exception e) {
-			Log.v("nebula", "Error");
-			e.printStackTrace();
-		}
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.main);
 		
-		System.out.println("End!");
+		Log.v("nebula", "init activity");
+		intentRecord = new Intent(this, ServiceSender.class);
+		intentPlay = new Intent(this, ServiceReceiver.class);
+		int sendPortRTP = 6030;
+		int sendPortRTCP = 6031;
+		int receivePortRTP = 6032;
+		int receivePortRTCP = 6033;
+		intentRecord.putExtra("portRTP", sendPortRTP);
+		intentRecord.putExtra("portRTCP", sendPortRTCP);
+		intentRecord.putExtra("portRTCP", sendPortRTCP);
+		intentPlay.putExtra("portRTP", receivePortRTP);
+		intentPlay.putExtra("portRTCP", receivePortRTCP);
+		
+		/*Button btnStartRecord=(Button)findViewById(R.id.Button01);
+		Button btnStopRecord=(Button)findViewById(R.id.Button02);
+		    
+		Button btnStartPlay=(Button)findViewById(R.id.Button03);
+		Button btnStopPlay=(Button)findViewById(R.id.Button04);
+		        
+		btnStartRecord.setOnClickListener(new View.OnClickListener() {		
+			@Override
+			public void onClick(View v) {
+					try {
+						startService(intentRecord);
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		
+		btnStopRecord.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				try {
+					Log.v("nebula", "time to stop");
+					//Intent stopIntent = new Intent(this, ServiceSender.class);
+					stopService(intentRecord);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		
+		btnStartPlay.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				try {
+					startService(intentPlay);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}		
+			}
+		});
+		
+		btnStopPlay.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				try {
+					Log.v("nebula", "time to stop");
+					//Intent stopIntent = new Intent(this, ServiceSender.class);
+					stopService(intentPlay);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 	
 	public String getLocalIpAddress() {

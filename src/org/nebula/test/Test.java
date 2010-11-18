@@ -44,7 +44,7 @@ public class Test extends Activity implements SIPInterface {
 	protected ServiceSender serviceBinder;
 	
 	@Override
-	public synchronized void onCreate(Bundle savedInstanceState) {
+	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
@@ -84,23 +84,14 @@ public class Test extends Activity implements SIPInterface {
 			        serviceBinder = null;
 			    }
 
-				public synchronized void onServiceConnected(ComponentName name, IBinder binder) {
+				public void onServiceConnected(ComponentName name, IBinder binder) {
 			        Log.v("nebula", "Connected!"); 
 			        serviceBinder = ((SenderBinder) binder).getService();
-					Log.v("nebula", "notifyAll();");
-			        notifyAll();
+			        serviceReady();
 				}  
 			};
 			    
 			bindService(intentRecord, connection, Context.BIND_AUTO_CREATE);
-			Log.v("nebula", "wait();");
-			wait();
-			
-			//ServiceSender service = ((BackgroundServiceBinder)service).getService(); 
-			Participant p = new Participant("130.229.131.172", 5062, 5063);
-			serviceBinder.addParticipant(p);
-			
-			Log.v("nebula", "App finished.");
 			
 			//startService(intentRecord);
 			//startService(intentPlay);
@@ -108,6 +99,15 @@ public class Test extends Activity implements SIPInterface {
 			Log.v("nebula", "Error");
 			e.printStackTrace();
 		}
+	}
+	
+	public void serviceReady() {
+		//ServiceSender service = ((BackgroundServiceBinder)service).getService(); 
+		Participant p = new Participant("130.229.131.172", 7078, 7079);
+		serviceBinder.addParticipant(p);
+		serviceBinder.startRecording();
+		
+		Log.v("nebula", "App finished.");
 	}
 
 	public void processRequest(RequestEvent requestReceivedEvent) {
@@ -122,8 +122,10 @@ public class Test extends Activity implements SIPInterface {
 					+ " received at " + SIPClient.getSipStack().getStackName()
 					+ " with server transaction id " + serverTransactionId);
 			
-			if (request.getMethod().equals(Request.BYE))
+			if (request.getMethod().equals(Request.BYE)) {
 				sip.processBye(request, serverTransactionId);
+				serviceBinder.stopRecording();
+			}
 			else if (request.getMethod().equals(Request.INVITE))
 				processInvite(request, serverTransactionId);
 			else

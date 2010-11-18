@@ -19,7 +19,6 @@ import android.util.Log;
 public class ServiceSender extends Service implements RTPAppIntf  {
 	private RTPClient rtpClientSender = null;
 	boolean isRecording;
-	private ServiceSender binder;
 
     @Override 
     public void onCreate() {
@@ -68,13 +67,6 @@ public class ServiceSender extends Service implements RTPAppIntf  {
 			e1.printStackTrace();
 			System.exit(-1);
 		}
-		
-		Thread recordThread = new Thread(new Runnable() {
-			public void run() {
-				record();
-			}
-		});
-		recordThread.start();
         return new SenderBinder(this); 
 	}
 		
@@ -103,7 +95,7 @@ public class ServiceSender extends Service implements RTPAppIntf  {
 		Log.v("nebula", "call record");
 		int frequency = 11025;
 		int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
-		int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
+		int audioEncoding = AudioFormat.ENCODING_PCM_8BIT;
 	  
 		int bufferSize = AudioRecord.getMinBufferSize(frequency, channelConfiguration,  audioEncoding);
 		AudioRecord audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, 
@@ -129,4 +121,19 @@ public class ServiceSender extends Service implements RTPAppIntf  {
 	public void receiveData(DataFrame frame, Participant participant) {}
 
 	public void userEvent(int type, Participant[] participant) {}
+
+	public void startRecording() {
+		
+		Thread recordThread = new Thread(new Runnable() {
+			public void run() {
+				record();
+			}
+		});
+		recordThread.start();
+	}
+
+	public void stopRecording() {
+    	isRecording = false;
+    	rtpClientSender.endSession();
+	}
 }

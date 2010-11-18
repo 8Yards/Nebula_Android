@@ -370,10 +370,10 @@ public class SIPClient implements SipListener {
 
 		String sdpData = "v=0\r\n"
 				+ "o=4855 13760799956958020 13760799956958020"
-				+ " IN IP4  129.6.55.78\r\n" + "s=mysession session\r\n"
+				+ " IN IP4  130.229.131.172\r\n" + "s=mysession session\r\n"
 				+ "p=+46 8 52018010\r\n" + "c=IN IP4  129.6.55.78\r\n"
-				+ "t=0 0\r\n" + "m=audio 6022 RTP/AVP 0 4 18\r\n"
-				+ "a=rtpmap:0 PCMU/8000\r\n" + "a=rtpmap:4 G723/8000\r\n"
+				+ "t=0 0\r\n" + "m=audio 5062 RTP/AVP 0 4 18\r\n"
+				+ "a=rtpmap:0 PCMA/8000\r\n" + "a=rtpmap:4 G723/8000\r\n"
 				+ "a=rtpmap:18 G729A/8000\r\n" + "a=ptime:20\r\n";
 		byte[] contents = sdpData.getBytes();
 

@@ -16,41 +16,29 @@ import android.media.MediaRecorder;
 import android.os.IBinder;
 import android.util.Log;
 
-public class ServiceSender extends Service implements RTPAppIntf {
+public class ServiceSender extends Service implements RTPAppIntf  {
 	private RTPClient rtpClientSender = null;
 	boolean isRecording;
+	private ServiceSender binder;
 
     @Override 
     public void onCreate() {
         Log.d("nebula", "onCreate");
     	super.onCreate();
     	isRecording = true;
-		
+    	
         Log.d("nebula", "finish create");
     } 
     
+    public void addParticipant(Participant p) {
+    	//Participant p = new Participant("130.229.141.195", 5062,5063);
+    	Log.v("nebula", "add a participant");
+    	rtpClientSender.addParticipant(p);
+    }
+    
     @Override 
     public int onStartCommand(Intent intent, int flags, int startId) { 
-		Log.v("nebula", "service start");
-	    
-		try {
-			int portRTP = intent.getExtras().getInt("portRTP");//5066;//
-			int portRTCP = intent.getExtras().getInt("portRTCP");//5067;//
-			rtpClientSender = new RTPClient(portRTP, portRTCP, null, false);
-		} catch (SocketException e1) {
-			e1.printStackTrace();
-			System.exit(-1);
-		}
-		Participant p = new Participant("130.229.141.195", 5062,5063);
-		rtpClientSender.addParticipant(p);
-		
-		Thread recordThread = new Thread(new Runnable() {
-			public void run() {
-				record();
-			}
-		});
-		recordThread.start();
-        return START_STICKY; 
+    	return 0;
     } 
     
     @Override 
@@ -58,10 +46,37 @@ public class ServiceSender extends Service implements RTPAppIntf {
     	isRecording = false;
     	rtpClientSender.endSession();
     	Log.v("nebula", "service finish");
-    } 
+} 
     
 	@Override
-	public IBinder onBind(Intent arg0) { return null; }
+	public boolean onUnbind(Intent intent) {
+    	isRecording = false;
+    	rtpClientSender.endSession();
+    	Log.v("nebula", "service finish");
+    	return true;
+	} 
+    
+	@Override
+	public IBinder onBind(Intent intent) {
+		Log.v("nebula", "service start");
+	    
+		try {
+			int portRTP = intent.getExtras().getInt("portRTP");
+			int portRTCP = intent.getExtras().getInt("portRTCP");
+			rtpClientSender = new RTPClient(portRTP, portRTCP, null, false);
+		} catch (SocketException e1) {
+			e1.printStackTrace();
+			System.exit(-1);
+		}
+		
+		Thread recordThread = new Thread(new Runnable() {
+			public void run() {
+				record();
+			}
+		});
+		recordThread.start();
+        return new SenderBinder(this); 
+	}
 		
 	protected void sendRTP(byte[] buffer, int size) {
 		Log.v("nebula", "sending");
@@ -107,11 +122,6 @@ public class ServiceSender extends Service implements RTPAppIntf {
 		Log.v("nebula", "stop recording..");
 	
 		audioRecord.stop();   
-	}
-	
-	private void stopRecording() throws Exception {
-		Log.v("nebula", "stopRecording");
-		isRecording=false;
 	}
 
 	public int frameSize(int payloadType) { return 0; }

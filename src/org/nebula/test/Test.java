@@ -11,111 +11,103 @@ import javax.sip.address.Address;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.HeaderFactory;
+import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
 
+import jlibrtp.Participant;
+
 import org.nebula.sipClient.SIPClient;
+import org.nebula.sipClient.SIPInterface;
 import org.nebula.test.R;
+import org.nebula.utils.Utils;
 
 import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-public class Test extends Activity {    
+public class Test extends Activity implements SIPInterface {    
 	Intent intentRecord;
 	Intent intentPlay;
+	private SIPClient sip;
+	private String myName = "michel";
+	private String myPassword = "michel";
+	private String myAddress;
+	private int myPort = 5062;
+	protected ServiceSender serviceBinder;
 	
 	@Override
-	public void onCreate(Bundle savedInstanceState) {
+	public synchronized void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 		
-		Log.v("nebula", "init activity");
 		intentRecord = new Intent(this, ServiceSender.class);
 		intentPlay = new Intent(this, ServiceReceiver.class);
-		int sendPortRTP = 6030;
-		int sendPortRTCP = 6031;
-		int receivePortRTP = 6032;
-		int receivePortRTCP = 6033;
-		intentRecord.putExtra("portRTP", sendPortRTP);
-		intentRecord.putExtra("portRTCP", sendPortRTCP);
-		intentRecord.putExtra("portRTCP", sendPortRTCP);
-		intentPlay.putExtra("portRTP", receivePortRTP);
-		intentPlay.putExtra("portRTCP", receivePortRTCP);
 		
-		/*Button btnStartRecord=(Button)findViewById(R.id.Button01);
-		Button btnStopRecord=(Button)findViewById(R.id.Button02);
-		    
-		Button btnStartPlay=(Button)findViewById(R.id.Button03);
-		Button btnStopPlay=(Button)findViewById(R.id.Button04);
-		        
-		btnStartRecord.setOnClickListener(new View.OnClickListener() {		
-			@Override
-			public void onClick(View v) {
-					try {
-						startService(intentRecord);
-					} catch (Exception e) {
-						e.printStackTrace();
-					}
-				}
-			});
-		
-		btnStopRecord.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				try {
-					Log.v("nebula", "time to stop");
-					//Intent stopIntent = new Intent(this, ServiceSender.class);
-					stopService(intentRecord);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
+		Log.v("nebula", "Start!");
+		try {
+			myAddress = Utils.getLocalIpAddress();
+			Log.v("nebula", myAddress);
+			sip = new SIPClient(myAddress, myPort, myName, myAddress, myPassword, this);
+			Request request = sip.invite("sujan", "192.16.124.211");
+			Response response = sip.send(request);
+			//Log.v("nebula", response.toString());
+			if(response.getStatusCode() != 200 || response.getRawContent() == null) {
+				Log.v("nebula", response.toString());
+				Log.v("nebula", "Finish..");
+				System.exit(-1);
 			}
-		});
-		
-		btnStartPlay.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				try {
-					startService(intentPlay);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}		
-			}
-		});
-		
-		btnStopPlay.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				try {
-					Log.v("nebula", "time to stop");
-					//Intent stopIntent = new Intent(this, ServiceSender.class);
-					stopService(intentPlay);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
-		});*/
-	}
-	
-	public String getLocalIpAddress() {
-	    try {
-	        for (Enumeration<NetworkInterface> en = NetworkInterface.getNetworkInterfaces(); en.hasMoreElements();) {
-	            NetworkInterface intf = en.nextElement();
-	            for (Enumeration<InetAddress> enumIpAddr = intf.getInetAddresses(); enumIpAddr.hasMoreElements();) {
-	                InetAddress inetAddress = enumIpAddr.nextElement();
-	                if (!inetAddress.isLoopbackAddress()) {
-	                    return inetAddress.getHostAddress().toString();
-	                }
-	            }
-	        }
-	    } catch (SocketException ex) {
-	        Log.e("nebula", ex.toString());
-	    }
-	    return null;
+			String sdp = new String(response.getRawContent());
+			Log.v("nebula", sdp);
+			String ipAddress = SDPUtils.getIPAddress(sdp);
+			int sendPortRTP = 6030;
+			int sendPortRTCP = 6031;
+			int receivePortRTP = 6032;
+			int receivePortRTCP = 6033;
+			
+			intentRecord.putExtra("portRTP", sendPortRTP);
+			intentRecord.putExtra("portRTCP", sendPortRTCP);
+			intentRecord.putExtra("portRTCP", sendPortRTCP);
+			intentPlay.putExtra("portRTP", receivePortRTP);
+			intentPlay.putExtra("portRTCP", receivePortRTCP);
+			
+			ServiceConnection connection = new ServiceConnection() {
+			    public void onServiceDisconnected(ComponentName name) { 
+			        Log.v("nebula", "Disconnected!"); 
+			        serviceBinder = null;
+			    }
+
+				public synchronized void onServiceConnected(ComponentName name, IBinder binder) {
+			        Log.v("nebula", "Connected!"); 
+			        serviceBinder = ((SenderBinder) binder).getService();
+					Log.v("nebula", "notifyAll();");
+			        notifyAll();
+				}  
+			};
+			    
+			bindService(intentRecord, connection, Context.BIND_AUTO_CREATE);
+			Log.v("nebula", "wait();");
+			wait();
+			
+			//ServiceSender service = ((BackgroundServiceBinder)service).getService(); 
+			Participant p = new Participant("130.229.131.172", 5062, 5063);
+			serviceBinder.addParticipant(p);
+			
+			Log.v("nebula", "App finished.");
+			
+			//startService(intentRecord);
+			//startService(intentPlay);
+		} catch (Exception e) {
+			Log.v("nebula", "Error");
+			e.printStackTrace();
+		}
 	}
 
 	public void processRequest(RequestEvent requestReceivedEvent) {

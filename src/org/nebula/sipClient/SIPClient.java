@@ -121,8 +121,7 @@ public class SIPClient implements SipListener {
 	    //ClientTransaction registerTid = 
 	    //	sipProvider.getNewClientTransaction(request);
 
-    	Log.v("nebula", "send a request");
-    	Log.v("nebula", request.toString());
+    	//Log.v("nebula", request.toString());
     	
 		// Create the client transaction.
     	Request r = (Request)request.clone();
@@ -134,10 +133,11 @@ public class SIPClient implements SipListener {
 		
 	    // send the request out.
 	    Tid.sendRequest();
-		if(request.getMethod().equals("REGISTER")) {
+    	Log.v("nebula", "send a request");
+		/*if(request.getMethod().equals("REGISTER")) {
 	    	Log.v("nebula", "wait for register");
-	    	wait();
-		}
+		}*/
+    	wait();
     	Log.v("nebula", "done waiting");
 
 		if (response.getStatusCode() == Response.UNAUTHORIZED) {
@@ -513,6 +513,13 @@ public class SIPClient implements SipListener {
 	 * @see javax.sip.SipListener#processRequest(javax.sip.RequestEvent)
 	 */
 	public void processRequest(RequestEvent requestReceivedEvent) {
+		Log.v("nebula", "Got a request");
+
+		CSeqHeader cseq = (CSeqHeader) response.getHeader(CSeqHeader.NAME);
+		Log.v("nebula", "Response received : Status Code = "
+				+ response.getStatusCode() + " " + cseq);
+		//Log.v("nebula", response);
+		
 		sipint.processRequest(requestReceivedEvent);
 	}
 
@@ -545,18 +552,20 @@ public class SIPClient implements SipListener {
 	 * @see javax.sip.SipListener#processResponse(javax.sip.ResponseEvent)
 	 */
 	public synchronized void processResponse(ResponseEvent responseReceivedEvent) {
-		System.out.println("Got a response");
+		//Log.v("nebula", "Got a response");
 		Response response = (Response) responseReceivedEvent.getResponse();
 		this.response = response;
 		ClientTransaction tid = responseReceivedEvent.getClientTransaction();
 		CSeqHeader cseq = (CSeqHeader) response.getHeader(CSeqHeader.NAME);
 
-		System.out.println("Response received : Status Code = "
-				+ response.getStatusCode() + " " + cseq);
-		System.out.println(response);
-		
-		if(tid.getState() == TransactionState.COMPLETED)
+		//Log.v("nebula", "Response received : Status Code = "
+		//		+ response.getStatusCode() + " " + cseq);
+		//Log.v("nebula", response);
+		Log.v("nebula", tid.getState().toString());
+		if(tid.getState() == TransactionState.COMPLETED || 
+				tid.getState() == TransactionState.TERMINATED) {
 			notify();
+		}
 			
 		if (tid == null) {
 			// RFC3261: MUST respond to every 2xx
@@ -611,6 +620,7 @@ public class SIPClient implements SipListener {
 	 */
 	public void processTimeout(javax.sip.TimeoutEvent timeoutEvent) {
 		System.out.println("Transaction Time out");
+		notify();
 	}
 
 	/*

@@ -323,10 +323,6 @@ public class SIPClient implements SipListener {
 		// add via headers
 		viaHeaders.add(viaHeader);
 
-		// Create ContentTypeHeader
-		ContentTypeHeader contentTypeHeader = headerFactory
-				.createContentTypeHeader("application", "sdp");
-
 		// Create a new CallId header
 		CallIdHeader callIdHeader = sipProvider.getNewCallId();
 
@@ -368,6 +364,10 @@ public class SIPClient implements SipListener {
 				"my header value");
 		request.addHeader(extensionHeader);
 
+		// Create ContentTypeHeader
+		/*ContentTypeHeader contentTypeHeader = headerFactory
+				.createContentTypeHeader("application", "sdp");
+
 		String sdpData = "v=0\r\n"
 				+ "o=4855 13760799956958020 13760799956958020"
 				+ " IN IP4  130.229.131.172\r\n" + "s=mysession session\r\n"
@@ -377,7 +377,7 @@ public class SIPClient implements SipListener {
 				+ "a=rtpmap:18 G729A/8000\r\n" + "a=ptime:20\r\n";
 		byte[] contents = sdpData.getBytes();
 
-		request.setContent(contents, contentTypeHeader);
+		request.setContent(contents, contentTypeHeader);*/
 		// You can add as many extension headers as you
 		// want.
 

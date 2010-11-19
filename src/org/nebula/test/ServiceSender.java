@@ -71,22 +71,32 @@ public class ServiceSender extends Service implements RTPAppIntf  {
 	}
 		
 	protected void sendRTP(byte[] buffer, int size) {
+		int offset=0;
+		byte[] lens = new byte[size];
+		for (int i = 0; (offset + i + 1) < size; i += 2) {
+		    lens[i] = buffer[offset + i + 1];
+		    lens[i + 1] = buffer[offset + i];
+		}
+		for (int i = 1, j = 0; i < size; i += 2, j++) {
+		    lens[j] = lens[i];
+		}
+		
 		Log.v("nebula", "sending");
 		byte[] currentBuffer;
 		if(size <= 1480) {
 			currentBuffer = new byte[size];
-			System.arraycopy(buffer, 0, currentBuffer, 0, size);
+			System.arraycopy(lens, 0, currentBuffer, 0, size);
 			rtpClientSender.sendData(currentBuffer);
 		}
 		else {
 			int i = size;
 			currentBuffer = new byte[1480];
 			while(i > 1480) {
-				System.arraycopy(buffer, size-i, currentBuffer, 0, 1480);
+				System.arraycopy(lens, size-i, currentBuffer, 0, 1480);
 				rtpClientSender.sendData(currentBuffer);
 				i -= 1480;
 			}
-			System.arraycopy(buffer, size-i, currentBuffer, 0, i);
+			System.arraycopy(lens, size-i, currentBuffer, 0, i);
 			rtpClientSender.sendData(currentBuffer);
 		}
 	}
@@ -95,7 +105,7 @@ public class ServiceSender extends Service implements RTPAppIntf  {
 		Log.v("nebula", "call record");
 		int frequency = 11025;
 		int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
-		int audioEncoding = AudioFormat.ENCODING_PCM_8BIT;
+		int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
 	  
 		int bufferSize = AudioRecord.getMinBufferSize(frequency, channelConfiguration,  audioEncoding);
 		AudioRecord audioRecord = new AudioRecord(MediaRecorder.AudioSource.MIC, 

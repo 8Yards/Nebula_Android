@@ -42,6 +42,8 @@ public class Test extends Activity implements SIPInterface {
 	private String myAddress;
 	private int myPort = 5062;
 	protected ServiceSender serviceBinder;
+	String ipAddress;
+	int destPortRTP;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -57,7 +59,24 @@ public class Test extends Activity implements SIPInterface {
 			Log.v("nebula", myAddress);
 			sip = new SIPClient(myAddress, myPort, myName, myAddress, myPassword, this);
 			Request request = sip.invite("sujan", "192.16.124.211");
+
+			// Create ContentTypeHeader
+			ContentTypeHeader contentTypeHeader = SIPClient.getHeaderFactory()
+					.createContentTypeHeader("application", "sdp");
+
+			String sdpData = "v=0\r\n"
+					+ "o=4855 13760799956958020 13760799956958020"
+					+ " IN IP4  "+myAddress+"\r\n" + "s=mysession session\r\n"
+					+ "p=+46 8 52018010\r\n" + "c=IN IP4  "+myAddress+"\r\n"
+					+ "t=0 0\r\n" + "m=audio 6062 RTP/AVP 0 4 18\r\n"
+					+ "a=rtpmap:0 PCMA/8000\r\n" + "a=rtpmap:4 G723/8000\r\n"
+					+ "a=rtpmap:18 G729A/8000\r\n" + "a=ptime:20\r\n";
+			byte[] contents = sdpData.getBytes();
+
+			request.setContent(contents, contentTypeHeader);
+			
 			Response response = sip.send(request);
+			
 			//Log.v("nebula", response.toString());
 			if(response.getStatusCode() != 200 || response.getRawContent() == null) {
 				Log.v("nebula", response.toString());
@@ -66,7 +85,8 @@ public class Test extends Activity implements SIPInterface {
 			}
 			String sdp = new String(response.getRawContent());
 			Log.v("nebula", sdp);
-			String ipAddress = SDPUtils.getIPAddress(sdp);
+			ipAddress = "130.229.159.44";//SDPUtils.getIPAddress(sdp);
+			destPortRTP = 7078;
 			int sendPortRTP = 6030;
 			int sendPortRTCP = 6031;
 			int receivePortRTP = 6032;
@@ -87,8 +107,8 @@ public class Test extends Activity implements SIPInterface {
 				public void onServiceConnected(ComponentName name, IBinder binder) {
 			        Log.v("nebula", "Connected!"); 
 			        serviceBinder = ((SenderBinder) binder).getService();
-			        serviceReady();
-				}  
+			        serviceReady(ipAddress, destPortRTP);
+				}
 			};
 			    
 			bindService(intentRecord, connection, Context.BIND_AUTO_CREATE);
@@ -101,9 +121,9 @@ public class Test extends Activity implements SIPInterface {
 		}
 	}
 	
-	public void serviceReady() {
+	public void serviceReady(String ipAddress, int portRTP) {
 		//ServiceSender service = ((BackgroundServiceBinder)service).getService(); 
-		Participant p = new Participant("130.229.131.172", 7078, 7079);
+		Participant p = new Participant(ipAddress, portRTP, portRTP+1);
 		serviceBinder.addParticipant(p);
 		serviceBinder.startRecording();
 		

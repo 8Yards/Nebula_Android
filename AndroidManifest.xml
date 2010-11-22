@@ -13,10 +13,10 @@
 
 		<activity android:name=".Account" />
 		<activity android:name=".Main" />
-		<activity android:name=".Calculator" />
+		
 		<activity android:name=".Contacts" />
 		<activity android:name=".Conversation" />
-		<activity android:name=".Settings" />
+	
 		<activity android:name=".Addcontacts" />
 		<activity android:name=".Editcontacts" />
 		<activity android:name=".Addgroup" />

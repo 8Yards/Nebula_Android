@@ -44,10 +44,14 @@ public class RESTGroups extends Resource {
 		return r;
 		
 	}
-	//blabla
-//	public Response retrieveGroup(){
-//		return new Response();
-//	}
+	public Response retrieveGroup(Group g) throws JSONException {
+		HashMap<String, String> hM = new HashMap<String, String>();
+		hM.put("id", "" + g.getId());
+		Response r = this.get("retrieveGroup", hM);
+		g.setGroupName("" + r.getResult().get("groupName"));
+		g.setGroupStatus("" + r.getResult().get("status"));
+		return r;
+	} 
 	/**
 	 * 
 	 * @param user List

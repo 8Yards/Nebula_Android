@@ -7,6 +7,7 @@ public class Group {
 	private String groupName;
 	private String groupStatus;
 	private ArrayList<Profile> contacts;
+	private int groupID;
 	/**
 	 * @return the groupName
 	 */
@@ -19,9 +20,11 @@ public class Group {
 	public void setGroupName(String groupName) {
 		this.groupName = groupName;
 	}
+	
 	/**
 	 * @return the groupStatus
 	 */
+	
 	public String getGroupStatus() {
 		return groupStatus;
 	}

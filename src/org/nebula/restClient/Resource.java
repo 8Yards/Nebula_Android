@@ -117,8 +117,8 @@ public abstract class Resource {
 	protected Response get(String method, HashMap<String, String> params) {
 		String requestURL = this.url;
 
-		if(this.data.containsKey("id"))
-			requestURL = requestURL + this.data.get("id") + "/";
+		if(params.containsKey("id"))
+			requestURL = requestURL + params.get("id") + "/";
 
 		String optionsStr = "";
 		Iterator it = params.entrySet().iterator();
@@ -129,7 +129,7 @@ public abstract class Resource {
 		}
 
 		requestURL = requestURL + method;
-
+		Log.e("nebula",requestURL);
 		if(!optionsStr.equals(""))
 			try {
 				requestURL = requestURL + "?" + new UrlEncodedFormEntity(convertToList(params));

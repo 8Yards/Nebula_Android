@@ -52,6 +52,18 @@ public class nebula extends Activity implements SIPInterface {
 		no_nebula = (Button) this.findViewById(R.id.no_nebula);
 		Button btnSign = (Button) findViewById(R.id.login);
 		Log.v("nebula", "saad");
+		
+		setArguments();
+		
+		try {
+			sip = new SIPClient(myAddress, myPort, "",
+					myAddress, "", null);
+		} catch (Exception e2) {
+			// TODO Auto-generated catch block
+			e2.printStackTrace();
+			System.exit(-1);
+		}
+		
 		try {
 
 			btnSign.setOnClickListener(new View.OnClickListener() {
@@ -61,12 +73,11 @@ public class nebula extends Activity implements SIPInterface {
 					vUserName = edit_User.getText().toString();
 					vPass = edit_Pass.getText().toString();
 					try {
-						setArguments();
+						sip.setMySIPName(vUserName);
+						sip.setMyPassword(vPass);
 						
 						Log.v("nebula", myAddress);
 						Log.v("nebula", String.valueOf(myPort));
-						sip = new SIPClient(myAddress, myPort, vUserName,
-								myAddress, vPass, null);
 					} catch (Exception e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();

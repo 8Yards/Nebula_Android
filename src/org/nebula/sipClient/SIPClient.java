@@ -563,7 +563,8 @@ public class SIPClient implements SipListener {
 		//Log.v("nebula", response);
 		Log.v("nebula", tid.getState().toString());
 		if(tid.getState() == TransactionState.COMPLETED || 
-				tid.getState() == TransactionState.TERMINATED) {
+				tid.getState() == TransactionState.TERMINATED || 
+				tid.getState() == TransactionState.TRYING) {
 			notify();
 		}
 			

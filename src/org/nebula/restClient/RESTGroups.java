@@ -44,7 +44,10 @@ public class RESTGroups extends Resource {
 		return r;
 		
 	}
-	
+	//blabla
+//	public Response retrieveGroup(){
+//		return new Response();
+//	}
 	/**
 	 * 
 	 * @param user List

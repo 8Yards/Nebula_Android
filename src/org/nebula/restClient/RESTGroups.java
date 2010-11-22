@@ -3,8 +3,11 @@ package org.nebula.restClient;
 import java.util.ArrayList;
 import java.util.HashMap;
 
+import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.nebula.userData.Group;
+import org.nebula.userData.Groups;
 import org.nebula.userData.Profile;
 
 import android.util.Log;
@@ -50,6 +53,34 @@ public class RESTGroups extends Resource {
 		Response r = this.get("retrieveGroup", hM);
 		g.setGroupName("" + r.getResult().get("groupName"));
 		g.setGroupStatus("" + r.getResult().get("status"));
+		return r;
+	} 
+	
+	public Response retrieveGroups() throws JSONException {
+		Response r = this.get("retrieveGroups");
+//		JSONArray jsonArray = r.getResult().getJSONArray("0");
+//		int size = jsonArray.length();
+//		Log.e("nebula","" + size);
+//	    ArrayList<JSONObject> arrays = new ArrayList<JSONObject>();
+//	    for (int i = 0; i < size; i++) {
+//	        JSONObject jsonObj = jsonArray.getJSONObject(i);
+//	        Log.e("nebula","" + jsonObj);
+//	            //Blah blah blah...
+//	            arrays.add(jsonObj);
+//	    }
+//	    Log.e("nebula","after while");
+//	    JSONObject[] jsons = new JSONObject[arrays.size()];
+//	    arrays.toArray(jsons);
+		Log.e("nebula", "" + r.getResult().getJSONObject("0").get("id"));
+		for (int i=0; i < r.getResult().length();i++)
+		{
+			Group group = new Group();
+			JSONObject jSonObj = r.getResult().getJSONObject("" + i);
+			group.setGroupName(jSonObj.getString("groupName"));
+			group.setId(jSonObj.getInt("id"));
+			group.setGroupStatus(jSonObj.getString("status"));
+			Groups.add(group);
+		}
 		return r;
 	} 
 	/**

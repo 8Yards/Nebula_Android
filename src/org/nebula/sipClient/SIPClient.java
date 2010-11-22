@@ -4,9 +4,6 @@ import javax.sip.*;
 import javax.sip.address.*;
 import javax.sip.header.*;
 import javax.sip.message.*;
-
-import android.util.Log;
-
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -121,27 +118,20 @@ public class SIPClient implements SipListener {
 	    //ClientTransaction registerTid = 
 	    //	sipProvider.getNewClientTransaction(request);
 
-    	//Log.v("nebula", request.toString());
-    	
 		// Create the client transaction.
     	Request r = (Request)request.clone();
 		Tid = sipProvider.getNewClientTransaction(request);
 	
-		//System.out.println(request);
+		System.out.println(request);
 
 		dialog = Tid.getDialog();
 		
 	    // send the request out.
 	    Tid.sendRequest();
-    	Log.v("nebula", "send a request");
-		/*if(request.getMethod().equals("REGISTER")) {
-	    	Log.v("nebula", "wait for register");
-		}*/
-    	wait();
-    	Log.v("nebula", "done waiting");
+		if(request.getMethod().equals("REGISTER"))
+	    	wait();
 
 		if (response.getStatusCode() == Response.UNAUTHORIZED) {
-	    	Log.v("nebula", "unauthorized?");
 			String nonce;
 			String realm;
 			
@@ -323,6 +313,10 @@ public class SIPClient implements SipListener {
 		// add via headers
 		viaHeaders.add(viaHeader);
 
+		// Create ContentTypeHeader
+		ContentTypeHeader contentTypeHeader = headerFactory
+				.createContentTypeHeader("application", "sdp");
+
 		// Create a new CallId header
 		CallIdHeader callIdHeader = sipProvider.getNewCallId();
 
@@ -364,20 +358,16 @@ public class SIPClient implements SipListener {
 				"my header value");
 		request.addHeader(extensionHeader);
 
-		// Create ContentTypeHeader
-		/*ContentTypeHeader contentTypeHeader = headerFactory
-				.createContentTypeHeader("application", "sdp");
-
 		String sdpData = "v=0\r\n"
 				+ "o=4855 13760799956958020 13760799956958020"
-				+ " IN IP4  130.229.131.172\r\n" + "s=mysession session\r\n"
+				+ " IN IP4  129.6.55.78\r\n" + "s=mysession session\r\n"
 				+ "p=+46 8 52018010\r\n" + "c=IN IP4  129.6.55.78\r\n"
-				+ "t=0 0\r\n" + "m=audio 5062 RTP/AVP 0 4 18\r\n"
-				+ "a=rtpmap:0 PCMA/8000\r\n" + "a=rtpmap:4 G723/8000\r\n"
+				+ "t=0 0\r\n" + "m=audio 6022 RTP/AVP 0 4 18\r\n"
+				+ "a=rtpmap:0 PCMU/8000\r\n" + "a=rtpmap:4 G723/8000\r\n"
 				+ "a=rtpmap:18 G729A/8000\r\n" + "a=ptime:20\r\n";
 		byte[] contents = sdpData.getBytes();
 
-		request.setContent(contents, contentTypeHeader);*/
+		request.setContent(contents, contentTypeHeader);
 		// You can add as many extension headers as you
 		// want.
 
@@ -513,13 +503,6 @@ public class SIPClient implements SipListener {
 	 * @see javax.sip.SipListener#processRequest(javax.sip.RequestEvent)
 	 */
 	public void processRequest(RequestEvent requestReceivedEvent) {
-		Log.v("nebula", "Got a request");
-
-		CSeqHeader cseq = (CSeqHeader) response.getHeader(CSeqHeader.NAME);
-		Log.v("nebula", "Response received : Status Code = "
-				+ response.getStatusCode() + " " + cseq);
-		//Log.v("nebula", response);
-		
 		sipint.processRequest(requestReceivedEvent);
 	}
 
@@ -552,20 +535,15 @@ public class SIPClient implements SipListener {
 	 * @see javax.sip.SipListener#processResponse(javax.sip.ResponseEvent)
 	 */
 	public synchronized void processResponse(ResponseEvent responseReceivedEvent) {
-		//Log.v("nebula", "Got a response");
+		System.out.println("Got a response");
 		Response response = (Response) responseReceivedEvent.getResponse();
 		this.response = response;
 		ClientTransaction tid = responseReceivedEvent.getClientTransaction();
 		CSeqHeader cseq = (CSeqHeader) response.getHeader(CSeqHeader.NAME);
 
-		//Log.v("nebula", "Response received : Status Code = "
-		//		+ response.getStatusCode() + " " + cseq);
-		//Log.v("nebula", response);
-		Log.v("nebula", tid.getState().toString());
-		if(tid.getState() == TransactionState.COMPLETED || 
-				tid.getState() == TransactionState.TERMINATED) {
-			notify();
-		}
+		System.out.println("Response received : Status Code = "
+				+ response.getStatusCode() + " " + cseq);
+		System.out.println(response);
 			
 		if (tid == null) {
 			// RFC3261: MUST respond to every 2xx
@@ -579,6 +557,9 @@ public class SIPClient implements SipListener {
 			}			
 			return;
 		}
+		
+		if(tid.getState() == TransactionState.COMPLETED)
+			notify();
 			
 		System.out.println("transaction state is " + tid.getState());
 		System.out.println("Dialog = " + tid.getDialog());
@@ -620,7 +601,6 @@ public class SIPClient implements SipListener {
 	 */
 	public void processTimeout(javax.sip.TimeoutEvent timeoutEvent) {
 		System.out.println("Transaction Time out");
-		notify();
 	}
 
 	/*

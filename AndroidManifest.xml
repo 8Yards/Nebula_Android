@@ -1,34 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-      package="org.nebula.test"
-      android:versionCode="1"
-      android:versionName="1.0">
+	package="android.demo" android:versionCode="1" android:versionName="1.0">
+	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
+	<application android:icon="@drawable/icon" android:label="@string/app_name">
+		<activity android:name=".nebula" android:label="@string/app_name">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
 
-	<uses-permission android:name="android.permission.RECORD_AUDIO" />
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
-    
-    <application android:icon="@drawable/icon" android:label="@string/app_name">
-        <activity android:name=".Test"
-                  android:label="@string/app_name">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-		<service android:enabled="true" android:name=".ServiceSender"> 
-		    <intent-filter> 
-		        <action android:name=".ServiceSender.RECORD" /> 
-		        <action android:name=".ServiceSender.STOP" /> 
-		    </intent-filter> 
-		</service>
-		<service android:enabled="true" android:name=".ServiceReceiver"> 
-		    <intent-filter> 
-		        <action android:name=".ServiceReceiver.RECORD" /> 
-		        <action android:name=".ServiceReceiver.STOP" /> 
-		    </intent-filter> 
-		</service>
 
-    </application>
+		<activity android:name=".Account" />
+		<activity android:name=".Main" />
+		<activity android:name=".Calculator" />
+		<activity android:name=".Contacts" />
+		<activity android:name=".Conversation" />
+		<activity android:name=".Settings" />
+		<activity android:name=".Addcontacts" />
+		<activity android:name=".Editcontacts" />
+		<activity android:name=".Addgroup" />
+	
+	</application>
 
 
 </manifest> 

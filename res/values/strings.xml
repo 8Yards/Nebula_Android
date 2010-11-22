@@ -1,5 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="hello">Hello World, Nebula!</string>
+    
     <string name="app_name">Nebula</string>
+    
+    
+<string name="group_prompt">Choose a group</string>   
+<string-array name="group_prompt">
+        <item>8yards</item>
+        <item>Salcas</item>
+        <item>Other Contact</item>
+        
+    </string-array>
+    <string name="type_prompt">Choose a group type</string>   
+<string-array name="type_prompt">
+        <item>Geographical</item>        
+        <item>Manual</item>
+    </string-array>
+    <string name="main_no_items">No items</string>
 </resources>

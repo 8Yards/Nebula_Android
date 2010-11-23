@@ -2,10 +2,12 @@ package android.demo;
 
 import java.util.ArrayList;
 
+import org.json.JSONException;
 import org.nebula.restClient.RESTClient;
 import org.nebula.restClient.RESTGroups;
 import org.nebula.restClient.Response;
 import org.nebula.userData.Group;
+import org.nebula.userData.Groups;
 import org.nebula.userData.Profile;
 
 import android.app.Activity;
@@ -20,13 +22,12 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class Addcontacts extends Activity {
 	DBClass _DB = new DBClass(this);
 	protected CharSequence[] _options = { "8yards", "Salcas", "Carenet",
-			"Minne" };
+	"Minne" };
 	protected boolean[] _selections = new boolean[_options.length];
 
 	protected Button _optionsButton;
@@ -61,27 +62,27 @@ public class Addcontacts extends Activity {
 
 			public void onClick(View view) {
 				String name = UserData.getInstance().getUserName() ; 
-			     String pass = UserData.getInstance().getUserPassword() ;
+				String pass = UserData.getInstance().getUserPassword() ;
 				RESTClient rc = new RESTClient(name,pass);
-				  //create a virtual profile
-				  RESTGroups rG = new RESTGroups(rc);
-				  Group group = new Group();
+				//create a virtual profile
+				RESTGroups rG = new RESTGroups(rc);
+				Group group = new Group();
 				ArrayList<Profile> aLP = new ArrayList<Profile>();
 				//adding three empty profile as example, we need to manipulate real data
-				  Profile prof1 = new Profile();
-				  prof1.setId(1);
-				  aLP.add(prof1);
-				  Profile prof2 = new Profile();
-				  prof2.setId(2);
-				  aLP.add(prof2);
-				  Profile prof3 = new Profile();
-				  prof3.setId(3);
-				  aLP.add(prof3);
-				  //add the contact into the group
-				  group.setContacts(aLP);
-				  Response r=rG.insertUsersIntoGroup(group);
+				Profile prof1 = new Profile();
+				prof1.setId(1);
+				aLP.add(prof1);
+				Profile prof2 = new Profile();
+				prof2.setId(2);
+				aLP.add(prof2);
+				Profile prof3 = new Profile();
+				prof3.setId(3);
+				aLP.add(prof3);
+				//add the contact into the group
+				group.setContacts(aLP);
+				Response r=rG.insertUsersIntoGroup(group);
 				//insert into database the users
-				
+
 				//_DB.open();
 
 				EditText Edit_user = (EditText) findViewById(R.id.edittext);
@@ -125,32 +126,56 @@ public class Addcontacts extends Activity {
 	}
 
 	@Override
+
+	//Called when the select groups button is loaded for the first time.
 	protected Dialog onCreateDialog(int id) {
+		try {		
+			String name = UserData.getInstance().getUserName() ; 
+			String pass = UserData.getInstance().getUserPassword() ;
+			Log.e("nebula",name + pass);
+			RESTClient rc = new RESTClient(name, pass);
+			RESTGroups rG = new RESTGroups(rc);
+
+			Response r = rG.retrieveGroups();
+			
+			_options = new CharSequence[Groups.size()];
+			for(int i=0;i<Groups.size();i++)
+			{
+				_options[i]=Groups.get(i).getGroupName();
+				Log.e("nebula",Groups.get(i).getGroupName());
+			}
+			
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return new AlertDialog.Builder(this)
-				.setTitle("Select Groups")
-				.setMultiChoiceItems(_options, _selections,
-						new DialogSelectionClickHandler())
+		.setTitle("Select Groups")
+		.setMultiChoiceItems(_options, _selections,
+				new DialogSelectionClickHandler())
 				.setPositiveButton("OK", new DialogButtonClickHandler())
 				.create();
 	}
 
 	public class DialogSelectionClickHandler implements
-			DialogInterface.OnMultiChoiceClickListener {
+	DialogInterface.OnMultiChoiceClickListener {
+		
+		//Log.i("nebula","DialogInterface.OnMultiChoiceClickListener");
+		
 		String mvalue = "";
 		EditText text = (EditText) findViewById(R.id.EditText01);
-		
+
 		public void onClick(DialogInterface dialog, int clicked,
 				boolean selected) {
-			
+
 			Log.i("ME", _options[clicked] + " selected: " + selected);
 			mvalue = mvalue + ", " + _options[clicked];
 			text.setText(mvalue);
-	}
-			
+		}
 	}
 
 	public class DialogButtonClickHandler implements
-			DialogInterface.OnClickListener {
+	DialogInterface.OnClickListener {
 
 		public void onClick(DialogInterface dialog, int clicked) {
 			switch (clicked) {
@@ -169,7 +194,7 @@ public class Addcontacts extends Activity {
 		for (int i = 0; i < _options.length; i++) {
 
 			// text.getText();
-			// Toast.makeText(getApplicationContext(),"_selections[i],Toast.LENGTH_LONG).show();
+			 Toast.makeText(getApplicationContext(),_options[i],Toast.LENGTH_LONG).show();
 		}
 	}
 

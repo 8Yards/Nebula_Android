@@ -4,11 +4,9 @@ import org.nebula.restClient.RESTClient;
 import org.nebula.restClient.RESTGroups;
 import org.nebula.restClient.Response;
 import org.nebula.userData.Group;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -41,31 +39,23 @@ public class Addgroup extends Activity {
 				// contact.setDomain("nebula.com");
 				group.setGroupStatus("Available");
 				Response r = rG.addNewGroup(group);
+
+				Integer result = r.getStatus();
 				
-				Integer result =r.getStatus();
-				//Log.v("nebula", Integer.toString(r.getStatus()));
-				//Toast.makeText(v.getContext(), grpname, Toast.LENGTH_LONG).show();
-				
-				  if (result >= 200 && result<=299) {
-				  Toast.makeText(v.getContext(), "Group Created Successfully",
-				  Toast.LENGTH_LONG).show(); 
-				  Intent intent = new Intent(Addgroup.this, Main.class); 
-				  startActivity(intent);
-				 // Response r=
-				  
-				  } else { Toast.makeText(v.getContext(),grpname+
-				  " Already exist", Toast.LENGTH_LONG).show();
-				 
-				 }
-				/*
-				 * Spinner spinner = (Spinner) findViewById(R.id.spinner);
-				 * ArrayAdapter<CharSequence> adapter =
-				 * ArrayAdapter.createFromResource( this, R.array.type_prompt,
-				 * android.R.layout.simple_spinner_item);
-				 * adapter.setDropDownViewResource
-				 * (android.R.layout.simple_spinner_dropdown_item);
-				 * spinner.setAdapter(adapter);
-				 */
+
+				if (result >= 200 && result <= 299) {
+					Toast.makeText(v.getContext(),
+							"Group " + grpname + " Created", Toast.LENGTH_LONG)
+							.show();
+					Intent intent = new Intent(Addgroup.this, Main.class);
+					startActivity(intent);
+					
+
+				} else {
+					Toast.makeText(v.getContext(), grpname + " Already exist",
+							Toast.LENGTH_LONG).show();
+
+				}
 			}
 		});
 

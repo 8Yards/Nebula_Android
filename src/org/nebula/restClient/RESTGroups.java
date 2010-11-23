@@ -138,7 +138,7 @@ for (Iterator iterator = r.getResult().keys(); iterator.hasNext();) {
 
 	public Response insertUserIntoGroup(Group group, String username) {
 		HashMap<String, Object> hMGroupUser = new HashMap<String, Object>();
-		hMGroupUser.put("'groupID", ""+group.getId());
+		hMGroupUser.put("groupID", group.getId());
 		hMGroupUser.put("username", username);
 		Log.v("nebula","calling");
 		Response groupUser = this.post("insertUserIntoGroup", hMGroupUser);

@@ -135,4 +135,35 @@ for (Iterator iterator = r.getResult().keys(); iterator.hasNext();) {
 		
 		return groupUser;
 	}
+
+	public Response insertUserIntoGroup(Group group, String username) {
+		HashMap<String, Object> hMGroupUser = new HashMap<String, Object>();
+		hMGroupUser.put("'groupID", ""+group.getId());
+		hMGroupUser.put("username", username);
+		Log.v("nebula","calling");
+		Response groupUser = this.post("insertUserIntoGroup", hMGroupUser);
+		Log.v("nebula",""+groupUser.getStatus());
+		Log.v("nebula",""+groupUser.getResult());
+		return null;
+	}
+	
+	public Response addContact(String contactUsername) {
+		HashMap<String, Object> hMGroupUser = new HashMap<String, Object>();
+		hMGroupUser.put("username", contactUsername);
+		hMGroupUser.put("nickname", contactUsername);
+		Response groupUser = this.post("addContact", hMGroupUser);
+//		Log.v("nebula",""+groupUser.getStatus());
+//		Log.v("nebula",""+groupUser.getResult());
+		return null;
+	}
+	
+	public Response addContact(String contactUsername, String contactNickName) {
+		HashMap<String, Object> hMGroupUser = new HashMap<String, Object>();
+		hMGroupUser.put("username", contactUsername);
+		hMGroupUser.put("nickname", contactNickName);
+		Response groupUser = this.post("addContact", hMGroupUser);
+//		Log.v("nebula",""+groupUser.getStatus());
+//		Log.v("nebula",""+groupUser.getResult());
+		return null;
+	}
 }

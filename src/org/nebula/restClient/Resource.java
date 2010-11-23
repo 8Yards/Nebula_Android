@@ -181,7 +181,7 @@ public abstract class Resource {
 			requestURL = requestURL + this.data.get("id") + "/";
 
 		requestURL += method;
-
+		Log.e("nebula",requestURL);
 		HttpPost httppost = new HttpPost(requestURL);
 		try {
 			JSONObject JSON = new JSONObject(options);

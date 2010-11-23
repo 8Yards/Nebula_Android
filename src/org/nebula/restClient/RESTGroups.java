@@ -2,6 +2,7 @@ package org.nebula.restClient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -9,8 +10,10 @@ import org.json.JSONObject;
 import org.nebula.userData.Group;
 import org.nebula.userData.Groups;
 import org.nebula.userData.Profile;
+import org.nebula.userData.Profiles;
 
 import android.util.Log;
+import android.util.TypedValue;
 
 public class RESTGroups extends Resource {
 
@@ -58,19 +61,7 @@ public class RESTGroups extends Resource {
 	
 	public Response retrieveGroups() throws JSONException {
 		Response r = this.get("retrieveGroups");
-//		JSONArray jsonArray = r.getResult().getJSONArray("0");
-//		int size = jsonArray.length();
-//		Log.e("nebula","" + size);
-//	    ArrayList<JSONObject> arrays = new ArrayList<JSONObject>();
-//	    for (int i = 0; i < size; i++) {
-//	        JSONObject jsonObj = jsonArray.getJSONObject(i);
-//	        Log.e("nebula","" + jsonObj);
-//	            //Blah blah blah...
-//	            arrays.add(jsonObj);
-//	    }
-//	    Log.e("nebula","after while");
-//	    JSONObject[] jsons = new JSONObject[arrays.size()];
-//	    arrays.toArray(jsons);
+
 		Log.e("nebula", "" + r.getResult().getJSONObject("0").get("id"));
 		for (int i=0; i < r.getResult().length();i++)
 		{
@@ -83,6 +74,44 @@ public class RESTGroups extends Resource {
 		}
 		return r;
 	} 
+	
+public Response retrieveAllGroupsMembers() throws JSONException {
+		
+	Response r = this.get("retrieveAllGroupsMembers");
+//	Log.e("nebula", ""+r.getStatus());
+//	Log.e("nebula", ""+r.getResult());
+//	Log.e("nebula", ""+r.getResult().getJSONObject("Group1"));
+//	Log.e("nebula", ""+r.getResult().getJSONObject("Group1").getJSONObject(""+0));
+	
+for (Iterator iterator = r.getResult().keys(); iterator.hasNext();) {
+	//Log.e("nebula", ""+iterator.next());
+	String groupName = ""+iterator.next();
+	JSONObject jsonObj = r.getResult().getJSONObject(groupName);
+	
+	
+	//group.setId(jSonObj1.getInt("id"));
+	Profiles profiles = new Profiles();
+	JSONObject jsonObj1 = null;
+	//the length of the array o
+	int limit = jsonObj.length()/4;
+	for (int i=0; i < jsonObj.length()/4;i++)
+	{
+		//retrieve all the group members
+		jsonObj1 = jsonObj.getJSONObject("" + i);
+		Log.e("nebula", "len:" + jsonObj.length());
+		Profile prof = new Profile(jsonObj1);
+		
+		profiles.add(prof);
+	}
+	
+	//retrive Group name, id and status
+	Group group = new Group(jsonObj, groupName, profiles.returnProfiles());
+	group.setContacts(profiles.returnProfiles());
+	Groups.add(group);
+	Log.e("nebula", "group Added");
+	}
+	return r;
+}
 	/**
 	 * 
 	 * @param user List

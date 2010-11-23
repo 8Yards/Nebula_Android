@@ -1,5 +1,10 @@
 package org.nebula.userData;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import android.util.Log;
+
 public class Profile {
 	private int id;
 	private String username;
@@ -23,6 +28,16 @@ public class Profile {
 		address = "";
 		password = "";
 		email_address = "";
+	}
+	public Profile(JSONObject jsonObject) throws JSONException{
+		this.address = jsonObject.getString("address");
+		this.domain = jsonObject.getString("domain");
+		this.email_address = jsonObject.getString("email_address");
+		this.fullName = jsonObject.getString("fullName");
+		this.phoneNumber = jsonObject.getString("phoneNumber");
+		this.status = jsonObject.getString("status");
+		this.username = jsonObject.getString("username");
+		
 	}
 	
 	/**

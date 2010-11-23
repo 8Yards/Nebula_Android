@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import org.json.JSONException;
 import org.nebula.userData.Profile;
+import org.nebula.userData.Profiles;
 
 import android.util.Log;
 
@@ -49,4 +50,5 @@ public class RESTProfiles extends Resource {
 	public Response retrieveAllMyGroups() {
 		return this.get("retrieveGroups");
 	}
+
 }

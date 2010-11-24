@@ -9,7 +9,8 @@
          android:textSize="16px"
          android:textStyle="bold"         
          android:layout_width="250px"
-         android:layout_height="wrap_content"/>         
+         android:layout_height="wrap_content"
+         android:textColor="#ffa500"/>         
  <CheckBox android:id="@+id/check1"
            android:focusable="false"
            android:layout_width="100px"

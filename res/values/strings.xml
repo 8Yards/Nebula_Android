@@ -4,11 +4,12 @@
     <string name="app_name">Nebula</string>
     
     
-<string name="group_prompt">Choose a group</string>   
+<string name="group_prompt"></string>   
 <string-array name="group_prompt">
-        <item>8yards</item>
-        <item>Salcas</item>
-        <item>Other Contact</item>
+<item>Available</item>
+        <item>Busy</item>
+        <item>Away</item>
+        <item>Offline</item>
         
     </string-array>
     <string name="type_prompt">Choose a group type</string>   

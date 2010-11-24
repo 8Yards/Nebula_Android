@@ -47,7 +47,8 @@ android:layout_width="200px"
 android:layout_height="40px"
 android:text="Sign in"
 android:layout_y="227px"
-android:layout_x="60px">
+android:layout_x="60px"
+android:onClick="doSignInToNebula">
 </Button>
 <ImageView
 android:id="@+id/widget51"
@@ -71,7 +72,8 @@ android:layout_width="200px"
 android:layout_height="40px"
 android:text="Create Account"
 android:layout_y="310px"
-android:layout_x="60px">
+android:layout_x="60px"
+android:onClick="doRegisterToNebula">
 </Button>
 <TextView
 android:id="@+id/widget45"

@@ -54,6 +54,7 @@ public class Utils {
 		return response;
 	}
 
+	//TODO: throw exception
 	public static String md5(String plaintext) {
 		MessageDigest m = null;
 		try {

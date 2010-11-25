@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LinearLayout
+		xmlns:android="http://schemas.android.com/apk/res/android"
+         android:orientation="vertical"
+         android:layout_width="fill_parent" 
+         android:layout_height="fill_parent"        >
+ 
+     <ExpandableListView android:id="@+id/android:list" 
+     		  android:layout_width="fill_parent" 
+              android:layout_height="fill_parent"                
+              android:dividerHeight="8px"
+              android:divider="#000000" 
+              android:childDivider="#000000" 
+              android:paddingTop="5px"/>
+ 
+     <TextView android:id="@+id/android:empty"
+               android:layout_width="fill_parent" 
+               android:layout_height="fill_parent"
+               android:text="No groups and contacts"
+               android:paddingTop="8px"/>
+</LinearLayout>

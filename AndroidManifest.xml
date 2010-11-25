@@ -11,6 +11,7 @@
 			</intent-filter>
 		</activity>
 		<activity android:name=".activities.Login"></activity>
+		<activity android:name=".activities.ContactsTab"></activity>
 
 	</application>
 	<uses-permission android:name="android.permission.INTERNET"></uses-permission>

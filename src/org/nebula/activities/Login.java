@@ -23,8 +23,8 @@ public class Login extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login);
 
-		userName = (EditText) findViewById(R.id.txtUserID);
-		password = (EditText) findViewById(R.id.txtPass);
+		userName = (EditText) findViewById(R.id.etUserID);
+		password = (EditText) findViewById(R.id.etPassword);
 	}
 
 	public void doSignInToNebula(View v) {
@@ -33,8 +33,8 @@ public class Login extends Activity {
 		setResult(status);
 
 		if (status == SIPManager.LOGIN_SUCCESSFUL) {
-			showAlert("Good credentials :D");
-			//finish();
+			//showAlert("Good credentials :D");
+			finish();
 		} else if (status == SIPManager.LOGIN_FAILURE) {
 			showAlert("Bad credentials :P");
 		}

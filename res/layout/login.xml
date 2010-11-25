@@ -5,7 +5,7 @@ android:layout_width="fill_parent"
 android:layout_height="fill_parent"
 xmlns:android="http://schemas.android.com/apk/res/android">
 <TextView
-android:id="@+id/user"
+android:id="@+id/tvUserName"
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
 android:text="Username"
@@ -14,7 +14,7 @@ android:layout_y="86px"
 >
 </TextView>
 <EditText
-android:id="@+id/txtUserID"
+android:id="@+id/etUserID"
 android:layout_width="226px"
 android:layout_height="50px"
 android:textSize="18sp"
@@ -23,7 +23,7 @@ android:layout_y="105px"
 >
 </EditText>
 <TextView
-android:id="@+id/pass"
+android:id="@+id/tvPassword"
 android:layout_width="wrap_content"
 android:layout_height="19px"
 android:text="Password"
@@ -32,7 +32,7 @@ android:layout_y="155px"
 >
 </TextView>
 <EditText
-android:id="@+id/txtPass"
+android:id="@+id/etPassword"
 android:layout_width="226px"
 android:layout_height="50px"
 android:textSize="18sp"
@@ -42,7 +42,7 @@ android:layout_y="175px"
 >
 </EditText>
 <Button
-android:id="@+id/login"
+android:id="@+id/bSignIn"
 android:layout_width="200px"
 android:layout_height="40px"
 android:text="Sign in"
@@ -51,7 +51,7 @@ android:layout_x="60px"
 android:onClick="doSignInToNebula">
 </Button>
 <ImageView
-android:id="@+id/widget51"
+android:id="@+id/ivNebula"
 android:layout_width="226px"
 android:layout_height="73px"
 android:src="@drawable/nebula"
@@ -60,14 +60,14 @@ android:layout_y="8px"
 >
 </ImageView>
 <TextView
-android:id="@+id/widget43"
+android:id="@+id/tvNoAccount"
 android:layout_height="wrap_content"
 android:text="Dont have Nebula Account yet?"
 android:layout_x="59px"
 android:layout_y="272px" android:layout_width="210px">
 </TextView>
 <Button
-android:id="@+id/no_nebula"
+android:id="@+id/bCreateAccount"
 android:layout_width="200px"
 android:layout_height="40px"
 android:text="Create Account"
@@ -76,7 +76,7 @@ android:layout_x="60px"
 android:onClick="doRegisterToNebula">
 </Button>
 <TextView
-android:id="@+id/widget45"
+android:id="@+id/tvCreateNewAccount"
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
 android:text="Create a new Account"

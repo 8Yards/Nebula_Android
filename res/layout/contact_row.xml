@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content">
+
+    <TextView android:id="@+id/tvContactName"
+         android:paddingLeft="50px"
+         android:focusable="false"
+         android:textSize="14px"
+         android:textStyle="bold"
+         android:layout_width="250px"
+         android:layout_height="wrap_content"/>
+    
+    <CheckBox android:id="@+id/cbCheckContact"
+           android:focusable="false"
+           android:layout_width="100px"
+           android:layout_height="wrap_content"/>
+
+</LinearLayout>

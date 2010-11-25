@@ -1,10 +1,11 @@
+/*
+ * author- marco, michel
+ * refactor - prajwol, marco
+ */
 package org.nebula.client.rest;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -20,10 +21,15 @@ import org.apache.http.NameValuePair;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.AuthState;
 import org.apache.http.auth.Credentials;
+import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.*;
+import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPut;
+import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.protocol.ClientContext;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.auth.BasicScheme;
@@ -32,9 +38,13 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.protocol.ExecutionContext;
 import org.apache.http.protocol.HTTP;
 import org.apache.http.protocol.HttpContext;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.nebula.main.NebulaApplication;
+import org.nebula.models.MyIdentity;
+import org.nebula.utils.Base64;
+import org.nebula.utils.Utils;
 
-//import android.util.Base64;
 import android.util.Log;
 
 /*
@@ -45,18 +55,10 @@ import android.util.Log;
 public abstract class Resource {
 	protected String url;
 	protected HashMap<String, Object> data = new HashMap<String, Object>();
-	private RESTClient rc;
+	private MyIdentity myIdentity;
 
-	/*
-	 * Constructor
-	 */
-	public Resource() {
-		this((RESTClient) null, "");
-	}
-
-	public Resource(RESTClient rc, String context) {
-		this.setRc(rc);
-		this.url = this.getRc().getServerIP() + "/" + context + "/";
+	public Resource(String context) {
+		this(null, context);
 	}
 
 	/*
@@ -65,13 +67,13 @@ public abstract class Resource {
 	 * @param data element parameters
 	 */
 	public Resource(HashMap<String, Object> data) {
-		this();
-		this.data = data;
+		this(data, "");
 	}
 
-	public Resource(RESTClient rc, HashMap<String, Object> data, String context) {
-		this((RESTClient) null, context);
+	public Resource(HashMap<String, Object> data, String context) {
+		myIdentity = NebulaApplication.getInstance().getMyIdentity();
 		this.data = data;
+		this.url = myIdentity.getRestServerIP() + "/" + context + "/";
 	}
 
 	/*
@@ -90,7 +92,7 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	public Response get() {
+	public Response get() throws ClientProtocolException, IOException, JSONException {
 		return get("", new HashMap<String, String>());
 	}
 
@@ -101,7 +103,7 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response get(String method) {
+	protected Response get(String method) throws ClientProtocolException, IOException, JSONException {
 		return get(method, new HashMap<String, String>());
 	}
 
@@ -112,7 +114,7 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response get(HashMap<String, String> params) {
+	protected Response get(HashMap<String, String> params) throws ClientProtocolException, IOException, JSONException {
 		return get("", params);
 	}
 
@@ -125,7 +127,8 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response get(String method, HashMap<String, String> params) {
+	protected Response get(String method, HashMap<String, String> params)
+			throws ClientProtocolException, IOException, JSONException {
 		String requestURL = this.url;
 
 		if (params.containsKey("id"))
@@ -141,15 +144,9 @@ public abstract class Resource {
 		}
 
 		requestURL = requestURL + method;
-		Log.e("nebula", requestURL);
 		if (!optionsStr.equals(""))
-			try {
-				requestURL = requestURL + "?"
-						+ new UrlEncodedFormEntity(convertToList(params));
-			} catch (UnsupportedEncodingException e) {
-				e.printStackTrace();
-				System.exit(-1);
-			}
+			requestURL = requestURL + "?"
+					+ new UrlEncodedFormEntity(convertToList(params));
 
 		HttpGet httpget = new HttpGet(requestURL);
 		return send_and_receive(httpget);
@@ -160,7 +157,7 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response post() {
+	protected Response post() throws ClientProtocolException, IOException, JSONException {
 		return post("", new HashMap<String, Object>());
 	}
 
@@ -171,7 +168,7 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response post(String method) {
+	protected Response post(String method) throws ClientProtocolException, IOException, JSONException {
 		return post(method, new HashMap<String, Object>());
 	}
 
@@ -182,7 +179,7 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response post(HashMap<String, Object> options) {
+	protected Response post(HashMap<String, Object> options) throws ClientProtocolException, IOException, JSONException {
 		return post("", options);
 	}
 
@@ -195,7 +192,8 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response post(String method, HashMap<String, Object> options) {
+	protected Response post(String method, HashMap<String, Object> options)
+			throws ClientProtocolException, IOException, JSONException {
 		String requestURL = this.url;
 
 		if (this.data.containsKey("id"))
@@ -204,18 +202,12 @@ public abstract class Resource {
 		requestURL += method;
 		Log.e("nebula", requestURL);
 		HttpPost httppost = new HttpPost(requestURL);
-		try {
-			JSONObject JSON = new JSONObject(options);
-			StringEntity se = new StringEntity(JSON.toString(), HTTP.UTF_8);
-			se.setContentType("application/json");
-			httppost
-					.setHeader("Content-Type", "application/json;charset=UTF-8");
+		JSONObject JSON = new JSONObject(options);
+		StringEntity se = new StringEntity(JSON.toString(), HTTP.UTF_8);
+		se.setContentType("application/json");
+		httppost.setHeader("Content-Type", "application/json;charset=UTF-8");
 
-			httppost.setEntity(se);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
+		httppost.setEntity(se);
 
 		return send_and_receive(httppost);
 	}
@@ -225,7 +217,7 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response put() {
+	protected Response put() throws ClientProtocolException, IOException, JSONException {
 		return put("", new HashMap<String, Object>());
 	}
 
@@ -236,7 +228,7 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response put(String method) {
+	protected Response put(String method) throws ClientProtocolException, IOException, JSONException {
 		return put(method, new HashMap<String, Object>());
 	}
 
@@ -247,7 +239,7 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response put(HashMap<String, Object> options) {
+	protected Response put(HashMap<String, Object> options) throws ClientProtocolException, IOException, JSONException {
 		return put("", options);
 	}
 
@@ -260,7 +252,8 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response put(String method, HashMap<String, Object> options) {
+	protected Response put(String method, HashMap<String, Object> options)
+			throws ClientProtocolException, IOException, JSONException {
 		String requestURL = this.url;
 
 		if (this.data.containsKey("id"))
@@ -269,16 +262,11 @@ public abstract class Resource {
 		requestURL += method;
 
 		HttpPut httpput = new HttpPut(requestURL);
-		try {
-			JSONObject JSON = new JSONObject(options);
-			StringEntity se = new StringEntity(JSON.toString(), HTTP.UTF_8);
-			se.setContentType("application/json");
-			httpput.setHeader("Content-Type", "application/json;charset=UTF-8");
-			httpput.setEntity(se);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
+		JSONObject JSON = new JSONObject(options);
+		StringEntity se = new StringEntity(JSON.toString(), HTTP.UTF_8);
+		se.setContentType("application/json");
+		httpput.setHeader("Content-Type", "application/json;charset=UTF-8");
+		httpput.setEntity(se);
 
 		return send_and_receive(httpput);
 	}
@@ -288,7 +276,7 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response delete() {
+	protected Response delete() throws ClientProtocolException, IOException, JSONException {
 		String requestURL = this.url;
 
 		if (this.data.containsKey("id"))
@@ -305,7 +293,7 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response delete(String id) {
+	protected Response delete(String id) throws ClientProtocolException, IOException, JSONException {
 		String requestURL = this.url + id + "/";
 		HttpDelete httpdelete = new HttpDelete(requestURL);
 		return send_and_receive(httpdelete);
@@ -358,17 +346,17 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response send_and_receive(HttpUriRequest request) {
+	protected Response send_and_receive(HttpUriRequest request)
+			throws ClientProtocolException, IOException, JSONException {
 		HttpClient httpclient = new DefaultHttpClient();
 
-		if (this.getRc() == null)
+		if (myIdentity == null) {
 			return null;
+		}
 
-		Log.v("nebula", this.getRc().getUsername());
-		if (this.getRc().getUsername() != "") {
-			Log.v("nebula", "authentication");
-			String username = this.getRc().getUsername();
-			String password = this.getRc().getPassword();
+		if (myIdentity.getMyUserName() != "") {
+			String username = myIdentity.getMyUserName();
+			String password = myIdentity.getMyPassword();
 
 			byte[] concat = new byte[username.length() + password.length() + 1];
 			System.arraycopy(username.getBytes(), 0, concat, 0, username
@@ -377,74 +365,19 @@ public abstract class Resource {
 			System.arraycopy(password.getBytes(), 0, concat,
 					username.length() + 1, password.length());
 
-			// byte[] base64 = Base64.encode(concat, 0);
 			String base64 = Base64.encode(username + ":" + password);
-
-			// request.addHeader("Authorization", "Basic "+new
-			// String(base64).replace("\n", ""));
 			request.addHeader("Authorization", "Basic "
 					+ base64.replace("\r\n", ""));
-			// Log.v("nebula", "-"+base64+"-");
 		}
-		HttpResponse response;
+		HttpResponse response = httpclient.execute(request);
+		InputStream instream = response.getEntity().getContent();
+		String result = Utils.convertStreamToString(instream);
+		int status = response.getStatusLine().getStatusCode();
 
-		try {
-			response = httpclient.execute(request);
-			InputStream instream = response.getEntity().getContent();
-			String result = convertStreamToString(instream);
-			int status = response.getStatusLine().getStatusCode();
-
-			try {
-				if (status >= 200 && status < 300) {
-					return new Response(status, new JSONObject(result));
-				} else {
-					System.out.println(result);
-					return new Response(status);
-				}
-			} catch (Exception e) {
-				System.out.println(result);
-				e.printStackTrace();
-				System.exit(-1);
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-			System.exit(-1);
-		}
-		return null;
-	}
-
-	/*
-	 * convert a stream into a String
-	 * 
-	 * @param inputStream The stream
-	 * 
-	 * @return result The string
-	 */
-	public String convertStreamToString(InputStream inputStream)
-			throws IOException {
-		if (inputStream != null) {
-			StringBuilder sb = new StringBuilder();
-			String line;
-			try {
-				BufferedReader reader = new BufferedReader(
-						new InputStreamReader(inputStream, "UTF-8"));
-				while ((line = reader.readLine()) != null) {
-					sb.append(line).append("\n");
-				}
-			} finally {
-				inputStream.close();
-			}
-			return sb.toString();
+		if (status >= 200 && status < 300) {
+			return new Response(status, new JSONObject(result));
 		} else {
-			return "";
+			return new Response(status);
 		}
-	}
-
-	public void setRc(RESTClient rc) {
-		this.rc = rc;
-	}
-
-	public RESTClient getRc() {
-		return rc;
 	}
 }

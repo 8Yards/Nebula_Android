@@ -11,13 +11,15 @@ public class MyIdentity {
 	private String myIP;
 	private int mySIPPort;
 	private int myRTPPort;
-	private String mySIPName;
+	private String myUserName;
 	private String myPassword;
 	private String mySIPDomain;
 
 	private String sipServerIP;
 	private Integer sipServerPort;
 	private String sipServerName;
+	
+	private String restServerIP;
 
 	private List<Group> myGroups;
 
@@ -31,10 +33,12 @@ public class MyIdentity {
 		sipServerIP = "192.16.124.211";
 		sipServerPort = 5060;
 		sipServerName = "Opensips";
+		
+		restServerIP = "http://192.16.124.211/REST";
 	}
 
 	public String getMySIPURI() {
-		return "sip:" + mySIPName + "@" + mySIPDomain;
+		return "sip:" + myUserName + "@" + mySIPDomain;
 	}
 
 	public String getMyIP() {
@@ -61,12 +65,12 @@ public class MyIdentity {
 		this.myRTPPort = myRTPPort;
 	}
 
-	public String getMySIPName() {
-		return mySIPName;
+	public String getMyUserName() {
+		return myUserName;
 	}
 
-	public void setMySIPName(String mySIPName) {
-		this.mySIPName = mySIPName;
+	public void setMyUserName(String myUserName) {
+		this.myUserName = myUserName;
 	}
 
 	public String getMyPassword() {
@@ -115,6 +119,14 @@ public class MyIdentity {
 
 	public void setMyGroups(List<Group> myGroups) {
 		this.myGroups = myGroups;
+	}
+
+	public String getRestServerIP() {
+		return restServerIP;
+	}
+
+	public void setRestServerIP(String restServerIP) {
+		this.restServerIP = restServerIP;
 	}
 
 }

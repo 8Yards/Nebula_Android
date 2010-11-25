@@ -3,26 +3,19 @@
  */
 package org.nebula.main;
 
-import java.util.List;
-
 import javax.sip.RequestEvent;
 
-import org.json.JSONException;
-import org.nebula.client.rest.RESTClient;
 import org.nebula.client.rest.RESTGroupManager;
 import org.nebula.client.sip.SIPInterface;
-import org.nebula.models.Group;
 import org.nebula.models.MyIdentity;
 import org.nebula.services.SIPClient;
 
 import android.app.Application;
-import android.util.Log;
 
 public class NebulaApplication extends Application implements SIPInterface {
 	private static NebulaApplication singleton;
 
 	private MyIdentity myIdentity = null;
-	private List<Group> myGroups = null;
 	private SIPClient mySIPClient = null;
 
 	public static NebulaApplication getInstance() {
@@ -51,15 +44,12 @@ public class NebulaApplication extends Application implements SIPInterface {
 	}
 
 	public void reloadMyGroups() {
-		RESTGroupManager rG = new RESTGroupManager(new RESTClient(
-				myIdentity.getMySIPName(), myIdentity.getMyPassword()));
+		RESTGroupManager rG = new RESTGroupManager();
 
 		try {
-			myGroups = rG.retrieveAllGroupsMembers();
-			Log.v("nebula", "Groups found: " + myGroups.size() + " Profiles found in first group: " + myGroups.get(0).getContacts().size());
-		} catch (JSONException e) {
-			Log.e("nebula", "Groups cannot be fetched: " + e.getMessage());
-			myGroups = null;
+			myIdentity.setMyGroups(rG.retrieveAllGroupsMembers());
+		} catch (Exception e) {
+			// do nothing here since the old group is preserved
 		}
 	}
 
@@ -69,14 +59,6 @@ public class NebulaApplication extends Application implements SIPInterface {
 
 	public void setMyIdentity(MyIdentity myIdentity) {
 		this.myIdentity = myIdentity;
-	}
-
-	public List<Group> getMyGroups() {
-		return myGroups;
-	}
-
-	public void setMyGroups(List<Group> myGroups) {
-		this.myGroups = myGroups;
 	}
 
 	public SIPClient getMySIPClient() {

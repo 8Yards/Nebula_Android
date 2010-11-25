@@ -5,21 +5,24 @@
 
 package org.nebula.client.rest;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.nebula.models.Group;
 
 public class RESTGroupManager extends Resource {
 
-	public RESTGroupManager(RESTClient rc) {
-		super(rc, "RESTGroups");
+	public RESTGroupManager() {
+		super("RESTGroups");
 	}
 
-	public List<Group> retrieveAllGroupsMembers() throws JSONException {
+	public List<Group> retrieveAllGroupsMembers() throws JSONException,
+			ClientProtocolException, IOException {
 		Response r = this.get("retrieveAllGroupsMembers");
 		List<Group> myGroups = new ArrayList<Group>();
 
@@ -29,7 +32,7 @@ public class RESTGroupManager extends Resource {
 
 			myGroups.add(new Group(groupObj, groupName));
 		}
-		
+
 		return myGroups;
 	}
 

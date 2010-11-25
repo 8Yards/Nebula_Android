@@ -3,7 +3,10 @@
  */
 package org.nebula.utils;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.math.BigInteger;
 import java.net.Inet4Address;
 import java.net.InetAddress;
@@ -34,10 +37,10 @@ public class Utils {
 		ServerSocket ss = new ServerSocket(0);
 		int randomPort = ss.getLocalPort();
 		ss.close();
-		
-		//TODO: may be remove this :)
+
+		// TODO: may be remove this :)
 		randomPort = 9876;
-		
+
 		return randomPort;
 	}
 
@@ -54,7 +57,7 @@ public class Utils {
 		return response;
 	}
 
-	//TODO: throw exception
+	// TODO: throw exception
 	public static String md5(String plaintext) {
 		MessageDigest m = null;
 		try {
@@ -73,4 +76,22 @@ public class Utils {
 		return hashtext;
 	}
 
+	public static String convertStreamToString(InputStream inputStream)
+			throws IOException {
+		if (inputStream != null) {
+			StringBuilder sb = new StringBuilder();
+			String line;
+			BufferedReader reader = new BufferedReader(new InputStreamReader(
+					inputStream, "UTF-8"));
+
+			while ((line = reader.readLine()) != null) {
+				sb.append(line).append("\n");
+			}
+			inputStream.close();
+			
+			return sb.toString();
+		} else {
+			return "";
+		}
+	}
 }

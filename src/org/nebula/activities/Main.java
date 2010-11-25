@@ -26,8 +26,8 @@ public class Main extends TabActivity {
 
 		// TODO: extract the code to appropriate place
 		myIdentity = NebulaApplication.getInstance().getMyIdentity();
-		if (myIdentity == null || myIdentity.getMySIPName() == null
-				|| myIdentity.getMySIPName().trim().equals("")) {
+		if (myIdentity == null || myIdentity.getMyUserName() == null
+				|| myIdentity.getMyUserName().trim().equals("")) {
 			// user is not logged in. start the login activity
 			Intent myIntent = new Intent(Main.this, Login.class);
 			startActivityForResult(myIntent, SHOW_SUB_ACTIVITY_LOGIN);

@@ -19,14 +19,14 @@ public class SIPManager {
 		try {
 			SIPClient sip = NebulaApplication.getInstance().getMySIPClient();
 			MyIdentity myIdentity = NebulaApplication.getInstance().getMyIdentity();
-			myIdentity.setMySIPName(userName);
+			myIdentity.setMyUserName(userName);
 			myIdentity.setMyPassword(password);
 			
 			Response response = sip.send(sip.register());
 			if (response.getStatusCode() == 200) {
 				return LOGIN_SUCCESSFUL;
 			} else {
-				myIdentity.setMySIPName("");
+				myIdentity.setMyUserName("");
 				myIdentity.setMyPassword("");
 				throw new Exception("Invalid credentials");
 			}

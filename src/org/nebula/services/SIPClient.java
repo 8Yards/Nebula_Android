@@ -105,11 +105,11 @@ public class SIPClient implements SipListener {
 
 	private ContactHeader createContactHeader() throws ParseException {
 		SipURI contactURI = addressFactory.createSipURI(myIdentity
-				.getMySIPName(), myIdentity.getSipServerIP());
+				.getMyUserName(), myIdentity.getSipServerIP());
 		contactURI.setPort(sipProvider.getListeningPoint(transport).getPort());
 
 		Address contactAddress = addressFactory.createAddress(contactURI);
-		contactAddress.setDisplayName(myIdentity.getMySIPName());
+		contactAddress.setDisplayName(myIdentity.getMyUserName());
 
 		return headerFactory.createContactHeader(contactAddress);
 	}
@@ -148,7 +148,7 @@ public class SIPClient implements SipListener {
 				m = p.matcher(ha);
 				if (m.find()) {
 					realm = m.group(1);
-					String username = myIdentity.getMySIPName();
+					String username = myIdentity.getMyUserName();
 					String password = myIdentity.getMyPassword();
 					String uri = myIdentity.getMySIPURI();
 
@@ -191,12 +191,12 @@ public class SIPClient implements SipListener {
 	 */
 	public Request register() throws Exception {
 		SipURI requestURI = addressFactory.createSipURI(myIdentity
-				.getMySIPName(), myIdentity.getSipServerIP());
+				.getMyUserName(), myIdentity.getSipServerIP());
 		CallIdHeader callIdHeader = getNewCallIdHeader();
 		CSeqHeader cSeqHeader = getCSeqHeader(Request.REGISTER);
 		FromHeader fromHeader = (FromHeader) getHeader(myIdentity
-				.getMySIPName(), myIdentity.getMySIPDomain(), true);
-		ToHeader toHeader = (ToHeader) getHeader(myIdentity.getMySIPName(),
+				.getMyUserName(), myIdentity.getMySIPDomain(), true);
+		ToHeader toHeader = (ToHeader) getHeader(myIdentity.getMyUserName(),
 				myIdentity.getMySIPDomain(), false);
 		List<ViaHeader> viaHeaders = getViaHeaders();
 		MaxForwardsHeader maxForwards = getMaxForwardsHeader();

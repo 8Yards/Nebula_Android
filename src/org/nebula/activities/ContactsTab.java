@@ -34,7 +34,7 @@ public class ContactsTab extends ExpandableListActivity {
 	}
 
 	private void reloadContactList() {
-		List<Group> myGroups = NebulaApplication.getInstance().getMyGroups();
+		List<Group> myGroups = NebulaApplication.getInstance().getMyIdentity().getMyGroups();
 
 		List<HashMap<String, String>> groups = new ArrayList<HashMap<String, String>>();
 		HashMap<String, ArrayList<HashMap<String, String>>> groupMembers = new HashMap<String, ArrayList<HashMap<String, String>>>();

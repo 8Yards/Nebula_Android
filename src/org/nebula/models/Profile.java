@@ -1,9 +1,15 @@
+/*
+ * author- marco, michel
+ * refactor- prajwol
+ */
+
 package org.nebula.models;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Profile {
+
 	private int id;
 	private String username;
 	private String domain;
@@ -28,6 +34,22 @@ public class Profile {
 		email_address = "";
 	}
 
+	public Profile(int id, String username, String domain, String fullName,
+			String status, String phoneNumber, String sipURI, String address,
+			String password, String emailAddress) {
+		super();
+		this.id = id;
+		this.username = username;
+		this.domain = domain;
+		this.fullName = fullName;
+		this.status = status;
+		this.phoneNumber = phoneNumber;
+		this.sipURI = sipURI;
+		this.address = address;
+		this.password = password;
+		email_address = emailAddress;
+	}
+	
 	public Profile(JSONObject jsonObject) throws JSONException {
 		this.address = jsonObject.getString("address");
 		this.domain = jsonObject.getString("domain");

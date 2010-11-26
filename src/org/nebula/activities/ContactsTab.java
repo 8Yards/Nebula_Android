@@ -119,6 +119,7 @@ public class ContactsTab extends ExpandableListActivity {
 			break;
 		}
 	}
+	
 	public void onContentChanged() {
 		super.onContentChanged();
 		// TODO: what here?

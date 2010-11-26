@@ -7,7 +7,6 @@ package org.nebula.activities;
 import org.nebula.R;
 import org.nebula.client.rest.RESTGroupManager;
 import org.nebula.client.rest.Status;
-import org.nebula.main.NebulaApplication;
 import org.nebula.models.Group;
 import android.app.Activity;
 import android.content.Intent;
@@ -33,14 +32,13 @@ public class AddGroup extends Activity {
 	}
 
 	public void doAddGroup(View v) {
-		if(groupName.length()==0)
-		{
-			Toast.makeText(getApplication(),
+		if(groupName.length()==0){
+					Toast.makeText(getApplication(),
 					"Please fill Group Name", Toast.LENGTH_LONG).show();
 		}
 		else{
-		RESTGroupManager groupManager = new RESTGroupManager();
-		Group newGroup = new Group(0, groupName.getText().toString(),
+			RESTGroupManager groupManager = new RESTGroupManager();
+			Group newGroup = new Group(0, groupName.getText().toString(),
 				"Available");
 		
 		try {
@@ -49,8 +47,8 @@ public class AddGroup extends Activity {
 			if (status.isSuccess() == false) {
 				Toast.makeText(getApplicationContext(),
 						status.getMessage(), Toast.LENGTH_LONG).show();
-				//throw new Exception(status.getMessage());
-			} else {
+			} 
+			else {
 
 				Toast.makeText(getApplicationContext(),
 						"Group Created Successfully", Toast.LENGTH_LONG).show();
@@ -59,7 +57,8 @@ public class AddGroup extends Activity {
 				Intent myIntent = new Intent(AddGroup.this, Main.class);
 				startActivityForResult(myIntent, SHOW_SUB_ACTIVITY_ContactsTab);
 			}
-		} catch (Exception e) {
+		} 
+		catch (Exception e) {
 
 			Toast.makeText(getApplicationContext(), e.getMessage(),
 					Toast.LENGTH_LONG).show();
@@ -70,8 +69,5 @@ public class AddGroup extends Activity {
 	public void doBackToMain(View v) {
 		setResult(ADDGROUP_FAILURE);
 		finish();
-	}
-	
-	
-	
+	}	
 }

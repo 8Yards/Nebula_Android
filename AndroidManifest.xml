@@ -13,6 +13,8 @@
 		<activity android:name=".activities.Login"></activity>
 		<activity android:name=".activities.ContactsTab"></activity>
 		<activity android:name=".activities.Register"></activity>
+		<activity android:name=".activities.AddGroup"></activity>
+		<activity android:name=".activities.AddContact"></activity>
 
 	</application>
 	<uses-permission android:name="android.permission.INTERNET"></uses-permission>

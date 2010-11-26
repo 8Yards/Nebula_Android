@@ -26,7 +26,8 @@ import android.widget.ExpandableListView;
 import android.widget.SimpleExpandableListAdapter;
 
 public class ContactsTab extends ExpandableListActivity {
-
+	private static final int SHOW_SUB_ACTIVITY_GoToGROUP = 1;
+	
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contacts_tab);
@@ -84,10 +85,14 @@ public class ContactsTab extends ExpandableListActivity {
 			 //startActivity(intent);
 			break;
 		case R.id.iAddGroup:
-			// Intent intent = new Intent(ContactsTab.this, Addgroup.class);
-			// startActivity(intent);
+			Intent intent = new Intent(ContactsTab.this, AddGroup.class);
+			startActivityForResult(intent,SHOW_SUB_ACTIVITY_GoToGROUP);
 			break;
 		case R.id.iEdit:
+			// Intent intent = new Intent(ContactsTab.this, Editcontacts.class);
+			// startActivity(intent);
+			break;
+		case R.id.iDelete:
 			// Intent intent = new Intent(ContactsTab.this, Editcontacts.class);
 			// startActivity(intent);
 			break;
@@ -98,6 +103,22 @@ public class ContactsTab extends ExpandableListActivity {
 		return true;
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		setResult(resultCode);
+		switch (requestCode) {
+		case (SHOW_SUB_ACTIVITY_GoToGROUP):
+			if (resultCode == AddGroup.ADDGROUP_SUCCESSFULL) {
+				finish();
+			} else {
+				//System.exit(-1);
+			}
+		default:
+			break;
+		}
+	}
 	public void onContentChanged() {
 		super.onContentChanged();
 		// TODO: what here?

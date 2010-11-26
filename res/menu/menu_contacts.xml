@@ -1,4 +1,5 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+<!-- author: saad  rearchitecture and refactor: saad, prajwol -->
     
     <item android:id="@+id/iInstantTalk"
         android:title="Instant Talk" 

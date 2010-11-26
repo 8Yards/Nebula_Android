@@ -2,7 +2,6 @@
  * author: marco
  * debugging, refactoring: prajwol, marco
  */
-
 package org.nebula.client.rest;
 
 import java.io.IOException;
@@ -10,7 +9,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 import org.json.JSONObject;

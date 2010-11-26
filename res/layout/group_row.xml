@@ -5,6 +5,7 @@
     android:layout_height="wrap_content">
 
     <TextView android:id="@+id/tvGroupName"
+    	 android:focusable="false"
          android:paddingLeft="50px"
          android:textSize="16px"
          android:textStyle="bold"         

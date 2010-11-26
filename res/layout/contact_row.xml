@@ -15,6 +15,7 @@
     <CheckBox android:id="@+id/cbCheckContact"
            android:focusable="false"
            android:layout_width="100px"
-           android:layout_height="wrap_content"/>
+           android:layout_height="wrap_content" 
+           android:onClick="doToggleCheckBox"/>
 
 </LinearLayout>

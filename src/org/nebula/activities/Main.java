@@ -1,6 +1,6 @@
 /*
  * author: saad ali
- * author - refactor and rearchitecture: prajwol kumar nakarmi, saad ali, michel hognurand
+ * author - refactor and rearchitecture: prajwol kumar nakarmi, saad ali
  */
 
 package org.nebula.activities;
@@ -57,14 +57,21 @@ public class Main extends TabActivity {
 
 	private void loadUI() {
 		setContentView(R.layout.main);
-		
-		NebulaApplication.getInstance().reloadMyGroups();
 
-		// TODO: add conversation tab
+		NebulaApplication.getInstance().reloadMyGroups();
 		TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
-		Intent intent = new Intent(Main.this, ContactsTab.class);
-		TabSpec spec = tabHost.newTabSpec("contacts").setIndicator("Contacts")
-				.setContent(intent);
-		tabHost.addTab(spec);
+
+		TabSpec contactSpec = tabHost.newTabSpec("contacts").setIndicator(
+				"Contacts",
+				getResources().getDrawable(R.drawable.ic_tab_albums))
+				.setContent(new Intent(Main.this, ContactsTab.class));
+		
+		TabSpec conversationSpec = tabHost.newTabSpec("conversation")
+				.setIndicator("Conversation",
+						getResources().getDrawable(R.drawable.ic_tab_artists))
+				.setContent(new Intent(Main.this, ConversationTab.class));
+
+		tabHost.addTab(contactSpec);
+		tabHost.addTab(conversationSpec);
 	}
 }

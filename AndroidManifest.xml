@@ -15,7 +15,7 @@
 		<activity android:name=".activities.Register"></activity>
 		<activity android:name=".activities.AddGroup"></activity>
 		<activity android:name=".activities.AddContact"></activity>
-
+		<activity android:name=".activities.ConversationTab"></activity>
 	</application>
 	<uses-permission android:name="android.permission.INTERNET"></uses-permission>
 </manifest> 

@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/iAddMember"
+        android:title="Add Member" 
+        android:icon="@drawable/group" />
+   
+    <item android:id="@+id/iSaveGroup"
+    	android:title="Save Group"
+        android:icon="@drawable/contact" />
+   
+    <item android:id="@+id/iDeleteConversation"
+        android:title="Delete Conversation" 
+        android:icon="@drawable/group" />
+</menu>

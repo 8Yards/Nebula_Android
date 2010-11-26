@@ -35,4 +35,5 @@ public class RESTProfileManager extends Resource {
 			return new Status(false, r.getResult().getString("result"));
 		}
 	}
+	
 }

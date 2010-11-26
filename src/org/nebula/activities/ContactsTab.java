@@ -17,6 +17,7 @@ import org.nebula.models.Profile;
 
 import android.app.AlertDialog;
 import android.app.ExpandableListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -56,17 +57,17 @@ public class ContactsTab extends ExpandableListActivity {
 			childData.add(children);
 		}
 
-		/*SimpleExpandableListAdapter expListAdapter = new SimpleExpandableListAdapter(
+		SimpleExpandableListAdapter expListAdapter = new SimpleExpandableListAdapter(
 				this, groupData, R.layout.group_row,
 				new String[] { "groupName" }, new int[] { R.id.tvGroupName },
 				childData, R.layout.contact_row, new String[] { "userName" },
-				new int[] { R.id.tvContactName });*/
+				new int[] { R.id.tvContactName });
 
-		SimpleExpandableListAdapter expListAdapter = new SimpleExpandableListAdapter(
+		/*SimpleExpandableListAdapter expListAdapter = new SimpleExpandableListAdapter(
 				this, groupData, R.layout.mighty_row,
 				new String[] { "groupName" }, new int[] { R.id.tvdisplayText },
 				childData, R.layout.mighty_row, new String[] { "userName" },
-				new int[] { R.id.tvdisplayText });
+				new int[] { R.id.tvdisplayText });*/
 		
 		setListAdapter(expListAdapter);
 	}
@@ -84,8 +85,8 @@ public class ContactsTab extends ExpandableListActivity {
 		case R.id.iInstantTalk:
 			break;
 		case R.id.iAddContact:
-			// Intent intent = new Intent(ContactsTab.this, Addcontacts.class);
-			// startActivity(intent);\
+			//Intent intent = new Intent(ContactsTab.this, Addcontacts.class);
+			 //startActivity(intent);
 			break;
 		case R.id.iAddGroup:
 			// Intent intent = new Intent(ContactsTab.this, Addgroup.class);

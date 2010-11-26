@@ -4,8 +4,7 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content">
 
-    <TextView android:id="@+id/tvGroupName"
-    	 android:focusable="false"
+    <TextView android:id="@+id/tvGroupName"    	 
          android:paddingLeft="50px"
          android:textSize="16px"
          android:textStyle="bold"         

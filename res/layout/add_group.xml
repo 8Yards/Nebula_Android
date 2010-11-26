@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout
+android:id="@+id/widget0"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+xmlns:android="http://schemas.android.com/apk/res/android"
+>
+<TextView
+android:id="@+id/tvAddGroup"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Add Group"
+android:textStyle="bold"
+android:layout_x="5px"
+android:layout_y="8px"
+>
+</TextView>
+<TextView
+android:id="@+id/txttext"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Group Name"
+android:layout_y="56px" android:layout_x="15px">
+</TextView>
+<EditText
+android:id="@+id/edittext"
+android:layout_width="178px"
+android:layout_height="wrap_content"
+android:textSize="18sp"
+android:layout_x="9px"
+android:layout_y="82px"
+>
+</EditText>
+
+<Button
+android:id="@+id/add"
+android:layout_width="70px"
+android:layout_height="40px"
+android:text="Add"
+android:layout_x="172px" android:layout_y="150px">
+</Button>
+<Button
+android:id="@+id/back"
+android:layout_width="70px"
+android:layout_height="40px"
+android:text="Back"
+android:layout_x="240px" android:layout_y="150px">
+</Button>
+
+
+</AbsoluteLayout>

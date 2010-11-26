@@ -24,31 +24,22 @@ public class Main extends TabActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// TODO: extract the code to appropriate place
 		myIdentity = NebulaApplication.getInstance().getMyIdentity();
-		if (myIdentity == null || myIdentity.getMyUserName() == null
-				|| myIdentity.getMyUserName().trim().equals("")) {
-			// user is not logged in. start the login activity
-			Intent myIntent = new Intent(Main.this, Login.class);
-			startActivityForResult(myIntent, SHOW_SUB_ACTIVITY_LOGIN);
-		} else {
-			loadUI();
-		}
+		loadUI();
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
-		case (SHOW_SUB_ACTIVITY_LOGIN): {
-			if (resultCode == SIPManager.LOGIN_SUCCESSFUL) {
+		case (SHOW_SUB_ACTIVITY_LOGIN):
+			if (resultCode == SIPManager.LOGIN_SUCCESSFUL
+					|| resultCode == Register.REGISTER_SUCCESSFULL) {
 				loadUI();
 			} else {
 				System.exit(-1);
 			}
-
 			break;
-		}
 		default:
 			break;
 		}
@@ -56,22 +47,30 @@ public class Main extends TabActivity {
 	}
 
 	private void loadUI() {
-		setContentView(R.layout.main);
+		if (myIdentity == null || myIdentity.getMyUserName() == null
+				|| myIdentity.getMyUserName().trim().equals("")) {
+			// user is not logged in. start the login activity
+			Intent myIntent = new Intent(Main.this, Login.class);
+			startActivityForResult(myIntent, SHOW_SUB_ACTIVITY_LOGIN);
+		} else {
+			setContentView(R.layout.main);
 
-		NebulaApplication.getInstance().reloadMyGroups();
-		TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
+			NebulaApplication.getInstance().reloadMyGroups();
+			TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
 
-		TabSpec contactSpec = tabHost.newTabSpec("contacts").setIndicator(
-				"Contacts",
-				getResources().getDrawable(R.drawable.ic_tab_albums))
-				.setContent(new Intent(Main.this, ContactsTab.class));
-		
-		TabSpec conversationSpec = tabHost.newTabSpec("conversation")
-				.setIndicator("Conversation",
-						getResources().getDrawable(R.drawable.ic_tab_artists))
-				.setContent(new Intent(Main.this, ConversationTab.class));
+			TabSpec contactSpec = tabHost.newTabSpec("contacts").setIndicator(
+					"Contacts",
+					getResources().getDrawable(R.drawable.ic_tab_albums))
+					.setContent(new Intent(Main.this, ContactsTab.class));
 
-		tabHost.addTab(contactSpec);
-		tabHost.addTab(conversationSpec);
+			TabSpec conversationSpec = tabHost.newTabSpec("conversation")
+					.setIndicator(
+							"Conversation",
+							getResources().getDrawable(
+									R.drawable.ic_tab_artists)).setContent(
+							new Intent(Main.this, ConversationTab.class));
+			tabHost.addTab(contactSpec);
+			tabHost.addTab(conversationSpec);
+		}
 	}
 }

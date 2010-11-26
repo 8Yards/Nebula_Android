@@ -15,6 +15,7 @@ import org.nebula.models.Group;
 import org.nebula.models.Profile;
 
 import android.app.ExpandableListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -79,8 +80,8 @@ public class ContactsTab extends ExpandableListActivity {
 		case R.id.iInstantTalk:
 			break;
 		case R.id.iAddContact:
-			// Intent intent = new Intent(ContactsTab.this, Addcontacts.class);
-			// startActivity(intent);\
+			//Intent intent = new Intent(ContactsTab.this, Addcontacts.class);
+			 //startActivity(intent);
 			break;
 		case R.id.iAddGroup:
 			// Intent intent = new Intent(ContactsTab.this, Addgroup.class);

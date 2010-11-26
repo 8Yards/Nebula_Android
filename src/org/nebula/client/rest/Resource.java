@@ -92,7 +92,8 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	public Response get() throws ClientProtocolException, IOException, JSONException {
+	public Response get() throws ClientProtocolException, IOException,
+			JSONException {
 		return get("", new HashMap<String, String>());
 	}
 
@@ -103,7 +104,8 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response get(String method) throws ClientProtocolException, IOException, JSONException {
+	protected Response get(String method) throws ClientProtocolException,
+			IOException, JSONException {
 		return get(method, new HashMap<String, String>());
 	}
 
@@ -114,7 +116,8 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response get(HashMap<String, String> params) throws ClientProtocolException, IOException, JSONException {
+	protected Response get(HashMap<String, String> params)
+			throws ClientProtocolException, IOException, JSONException {
 		return get("", params);
 	}
 
@@ -157,7 +160,8 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response post() throws ClientProtocolException, IOException, JSONException {
+	protected Response post() throws ClientProtocolException, IOException,
+			JSONException {
 		return post("", new HashMap<String, Object>());
 	}
 
@@ -168,7 +172,8 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response post(String method) throws ClientProtocolException, IOException, JSONException {
+	protected Response post(String method) throws ClientProtocolException,
+			IOException, JSONException {
 		return post(method, new HashMap<String, Object>());
 	}
 
@@ -179,7 +184,8 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response post(HashMap<String, Object> options) throws ClientProtocolException, IOException, JSONException {
+	protected Response post(HashMap<String, Object> options)
+			throws ClientProtocolException, IOException, JSONException {
 		return post("", options);
 	}
 
@@ -196,11 +202,12 @@ public abstract class Resource {
 			throws ClientProtocolException, IOException, JSONException {
 		String requestURL = this.url;
 
-		if (this.data.containsKey("id"))
+		if (this.data != null && this.data.containsKey("id")) {
 			requestURL = requestURL + this.data.get("id") + "/";
+		}
 
 		requestURL += method;
-		Log.e("nebula", requestURL);
+
 		HttpPost httppost = new HttpPost(requestURL);
 		JSONObject JSON = new JSONObject(options);
 		StringEntity se = new StringEntity(JSON.toString(), HTTP.UTF_8);
@@ -208,7 +215,6 @@ public abstract class Resource {
 		httppost.setHeader("Content-Type", "application/json;charset=UTF-8");
 
 		httppost.setEntity(se);
-
 		return send_and_receive(httppost);
 	}
 
@@ -217,7 +223,8 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response put() throws ClientProtocolException, IOException, JSONException {
+	protected Response put() throws ClientProtocolException, IOException,
+			JSONException {
 		return put("", new HashMap<String, Object>());
 	}
 
@@ -228,7 +235,8 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response put(String method) throws ClientProtocolException, IOException, JSONException {
+	protected Response put(String method) throws ClientProtocolException,
+			IOException, JSONException {
 		return put(method, new HashMap<String, Object>());
 	}
 
@@ -239,7 +247,8 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response put(HashMap<String, Object> options) throws ClientProtocolException, IOException, JSONException {
+	protected Response put(HashMap<String, Object> options)
+			throws ClientProtocolException, IOException, JSONException {
 		return put("", options);
 	}
 
@@ -276,7 +285,8 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response delete() throws ClientProtocolException, IOException, JSONException {
+	protected Response delete() throws ClientProtocolException, IOException,
+			JSONException {
 		String requestURL = this.url;
 
 		if (this.data.containsKey("id"))
@@ -293,7 +303,8 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response delete(String id) throws ClientProtocolException, IOException, JSONException {
+	protected Response delete(String id) throws ClientProtocolException,
+			IOException, JSONException {
 		String requestURL = this.url + id + "/";
 		HttpDelete httpdelete = new HttpDelete(requestURL);
 		return send_and_receive(httpdelete);
@@ -354,30 +365,29 @@ public abstract class Resource {
 			return null;
 		}
 
-		if (myIdentity.getMyUserName() != "") {
+		if (myIdentity.getMyUserName() != null
+				&& !myIdentity.getMyUserName().trim().equals("")) {
 			String username = myIdentity.getMyUserName();
 			String password = myIdentity.getMyPassword();
 
 			byte[] concat = new byte[username.length() + password.length() + 1];
-			System.arraycopy(username.getBytes(), 0, concat, 0, username
-					.length());
+			System.arraycopy(username.getBytes(), 0, concat, 0,
+					username.length());
 			System.arraycopy(":".getBytes(), 0, concat, username.length(), 1);
 			System.arraycopy(password.getBytes(), 0, concat,
 					username.length() + 1, password.length());
 
 			String base64 = Base64.encode(username + ":" + password);
-			request.addHeader("Authorization", "Basic "
-					+ base64.replace("\r\n", ""));
+			request.addHeader("Authorization",
+					"Basic " + base64.replace("\r\n", ""));
 		}
 		HttpResponse response = httpclient.execute(request);
 		InputStream instream = response.getEntity().getContent();
 		String result = Utils.convertStreamToString(instream);
+
 		int status = response.getStatusLine().getStatusCode();
 
-		if (status >= 200 && status < 300) {
-			return new Response(status, new JSONObject(result));
-		} else {
-			return new Response(status);
-		}
+		// prajwol - well, you dont have right to trim the result :@
+		return new Response(status, new JSONObject(result));
 	}
 }

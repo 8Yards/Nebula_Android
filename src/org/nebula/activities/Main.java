@@ -24,31 +24,22 @@ public class Main extends TabActivity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		// TODO: extract the code to appropriate place
 		myIdentity = NebulaApplication.getInstance().getMyIdentity();
-		if (myIdentity == null || myIdentity.getMyUserName() == null
-				|| myIdentity.getMyUserName().trim().equals("")) {
-			// user is not logged in. start the login activity
-			Intent myIntent = new Intent(Main.this, Login.class);
-			startActivityForResult(myIntent, SHOW_SUB_ACTIVITY_LOGIN);
-		} else {
-			loadUI();
-		}
+		loadUI();
 	}
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
-		case (SHOW_SUB_ACTIVITY_LOGIN): {
-			if (resultCode == SIPManager.LOGIN_SUCCESSFUL) {
+		case (SHOW_SUB_ACTIVITY_LOGIN):
+			if (resultCode == SIPManager.LOGIN_SUCCESSFUL
+					|| resultCode == Register.REGISTER_SUCCESSFULL) {
 				loadUI();
 			} else {
 				System.exit(-1);
 			}
-
 			break;
-		}
 		default:
 			break;
 		}
@@ -56,15 +47,22 @@ public class Main extends TabActivity {
 	}
 
 	private void loadUI() {
-		setContentView(R.layout.main);
-		
-		NebulaApplication.getInstance().reloadMyGroups();
+		if (myIdentity == null || myIdentity.getMyUserName() == null
+				|| myIdentity.getMyUserName().trim().equals("")) {
+			// user is not logged in. start the login activity
+			Intent myIntent = new Intent(Main.this, Login.class);
+			startActivityForResult(myIntent, SHOW_SUB_ACTIVITY_LOGIN);
+		} else {
+			setContentView(R.layout.main);
 
-		// TODO: add conversation tab
-		TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
-		Intent intent = new Intent(Main.this, ContactsTab.class);
-		TabSpec spec = tabHost.newTabSpec("contacts").setIndicator("Contacts")
-				.setContent(intent);
-		tabHost.addTab(spec);
+			NebulaApplication.getInstance().reloadMyGroups();
+
+			// TODO: add conversation tab
+			TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
+			Intent intent = new Intent(Main.this, ContactsTab.class);
+			TabSpec spec = tabHost.newTabSpec("contacts")
+					.setIndicator("Contacts").setContent(intent);
+			tabHost.addTab(spec);
+		}
 	}
 }

@@ -34,18 +34,16 @@ public class Profile {
 		email_address = "";
 	}
 
-	public Profile(int id, String username, String domain, String fullName,
-			String status, String phoneNumber, String sipURI, String address,
-			String password, String emailAddress) {
-		super();
+	public Profile(int id, String username,  String fullName,
+			 String password, String emailAddress) {
+		this();
 		this.id = id;
 		this.username = username;
-		this.domain = domain;
+		this.domain = "";
 		this.fullName = fullName;
-		this.status = status;
-		this.phoneNumber = phoneNumber;
-		this.sipURI = sipURI;
-		this.address = address;
+		this.phoneNumber = "";
+		this.sipURI = "";
+		this.address = "";
 		this.password = password;
 		email_address = emailAddress;
 	}

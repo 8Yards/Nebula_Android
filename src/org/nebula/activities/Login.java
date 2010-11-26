@@ -9,11 +9,13 @@ import org.nebula.client.sip.SIPManager;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 
 public class Login extends Activity {
+	private static final int SHOW_SUB_ACTIVITY_REGISTER = 1;
 
 	EditText userName;
 	EditText password;
@@ -33,7 +35,6 @@ public class Login extends Activity {
 		setResult(status);
 
 		if (status == SIPManager.LOGIN_SUCCESSFUL) {
-			//showAlert("Good credentials :D");
 			finish();
 		} else if (status == SIPManager.LOGIN_FAILURE) {
 			showAlert("Bad credentials :P");
@@ -41,11 +42,29 @@ public class Login extends Activity {
 	}
 
 	public void doRegisterToNebula(View v) {
-		// TODO: implement this
+		Intent myIntent = new Intent(Login.this, Register.class);
+		startActivityForResult(myIntent, SHOW_SUB_ACTIVITY_REGISTER);
 	}
 
 	public void showAlert(String message) {
 		new AlertDialog.Builder(this).setMessage(message).show();
 	}
 
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+
+		setResult(resultCode);
+		switch (requestCode) {
+		case (SHOW_SUB_ACTIVITY_REGISTER):
+			if (resultCode == Register.REGISTER_SUCCESSFULL) {
+				finish();
+			} else {
+				//TODO:: recheck if this is good way
+				System.exit(-1);
+			}
+		default:
+			break;
+		}
+	}
 }

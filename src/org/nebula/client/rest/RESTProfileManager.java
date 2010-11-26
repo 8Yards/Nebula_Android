@@ -29,11 +29,10 @@ public class RESTProfileManager extends Resource {
 
 		Response r = this.post(h);
 		if (r.getStatus() == 201) {
-			p.setId((Integer) r.getResult().get("id"));
+			p.setId(r.getResult().getInt("id"));
 			return new Status(true, "Profile added successfully");
 		} else {
-			//TODO:: check if this returns the result
-			return new Status(false, r.getResult().toString());
+			return new Status(false, r.getResult().getString("result"));
 		}
 	}
 }

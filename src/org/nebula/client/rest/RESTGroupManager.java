@@ -2,7 +2,7 @@
  * author: marco
  * debugging, refactoring: prajwol, marco
  */
-
+ 
 package org.nebula.client.rest;
 
 import java.io.IOException;
@@ -27,14 +27,13 @@ public class RESTGroupManager extends Resource {
 			ClientProtocolException, IOException {
 		Response r = this.get("retrieveAllGroupsMembers");
 		List<Group> myGroups = new ArrayList<Group>();
-
+		//scan the data for the name of the groups
 		for (Iterator iterator = r.getResult().keys(); iterator.hasNext();) {
 			String groupName = "" + iterator.next();
+			//retrieve the JSON object and instantiates a new Group with it
 			JSONObject groupObj = r.getResult().getJSONObject(groupName);
-
 			myGroups.add(new Group(groupObj, groupName));
 		}
-
 		return myGroups;
 	}
 	
@@ -54,28 +53,37 @@ public class RESTGroupManager extends Resource {
 		
 		Response r = this.post("insertGroup", hM);
 		//201 = HTTP status code for user inserted
-		boolean validOP = r.getStatus() == 201;
-		Status status = new Status(validOP, "" + r.getResult());
-		//store the id of the brand new group for utilize it in inserting the user
-		group.setId(Integer.parseInt(r.getResult().getString("id")));
-		return status;
+		if (r.getStatus() == 201) {
+			//store the id of the brand new group for utilize it in inserting the user
+			group.setId(Integer.parseInt(r.getResult().getString("id")));
+			return new Status(true, "Profile added successfully");
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
 	}
-	
+	/**
+	 * @return status of the performed operation
+	 */
 	public Status retrieveGroup(Group g) throws JSONException, ClientProtocolException, IOException {
 		HashMap<String, String> hM = new HashMap<String, String>();
 		hM.put("id", "" + g.getId());
 		Response r = this.get("retrieveGroup", hM);
 		g.setGroupName("" + r.getResult().get("groupName"));
 		g.setGroupStatus("" + r.getResult().get("status"));
-		boolean validOP = (r.getStatus() >= 200) && (r.getStatus() < 300);
-		Status status = new Status(validOP, "" + r.getResult());
-		return status;
+		// HTTP valid return status
+		if ((r.getStatus() >= 200) && (r.getStatus() < 300)) {
+			return new Status(true, "Group retrieved successfully");
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
 	} 
+	
 	
 	public List<Group> retrieveGroups() throws JSONException, ClientProtocolException, IOException {
 		Response r = this.get("retrieveGroups");
 		List<Group> myGroups = new ArrayList<Group>();
 		
+		// scan through the array and return the fetched group
 		for (int i=0; i < r.getResult().length();i++)
 		{
 			Group group = new Group();
@@ -88,6 +96,11 @@ public class RESTGroupManager extends Resource {
 		return myGroups;
 	} 
 	
+	/**
+	 * Insert the Profiles that belongs to group object into it in the DB
+	 * @param group
+	 * @return
+	 */
 	public Status insertUsersIntoGroup(Group group) throws ClientProtocolException, IOException, JSONException{
 		//for every user, perform the insert operation
 		Response r = null;
@@ -99,40 +112,60 @@ public class RESTGroupManager extends Resource {
 			hMGroupUser.put("groupID", group.getId());
 			r = this.post("insertUserIntoGroup", hMGroupUser);
 		}
-		boolean validOP = (r.getStatus() == 201);
-		Status status = new Status(validOP, "" + r.getResult());
-		return status;
+		//201 = HTTP status for insertion performed correctly
+		if (r.getStatus() == 201) {return new Status(true, "Profile added successfully");
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
 	}
 	
+	/**
+	 * Insert a specific user into a group in DB
+	 */
 	public Status insertUserIntoGroup(Group group, String username) throws ClientProtocolException, IOException, JSONException {
 		HashMap<String, Object> hMGroupUser = new HashMap<String, Object>();
 		hMGroupUser.put("groupID", group.getId());
 		hMGroupUser.put("username", username);
 		Response r = this.post("insertUserIntoGroup", hMGroupUser);
-		boolean validOP = (r.getStatus() == 201);
-		Status status = new Status(validOP, "" + r.getResult());
-		return status;
+		//201 = HTTP status for insertion performed correctly
+		if (r.getStatus() == 201) {return new Status(true, "Profile added successfully");
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
 	}
 	
-
+	/**
+	 * @param contactUsername user supposed to be added as contact
+	 * @return status of the performed operation
+	 */
 	public Status addContact(String contactUsername) throws ClientProtocolException, IOException, JSONException {
 		HashMap<String, Object> hMGroupUser = new HashMap<String, Object>();
 		hMGroupUser.put("username", contactUsername);
 		hMGroupUser.put("nickname", contactUsername);
 		Response r = this.post("addContact", hMGroupUser);
-		boolean validOP = (r.getStatus() == 201);
-		Status status = new Status(validOP, "" + r.getResult());
-		return status;
+		//201 = HTTP status for insertion performed correctly
+		if (r.getStatus() == 201) {return new Status(true, "Profile added successfully");
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
 	}
 
+	/**
+	 * @param contactUsername user supposed to be added as contact
+	 * @param contactNickName nick of the user supposed to be added as contact
+	 * @return status of the performed operation
+	 */
 	public Status addContact(String contactUsername, String contactNickName) throws ClientProtocolException, IOException, JSONException {
 		HashMap<String, Object> hMGroupUser = new HashMap<String, Object>();
 		hMGroupUser.put("username", contactUsername);
 		hMGroupUser.put("nickname", contactNickName);
 		Response r = this.post("addContact", hMGroupUser);
-		boolean validOP = (r.getStatus() == 201);
-		Status status = new Status(validOP, "" + r.getResult());
-		return status;
+		//201 = HTTP status for insertion performed correctly
+		if (r.getStatus() == 201) {
+			return new Status(true, "Profile added successfully");
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
 	}
 	
 }

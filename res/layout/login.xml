@@ -20,6 +20,7 @@ android:layout_height="50px"
 android:textSize="18sp"
 android:layout_x="46px"
 android:layout_y="105px"
+android:text="saad"
 >
 </EditText>
 <TextView
@@ -39,6 +40,7 @@ android:textSize="18sp"
 android:password="true"
 android:layout_x="46px"
 android:layout_y="175px"
+android:text="saad"
 >
 </EditText>
 <Button

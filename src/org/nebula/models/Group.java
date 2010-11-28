@@ -15,7 +15,7 @@ public class Group {
 	private int id;
 	private String groupName;
 	private String groupStatus;
-	private List<Profile> contacts;
+	private List<Profile> contacts = new ArrayList<Profile>();
 
 	public Group() {
 		this.groupName = "";
@@ -72,5 +72,9 @@ public class Group {
 
 	public int getId() {
 		return id;
+	}
+	
+	public String toString(){
+		return this.groupName;
 	}
 }

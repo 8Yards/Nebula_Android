@@ -138,4 +138,8 @@ public class Profile {
 	public void setEmail_address(String email_address) {
 		this.email_address = email_address;
 	}
+	
+	public String toString(){
+		return this.username;
+	}
 }

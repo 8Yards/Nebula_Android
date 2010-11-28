@@ -88,7 +88,7 @@ public class Utils {
 				sb.append(line).append("\n");
 			}
 			inputStream.close();
-			
+
 			return sb.toString();
 		} else {
 			return "";

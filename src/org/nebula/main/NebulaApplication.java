@@ -3,16 +3,20 @@
  */
 package org.nebula.main;
 
-import javax.sip.RequestEvent;
-
 import org.nebula.client.rest.RESTGroupManager;
-import org.nebula.client.sip.SIPInterface;
+import org.nebula.client.sip.SIPClient;
+import org.nebula.client.sip.SIPManager;
+import org.nebula.models.Group;
 import org.nebula.models.MyIdentity;
-import org.nebula.services.SIPClient;
+import org.nebula.models.Profile;
 
 import android.app.Application;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.Log;
 
-public class NebulaApplication extends Application implements SIPInterface {
+public class NebulaApplication extends Application implements
+		NebulaEventHandler {
 	private static NebulaApplication singleton;
 
 	private MyIdentity myIdentity = null;
@@ -31,7 +35,8 @@ public class NebulaApplication extends Application implements SIPInterface {
 
 		try {
 			myIdentity.loadConfiguration();
-			mySIPClient = new SIPClient(this);
+			mySIPClient = new SIPClient();
+			mySIPClient.setEventHandler(this);
 		} catch (Exception e) {
 			// TODO Handle gracefully
 			e.printStackTrace();
@@ -39,8 +44,11 @@ public class NebulaApplication extends Application implements SIPInterface {
 		}
 	}
 
-	public void processRequest(RequestEvent requestReceivedEvent) {
-		// TODO: implement this
+	public void processEvent(Object... params) {
+		Log.v("nebula", "nebulaApp:" + params[0].toString() + "("
+				+ params.length + ")");
+		sendBroadcast(new Intent(params[0].toString()).putExtra("params",
+				params));
 	}
 
 	public void reloadMyGroups() {
@@ -48,8 +56,19 @@ public class NebulaApplication extends Application implements SIPInterface {
 
 		try {
 			myIdentity.setMyGroups(rG.retrieveAllGroupsMembers());
+			renewMyPresenceSubscriptions();
 		} catch (Exception e) {
 			// do nothing here since the old group is preserved
+			Log.e("nebula", e.getMessage());
+		}
+	}
+
+	private void renewMyPresenceSubscriptions() {
+		for (Group individualGroup : myIdentity.getMyGroups()) {
+			for (Profile individualProfile : individualGroup.getContacts()) {
+				SIPManager.doSubscribe(individualProfile.getUsername(),
+						myIdentity.getMySIPDomain());
+			}
 		}
 	}
 

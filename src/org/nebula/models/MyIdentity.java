@@ -4,6 +4,7 @@
 
 package org.nebula.models;
 
+import java.util.ArrayList;
 import java.util.List;
 import org.nebula.utils.Utils;
 
@@ -21,7 +22,7 @@ public class MyIdentity {
 	
 	private String restServerIP;
 
-	private List<Group> myGroups;
+	private List<Group> myGroups = new ArrayList<Group>();
 
 	public void loadConfiguration() throws Exception {
 		myIP = Utils.getLocalIpAddress();

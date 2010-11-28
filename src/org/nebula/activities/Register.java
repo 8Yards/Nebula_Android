@@ -1,3 +1,8 @@
+/*
+ * author: saad ali
+ * rearchitecture and programming: saad ali, prajwol
+ * validation: sharique
+ */
 package org.nebula.activities;
 
 import org.nebula.R;
@@ -33,6 +38,14 @@ public class Register extends Activity {
 	}
 
 	public void doRegsiterToNebula(View v) {
+		if (userName.length() <= 0 || fullName.length() <= 0
+				|| password.length() <= 0 || emailAddress.length() <= 0) {
+				Toast.makeText(v.getContext(), "Please fill all fields!",
+				Toast.LENGTH_LONG).show();
+
+		}
+		else
+		{
 		RESTProfileManager profileManager = new RESTProfileManager();
 		Profile newProfile = new Profile(0, userName.getText().toString(),
 				fullName.getText().toString(), emailAddress.getText()
@@ -64,7 +77,7 @@ public class Register extends Activity {
 					Toast.LENGTH_LONG).show();
 			setResult(REGISTER_FAILURE);
 		}
-
+		}
 	}
 
 	public void doBackToSignIn(View v) {

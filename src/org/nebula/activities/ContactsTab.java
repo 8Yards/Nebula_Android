@@ -2,7 +2,6 @@
  * author: saad
  * rearchitecture and refactor: prajwol, saad
  */
-
 package org.nebula.activities;
 
 import java.util.ArrayList;
@@ -21,12 +20,14 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.SimpleExpandableListAdapter;
+import android.widget.Spinner;
 
 public class ContactsTab extends ExpandableListActivity {
 
 	private List<Map<String, String>> groupData = new ArrayList<Map<String, String>>();
 	private List<List<Map<String, String>>> childData = new ArrayList<List<Map<String, String>>>();
 	private SimpleExpandableListAdapter expListAdapter;
+	private static final int SHOW_SUB_ACTIVITY_GoToGROUP = 1;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -43,6 +44,14 @@ public class ContactsTab extends ExpandableListActivity {
 	}
 
 	/*private void reloadContactList() {
+		// TextView presence = (TextView) findViewById(R.id.presence);
+		Spinner spinner = (Spinner) findViewById(R.id.sStatus);
+		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+				this, R.array.status_prompt,
+				android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinner.setAdapter(adapter);
+
 		List<Group> myGroups = NebulaApplication.getInstance().getMyIdentity()
 				.getMyGroups();
 
@@ -66,13 +75,14 @@ public class ContactsTab extends ExpandableListActivity {
 				childData, R.layout.contact_row, new String[] { "userName" },
 				new int[] { R.id.tvContactName });
 
-		setListAdapter(expListAdapter);	
-	}*/
+		/*
+		 * SimpleExpandableListAdapter expListAdapter = new
+		 * SimpleExpandableListAdapter( this, groupData, R.layout.mighty_row,
+		 * new String[] { "groupName" }, new int[] { R.id.tvdisplayText },
+		 * childData, R.layout.mighty_row, new String[] { "userName" }, new
+		 * int[] { R.id.tvdisplayText });
+		 */
 
-	private void reloadContactList() {
-		List<Group> myGroups = NebulaApplication.getInstance().getMyIdentity()
-				.getMyGroups();
-		
 		groupData.clear();
 		childData.clear();
 
@@ -109,10 +119,14 @@ public class ContactsTab extends ExpandableListActivity {
 			// startActivity(intent);
 			break;
 		case R.id.iAddGroup:
-			// Intent intent = new Intent(ContactsTab.this, Addgroup.class);
-			// startActivity(intent);
+			Intent intent = new Intent(ContactsTab.this, AddGroup.class);
+			startActivityForResult(intent, SHOW_SUB_ACTIVITY_GoToGROUP);
 			break;
 		case R.id.iEdit:
+			// Intent intent = new Intent(ContactsTab.this, Editcontacts.class);
+			// startActivity(intent);
+			break;
+		case R.id.iDelete:
 			// Intent intent = new Intent(ContactsTab.this, Editcontacts.class);
 			// startActivity(intent);
 			break;

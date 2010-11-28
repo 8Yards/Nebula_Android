@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- author: saad  rearchitecture and refactor: saad -->
+
 <TabHost xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@android:id/tabhost"
     android:layout_width="fill_parent"
@@ -40,4 +42,5 @@
             android:padding="5dp" />
             
     </LinearLayout>
+    
 </TabHost>

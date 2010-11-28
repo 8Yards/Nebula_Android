@@ -1,21 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     
-    <string name="app_name">Nebula</string>
-    
-    
-<string name="group_prompt"></string>   
-<string-array name="group_prompt">
-<item>Available</item>
+    <string name="app_name">Nebula</string>    
+	
+	<string name="status_prompt"></string>   
+	<string-array name="status_prompt">
+		<item>Available</item>
         <item>Busy</item>
         <item>Away</item>
-        <item>Offline</item>
-        
+        <item>Offline</item>    
     </string-array>
+    
     <string name="type_prompt">Choose a group type</string>   
-<string-array name="type_prompt">
+	<string-array name="type_prompt">
         <item>Geographical</item>        
         <item>Manual</item>
     </string-array>
+    
     <string name="main_no_items">No items</string>
+    
 </resources>

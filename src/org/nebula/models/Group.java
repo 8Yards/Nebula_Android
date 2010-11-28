@@ -23,7 +23,14 @@ public class Group {
 		this.groupStatus = "";
 		this.contacts = null;
 	}
-
+	
+	public Group(int id, String groupName,  String groupStatus) {
+		this();
+		this.id = id;
+		this.groupName = groupName;
+		this.groupStatus = groupStatus;
+	}
+	
 	public Group(JSONObject groupObj, String groupName) throws JSONException {
 		this.groupName = groupName;
 		this.id = groupObj.getInt("id");

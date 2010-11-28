@@ -15,10 +15,12 @@ import org.nebula.models.Group;
 import org.nebula.models.Profile;
 
 import android.app.ExpandableListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
 
@@ -27,61 +29,35 @@ public class ContactsTab extends ExpandableListActivity {
 	private List<Map<String, String>> groupData = new ArrayList<Map<String, String>>();
 	private List<List<Map<String, String>>> childData = new ArrayList<List<Map<String, String>>>();
 	private SimpleExpandableListAdapter expListAdapter;
-	private static final int SHOW_SUB_ACTIVITY_GoToGROUP = 1;
+	private ArrayAdapter<CharSequence> adapter;
+	private Spinner spinner;
+	
+	private static final int SHOW_SUB_ACTIVITY_GOTOGROUP = 1;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contacts_tab);
+		
+		spinner = (Spinner) findViewById(R.id.sStatus);
+	    adapter = ArrayAdapter.createFromResource(
+	        this, R.array.status_prompt,
+	        android.R.layout.simple_spinner_item);
+	    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+	    spinner.setAdapter(adapter);
 
 		expListAdapter = new SimpleExpandableListAdapter(this, groupData,
 				R.layout.group_row, new String[] { "groupName" },
 				new int[] { R.id.tvGroupName }, childData,
 				R.layout.contact_row, new String[] { "userName" },
 				new int[] { R.id.tvContactName });
-		
+
 		setListAdapter(expListAdapter);
 		reloadContactList();
 	}
 
-	/*private void reloadContactList() {
-		// TextView presence = (TextView) findViewById(R.id.presence);
-		Spinner spinner = (Spinner) findViewById(R.id.sStatus);
-		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-				this, R.array.status_prompt,
-				android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-		spinner.setAdapter(adapter);
-
+	public void reloadContactList() {
 		List<Group> myGroups = NebulaApplication.getInstance().getMyIdentity()
 				.getMyGroups();
-
-		for (Group individualGroup : myGroups) {
-			Map<String, String> curGroupMap = new HashMap<String, String>();
-			groupData.add(curGroupMap);
-			curGroupMap.put("groupName", individualGroup.getGroupName());
-
-			List<Map<String, String>> children = new ArrayList<Map<String, String>>();
-			for (Profile individualProfile : individualGroup.getContacts()) {
-				Map<String, String> curChildMap = new HashMap<String, String>();
-				children.add(curChildMap);
-				curChildMap.put("userName", individualProfile.getUsername());
-			}
-			childData.add(children);
-		}
-
-		SimpleExpandableListAdapter expListAdapter = new SimpleExpandableListAdapter(
-				this, groupData, R.layout.group_row,
-				new String[] { "groupName" }, new int[] { R.id.tvGroupName },
-				childData, R.layout.contact_row, new String[] { "userName" },
-				new int[] { R.id.tvContactName });
-
-		/*
-		 * SimpleExpandableListAdapter expListAdapter = new
-		 * SimpleExpandableListAdapter( this, groupData, R.layout.mighty_row,
-		 * new String[] { "groupName" }, new int[] { R.id.tvdisplayText },
-		 * childData, R.layout.mighty_row, new String[] { "userName" }, new
-		 * int[] { R.id.tvdisplayText });
-		 */
 
 		groupData.clear();
 		childData.clear();
@@ -120,7 +96,7 @@ public class ContactsTab extends ExpandableListActivity {
 			break;
 		case R.id.iAddGroup:
 			Intent intent = new Intent(ContactsTab.this, AddGroup.class);
-			startActivityForResult(intent, SHOW_SUB_ACTIVITY_GoToGROUP);
+			startActivityForResult(intent, SHOW_SUB_ACTIVITY_GOTOGROUP);
 			break;
 		case R.id.iEdit:
 			// Intent intent = new Intent(ContactsTab.this, Editcontacts.class);
@@ -136,21 +112,4 @@ public class ContactsTab extends ExpandableListActivity {
 		}
 		return true;
 	}
-
-	/*
-	 * public void doToggleCheckBox(View v) { new
-	 * AlertDialog.Builder(this).setMessage(
-	 * v.getParent()..getClass().getName()).show(); }
-	 * 
-	 * @Override public boolean onChildClick(ExpandableListView parent, View v,
-	 * int groupPosition, int childPosition, long id) {
-	 * super.onChildClick(parent, v, groupPosition, childPosition, id);
-	 * 
-	 * v.setSelected(selected)
-	 * 
-	 * new AlertDialog.Builder(this).setMessage(v.getClass().getName()).show();
-	 * 
-	 * return true; }
-	 */
-
 }

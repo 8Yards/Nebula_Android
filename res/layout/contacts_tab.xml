@@ -1,23 +1,51 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- author: saad  rearchitecture and refactor: saad -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent" 
+    android:layout_height="fill_parent" >
+    
+	<LinearLayout 
+        android:orientation="horizontal"       
+        android:layout_width="fill_parent"
+        android:layout_height="50px"
+        android:padding="5dp">
+	
+		<TextView 
+	 		android:text="Saad" 
+			android:id="@+id/tvPresence" 
+	        android:textSize="16px"
+	        android:textStyle="bold"         
+	        android:layout_width="165px"
+			android:layout_height="wrap_content"
+			android:textColor="#23cf34">
+		</TextView>
+ 
+		<Spinner
+			android:id="@+id/sStatus"
+			android:layout_width="125px"
+			android:layout_height="wrap_content"
+			android:layout_x="10px"
+			android:layout_y="220px">
+		</Spinner>
+		
+	</LinearLayout>
+         
+    <ExpandableListView android:id="@+id/android:list" 
+    		android:layout_width="fill_parent" 
+      		android:layout_height="fill_parent"                
+          	android:dividerHeight="8px"
+ 	        android:divider="#000000" 
+    	    android:childDivider="#000000" 
+         	android:paddingTop="5px">
+    </ExpandableListView>
+ 
+    <TextView 
+     		android:id="@+id/android:empty"
+            android:layout_width="fill_parent" 
+            android:layout_height="fill_parent"
+            android:text="No groups and contacts"
+            android:paddingTop="8px">
+    </TextView>
 
-<LinearLayout
-		xmlns:android="http://schemas.android.com/apk/res/android"
-         android:orientation="vertical"
-         android:layout_width="fill_parent" 
-         android:layout_height="fill_parent"        >
- 
-     <ExpandableListView android:id="@+id/android:list" 
-     		  android:layout_width="fill_parent" 
-              android:layout_height="fill_parent"                
-              android:dividerHeight="8px"
-              android:divider="#000000" 
-              android:childDivider="#000000" 
-              android:paddingTop="5px"/>
- 
-     <TextView android:id="@+id/android:empty"
-               android:layout_width="fill_parent" 
-               android:layout_height="fill_parent"
-               android:text="No groups and contacts"
-               android:paddingTop="8px"/>
 </LinearLayout>

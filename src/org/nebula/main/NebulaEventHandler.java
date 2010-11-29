@@ -1,5 +1,5 @@
 /*
- * author: michel hognerund
+ * author: michel hognerud
  */
 package org.nebula.main;
 

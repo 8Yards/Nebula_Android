@@ -1,5 +1,5 @@
 /*
- * author: saad
+ * author: saad,sharique
  * rearchitecture and refactor: prajwol, saad
  */
 package org.nebula.activities;
@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.nebula.R;
+import org.nebula.client.sip.SIPManager;
 import org.nebula.main.NebulaApplication;
 import org.nebula.models.Group;
 import org.nebula.models.Profile;
@@ -17,33 +18,38 @@ import org.nebula.models.Profile;
 import android.app.ExpandableListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemSelectedListener;
 import android.widget.ArrayAdapter;
 import android.widget.SimpleExpandableListAdapter;
 import android.widget.Spinner;
 
-public class ContactsTab extends ExpandableListActivity {
+public class ContactsTab extends ExpandableListActivity implements
+		OnItemSelectedListener {
 
 	private List<Map<String, String>> groupData = new ArrayList<Map<String, String>>();
 	private List<List<Map<String, String>>> childData = new ArrayList<List<Map<String, String>>>();
 	private SimpleExpandableListAdapter expListAdapter;
 	private ArrayAdapter<CharSequence> adapter;
 	private Spinner spinner;
-	
+
 	private static final int SHOW_SUB_ACTIVITY_GOTOGROUP = 1;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contacts_tab);
-		
+
 		spinner = (Spinner) findViewById(R.id.sStatus);
-	    adapter = ArrayAdapter.createFromResource(
-	        this, R.array.status_prompt,
-	        android.R.layout.simple_spinner_item);
-	    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-	    spinner.setAdapter(adapter);
+		adapter = ArrayAdapter.createFromResource(this, R.array.status,
+				android.R.layout.simple_spinner_item);
+		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		spinner.setAdapter(adapter);
+		spinner.setOnItemSelectedListener(this);
 
 		expListAdapter = new SimpleExpandableListAdapter(this, groupData,
 				R.layout.group_row, new String[] { "groupName" },
@@ -53,6 +59,7 @@ public class ContactsTab extends ExpandableListActivity {
 
 		setListAdapter(expListAdapter);
 		reloadContactList();
+
 	}
 
 	public void reloadContactList() {
@@ -91,7 +98,8 @@ public class ContactsTab extends ExpandableListActivity {
 		case R.id.iInstantTalk:
 			break;
 		case R.id.iAddContact:
-			// Intent intent = new Intent(ContactsTab.this, Addcontacts.class);
+			// Intent intent = new Intent(ContactsTab.this,
+			// Addcontacts.class);
 			// startActivity(intent);
 			break;
 		case R.id.iAddGroup:
@@ -99,11 +107,13 @@ public class ContactsTab extends ExpandableListActivity {
 			startActivityForResult(intent, SHOW_SUB_ACTIVITY_GOTOGROUP);
 			break;
 		case R.id.iEdit:
-			// Intent intent = new Intent(ContactsTab.this, Editcontacts.class);
+			// Intent intent = new Intent(ContactsTab.this,
+			// Editcontacts.class);
 			// startActivity(intent);
 			break;
 		case R.id.iDelete:
-			// Intent intent = new Intent(ContactsTab.this, Editcontacts.class);
+			// Intent intent = new Intent(ContactsTab.this,
+			// Editcontacts.class);
 			// startActivity(intent);
 			break;
 		case R.id.iSignout:
@@ -111,5 +121,18 @@ public class ContactsTab extends ExpandableListActivity {
 			break;
 		}
 		return true;
+	}
+
+	public void onItemSelected(AdapterView<?> parent, View view, int pos,
+			long id) {
+		int status = SIPManager.doPublish(parent.getItemAtPosition(pos)
+				.toString());
+		Log.v("nebula", "contacts_tab: "
+				+ (status == SIPManager.PUBLISH_SUCCESSFUL ? "publish success"
+						: "publish failure"));
+	}
+
+	public void onNothingSelected(AdapterView<?> arg0) {
+		// Do nothing here :P
 	}
 }

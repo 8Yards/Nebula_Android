@@ -13,10 +13,10 @@ import android.util.Log;
 public class SIPManager {
 	public static final int LOGIN_FAILURE = 0;
 	public static final int LOGIN_SUCCESSFUL = 1;
-	private static final int SUBSCRIBE_FAILURE = 2;
-	private static final int SUBSCRIBE_SUCCESSFUL = 3;
-	private static final int PUBLISH_FAILURE = 4;
-	private static final int PUBLISH_SUCCESSFUL = 5;
+	public static final int SUBSCRIBE_FAILURE = 2;
+	public static final int SUBSCRIBE_SUCCESSFUL = 3;
+	public static final int PUBLISH_FAILURE = 4;
+	public static final int PUBLISH_SUCCESSFUL = 5;
 
 	public static int doLogin(String userName, String password) {
 		try {

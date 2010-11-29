@@ -66,6 +66,20 @@ public class RESTGroupManager extends Resource {
 	}
 
 	/**
+	 * 
+	 * @param id id of the group to be dropped
+	 * @return status of the performed operation
+	 */
+	public Status deleteGroup(int id) throws ClientProtocolException, IOException, JSONException{
+		Response r = this.delete("deleteGroup", "" + id);
+		if ((r.getStatus() >= 200) && (r.getStatus() < 300)) {
+			return new Status(true, "Group dropped successfully");
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
+	}
+	
+	/**
 	 * @return status of the performed operation
 	 */
 	public Status retrieveGroup(Group g) throws JSONException,

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- author: saad,sharique  rearchitecture and refactor: saad -->
+<!-- author: saad,sharique  rearchitecture and refactor: venkatesh, saad -->
 
 <AbsoluteLayout
-android:id="@+id/widget0"
+android:id="@+id/addContactView"
 android:layout_width="fill_parent"
 android:layout_height="fill_parent"
 xmlns:android="http://schemas.android.com/apk/res/android">
@@ -18,16 +18,16 @@ android:layout_y="8px">
 </TextView>
 
 <TextView
-android:id="@+id/tvNebulaName"
+android:id="@+id/tvNebulaID"
 android:layout_width="wrap_content"
 android:layout_height="wrap_content"
-android:text="Nebula Name"
+android:text="Nebula ID"
 android:layout_x="14px"
 android:layout_y="120px">
 </TextView>
 
 <EditText
-android:id="@+id/etNebulaName"
+android:id="@+id/etNebulaID"
 android:layout_width="178px"
 android:layout_height="wrap_content"
 android:textSize="18sp"
@@ -36,7 +36,7 @@ android:layout_y="140px">
 </EditText>
 
 <Button
-android:id="@+id/bAdd"
+android:id="@+id/bAddContact"
 android:layout_width="70px"
 android:layout_height="40px"
 android:text="Add"
@@ -50,9 +50,9 @@ android:id="@+id/bBack"
 android:layout_width="70px"
 android:layout_height="40px"
 android:text="Back"
-android:layout_x="240px" 
+android:layout_x="240px"
 android:layout_y="330px"
-android:onClick="doBackToMain">
+android:onClick="doBack">
 </Button>
 
 <TextView
@@ -83,17 +83,17 @@ android:layout_y="66px">
 </EditText>
 
 <Button 
-android:id="@+id/bSelectGroup" 
+android:id="@+id/bSelectGroups" 
 android:layout_height="wrap_content" 
 android:text="Select" 
 android:layout_x="200dip" 
 android:layout_width="100px" 
 android:layout_y="240dip"
-android:onClick="doSelectGroup">
+android:onClick="doSelectGroups">
 </Button>
 
 <EditText 
-android:id="@+id/etSelectGroup" 
+android:id="@+id/etSelectedGroups" 
 android:layout_x="12dip" 
 android:layout_y="215dip" 
 android:layout_height="100px" 

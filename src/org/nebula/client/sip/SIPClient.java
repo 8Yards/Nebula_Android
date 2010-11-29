@@ -132,8 +132,8 @@ public class SIPClient implements SipListener {
 				.getMyUserName(), myIdentity.getMyIP());
 
 		// TODO:: well in production remove this
-//		 contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
-//		 "130.229.137.196 ");
+		// contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
+		// "130.229.137.196 ");
 
 		contactURI.setPort(sipProvider.getListeningPoint(transport).getPort());
 
@@ -342,8 +342,9 @@ public class SIPClient implements SipListener {
 		return inviteReq;
 	}
 
-	public Request bye() throws ParseException, InvalidArgumentException, Exception { 
-//		return Tid.getDialog().createRequest(Request.BYE) ;
+	public Request bye() throws ParseException, InvalidArgumentException,
+			Exception {
+		// return Tid.getDialog().createRequest(Request.BYE) ;
 		return dialog.createRequest(Request.BYE);
 	}
 
@@ -549,7 +550,7 @@ public class SIPClient implements SipListener {
 					}
 				} else if (cseq.getMethod().equals(Request.REGISTER)) {
 					tid.getDialog().notify();
-//					tid.notify() ;
+					// tid.notify() ;
 				}
 			}
 		} catch (Exception ex) {

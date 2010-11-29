@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <!-- author: saad  rearchitecture and refactor: saad -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
@@ -10,9 +9,8 @@
         android:layout_width="fill_parent"
         android:layout_height="50px"
         android:padding="5dp">
-	
+
 		<TextView 
-	 		android:text="Saad" 
 			android:id="@+id/tvPresence" 
 	        android:textSize="16px"
 	        android:textStyle="bold"         
@@ -28,7 +26,7 @@
 			android:layout_x="10px"
 			android:layout_y="220px">
 		</Spinner>
-		
+
 	</LinearLayout>
          
     <ExpandableListView android:id="@+id/android:list" 

@@ -42,7 +42,6 @@ public class Register extends Activity {
 				|| password.length() <= 0 || emailAddress.length() <= 0) {
 				Toast.makeText(v.getContext(), "Please fill all fields!",
 				Toast.LENGTH_LONG).show();
-
 		}
 		else
 		{

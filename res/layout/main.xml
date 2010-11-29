@@ -11,25 +11,6 @@
         android:layout_height="fill_parent"
         android:padding="5dp">
         
-        <EditText
-			android:id="@+id/etToUser"
-			android:layout_width="226px"
-			android:layout_height="50px"
-			android:textSize="18sp"
-			android:layout_x="46px"
-			android:layout_y="105px"
-			android:text="prajwol"
-			></EditText>
-      
-        <Button
-			android:id="@+id/bSubscribe"
-			android:layout_width="200px"
-			android:layout_height="40px"
-			android:text="Subscribe"
-			android:layout_y="227px"
-			android:layout_x="60px"
-			android:onClick="doSubscribe"></Button>
-        
         <TabWidget
             android:id="@android:id/tabs"        
             android:layout_width="fill_parent"                   

@@ -6,21 +6,13 @@
 package org.nebula.activities;
 
 import org.nebula.R;
-import org.nebula.client.sip.SIPClient;
 import org.nebula.client.sip.SIPManager;
 import org.nebula.main.NebulaApplication;
 import org.nebula.models.MyIdentity;
 
-import android.app.AlertDialog;
 import android.app.TabActivity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 
@@ -28,23 +20,11 @@ public class Main extends TabActivity {
 	private static final int SHOW_SUB_ACTIVITY_LOGIN = 1;
 
 	private MyIdentity myIdentity = null;
-	private PresenceReceiver presenceReceiver = null;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		myIdentity = NebulaApplication.getInstance().getMyIdentity();
 		loadUI();
-	}
-
-	@Override
-	protected void onResume() {
-		if (presenceReceiver == null) {
-			presenceReceiver = new PresenceReceiver();		
-			registerReceiver(presenceReceiver, new IntentFilter(
-					SIPClient.NOTIFY_PRESENCE));
-		}
-
-		super.onResume();
 	}
 
 	@Override
@@ -62,7 +42,6 @@ public class Main extends TabActivity {
 		default:
 			break;
 		}
-
 	}
 
 	private void loadUI() {
@@ -75,41 +54,23 @@ public class Main extends TabActivity {
 			setContentView(R.layout.main);
 			TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
 
-			TabSpec contactSpec = tabHost.newTabSpec("contacts").setIndicator(
-					"Contacts",
-					getResources().getDrawable(R.drawable.ic_tab_albums))
+			TabSpec contactSpec = tabHost
+					.newTabSpec("contacts")
+					.setIndicator(
+							"Contacts",
+							getResources()
+									.getDrawable(R.drawable.ic_tab_albums))
 					.setContent(new Intent(Main.this, ContactsTab.class));
 
-			TabSpec conversationSpec = tabHost.newTabSpec("conversation")
+			TabSpec conversationSpec = tabHost
+					.newTabSpec("conversation")
 					.setIndicator(
 							"Conversation",
 							getResources().getDrawable(
-									R.drawable.ic_tab_artists)).setContent(
-							new Intent(Main.this, ConversationTab.class));
+									R.drawable.ic_tab_artists))
+					.setContent(new Intent(Main.this, ConversationTab.class));
 			tabHost.addTab(contactSpec);
 			tabHost.addTab(conversationSpec);
 		}
-	}
-
-	public void doSubscribe(View v) {
-		EditText toUser = (EditText) findViewById(R.id.etToUser);
-		SIPManager.doSubscribe(toUser.getText().toString(), myIdentity
-				.getMySIPDomain());
-	}
-
-	public class PresenceReceiver extends BroadcastReceiver {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Object[] params = (Object[]) intent.getExtras().get("params");
-			Log.v("nebula", "main:" + "params_len=" + params.length);
-			for (int i = 0; i < params.length; i++) {
-				Log.v("nebula", "main:" + "param-" + params[i]);
-			}
-			alert(params[1] + ", " + params[2]);
-		}
-	}
-
-	public void alert(String message) {
-		new AlertDialog.Builder(this).setMessage(message).show();
 	}
 }

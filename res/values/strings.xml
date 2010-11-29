@@ -3,9 +3,9 @@
     
     <string name="app_name">Nebula</string>    
 	
-	<string name="status_prompt"></string>   
-	<string-array name="status_prompt">
-		<item>Available</item>
+	<string name="status"></string>   
+	<string-array name="status">
+		<item>Online</item>
         <item>Busy</item>
         <item>Away</item>
         <item>Offline</item>    

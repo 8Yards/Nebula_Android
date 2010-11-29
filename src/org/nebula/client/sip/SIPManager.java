@@ -15,6 +15,8 @@ public class SIPManager {
 	public static final int LOGIN_SUCCESSFUL = 1;
 	private static final int SUBSCRIBE_FAILURE = 2;
 	private static final int SUBSCRIBE_SUCCESSFUL = 3;
+	private static final int PUBLISH_FAILURE = 4;
+	private static final int PUBLISH_SUCCESSFUL = 5;
 
 	public static int doLogin(String userName, String password) {
 		try {
@@ -50,6 +52,21 @@ public class SIPManager {
 		} catch (Exception e) {
 			Log.e("nebula", "sip_manager:" + e.getMessage());
 			return SUBSCRIBE_FAILURE;
+		}
+	}
+	
+	public static int doPublish(String status) {
+		try {
+			SIPClient sip = NebulaApplication.getInstance().getMySIPClient();
+			Response response = sip.send(sip.publish(status, 3600));
+			if (response.getStatusCode() == 200) {
+				return PUBLISH_SUCCESSFUL;
+			} else {
+				throw new Exception("Publish didn't succeed");
+			}
+		} catch (Exception e) {
+			Log.e("nebula", "sip_manager:" + e.getMessage());
+			return PUBLISH_FAILURE;
 		}
 	}
 

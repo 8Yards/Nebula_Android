@@ -111,10 +111,13 @@ public class AddContact extends Activity
 				for(int i=0;i<selectedGroups.length;i++)
 				{
 					//TODO Remove this try catch and club the job of adding the new contact 
-					//	into the mentioned groups also into the REST call above
+					//	into the mentioned groups also with the REST call above
 					try
 					{
-						groupManager.insertUserIntoGroup(groups.get(i), nebulaId);
+						if(selectedGroups[i])
+						{
+							groupManager.insertUserIntoGroup(groups.get(i), nebulaId);
+						}
 					}
 					catch(Exception e) {}
 				}

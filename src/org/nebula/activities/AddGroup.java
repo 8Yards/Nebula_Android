@@ -10,7 +10,6 @@ import org.nebula.client.rest.Status;
 import org.nebula.models.Group;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -18,7 +17,6 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class AddGroup extends Activity {
-	private static final int SHOW_SUB_ACTIVITY_ContactsTab = 1;
 
 	public static final int ADDGROUP_SUCCESSFULL = 1;
 	public static final int ADDGROUP_FAILURE = 0;
@@ -41,25 +39,18 @@ public class AddGroup extends Activity {
 			RESTGroupManager groupManager = new RESTGroupManager();
 			Group newGroup = new Group(0, groupName.getText().toString(),
 					"Available");
-
 			try {
 				Status status = groupManager.addNewGroup(newGroup);
 
 				if (status.isSuccess() == false) {
 					Toast.makeText(getApplicationContext(),
-							status.getMessage(), Toast.LENGTH_LONG).show();
+							"Group Name already exists", Toast.LENGTH_LONG).show();
 				} else {
-
 					Toast.makeText(getApplicationContext(),
 							"Group Created Successfully", Toast.LENGTH_LONG)
 							.show();
-
 					setResult(ADDGROUP_SUCCESSFULL);
 					finish();
-
-					Intent myIntent = new Intent(AddGroup.this, Main.class);
-					startActivityForResult(myIntent,
-							SHOW_SUB_ACTIVITY_ContactsTab);
 				}
 			} catch (Exception e) {
 
@@ -67,6 +58,7 @@ public class AddGroup extends Activity {
 						Toast.LENGTH_LONG).show();
 				Log.e("nebula", e.getMessage());
 				setResult(ADDGROUP_FAILURE);
+				finish();
 			}
 		}
 	}

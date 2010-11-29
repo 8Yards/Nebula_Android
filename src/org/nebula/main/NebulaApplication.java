@@ -12,7 +12,6 @@ import org.nebula.models.Profile;
 
 import android.app.Application;
 import android.content.Intent;
-import android.os.Bundle;
 import android.util.Log;
 
 public class NebulaApplication extends Application implements

@@ -134,8 +134,8 @@ public class SIPClient implements SipListener {
 				.getMyUserName(), myIdentity.getMyIP());
 
 		// TODO:: well in production remove this
-		contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
-				"83.179.10.217");
+		//contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
+			//	"83.179.10.217");
 
 		contactURI.setPort(sipProvider.getListeningPoint(transport).getPort());
 

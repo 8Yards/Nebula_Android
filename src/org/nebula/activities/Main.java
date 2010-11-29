@@ -93,9 +93,10 @@ public class Main extends TabActivity {
 	}
 
 	public void doSubscribe(View v) {
-		EditText toUser = (EditText) findViewById(R.id.etToUser);
-		SIPManager.doSubscribe(toUser.getText().toString(), myIdentity
-				.getMySIPDomain());
+//		EditText toUser = (EditText) findViewById(R.id.etToUser);
+//		SIPManager.doSubscribe(toUser.getText().toString(), myIdentity
+//				.getMySIPDomain());
+		SIPManager.doLogout();
 	}
 
 	public class PresenceReceiver extends BroadcastReceiver {

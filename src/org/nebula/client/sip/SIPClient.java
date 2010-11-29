@@ -132,8 +132,8 @@ public class SIPClient implements SipListener {
 				.getMyUserName(), myIdentity.getMyIP());
 
 		// TODO:: well in production remove this
-		// contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
-		// "83.179.10.217");
+//		 contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
+//		 "130.229.137.196 ");
 
 		contactURI.setPort(sipProvider.getListeningPoint(transport).getPort());
 
@@ -241,11 +241,15 @@ public class SIPClient implements SipListener {
 	 */
 	// TODO:: test the refactor
 	public Request register() throws Exception {
+		return register(3600);
+	}
+
+	public Request register(int expires) throws Exception {
 		Request registerReq = createRequest(myIdentity.getMyUserName(),
 				myIdentity.getMySIPDomain(), Request.REGISTER, addressFactory
 						.createSipURI(myIdentity.getMyUserName(), myIdentity
 								.getMySIPDomain()));
-		registerReq.setExpires(headerFactory.createExpiresHeader(3600));
+		registerReq.setExpires(headerFactory.createExpiresHeader(expires));
 
 		return registerReq;
 	}
@@ -337,8 +341,9 @@ public class SIPClient implements SipListener {
 
 		return inviteReq;
 	}
-	
-	public Request bye() throws SipException{
+
+	public Request bye() throws ParseException, InvalidArgumentException, Exception { 
+//		return Tid.getDialog().createRequest(Request.BYE) ;
 		return dialog.createRequest(Request.BYE);
 	}
 
@@ -542,6 +547,9 @@ public class SIPClient implements SipListener {
 								.getNewClientTransaction(byeRequest);
 						tid.getDialog().sendRequest(ct);
 					}
+				} else if (cseq.getMethod().equals(Request.REGISTER)) {
+					tid.getDialog().notify();
+//					tid.notify() ;
 				}
 			}
 		} catch (Exception ex) {

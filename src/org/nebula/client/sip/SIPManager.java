@@ -17,6 +17,8 @@ public class SIPManager {
 	public static final int SUBSCRIBE_SUCCESSFUL = 3;
 	public static final int PUBLISH_FAILURE = 4;
 	public static final int PUBLISH_SUCCESSFUL = 5;
+	private static final int LOGOUT_FAILURE = 0;
+	private static final int LOGOUT_SUCCESS = 0;
 
 	public static int doLogin(String userName, String password) {
 		try {
@@ -54,7 +56,7 @@ public class SIPManager {
 			return SUBSCRIBE_FAILURE;
 		}
 	}
-	
+
 	public static int doPublish(String status) {
 		try {
 			SIPClient sip = NebulaApplication.getInstance().getMySIPClient();
@@ -70,4 +72,31 @@ public class SIPManager {
 		}
 	}
 
+	/*
+	 * contact nina
+	 */
+	public static int doLogout() {
+		Log.v("nebula", "sip_manager: logout called");
+		
+		try {
+			// bye should be sent to all active peers
+			SIPClient sip = NebulaApplication.getInstance().getMySIPClient();
+//			Response resp ;= sip.send(sip.bye());
+
+			Response resp = sip.send(sip.register(0));
+			if (resp.getStatusCode() == Response.OK) {
+				return LOGOUT_SUCCESS;
+			}
+		} catch (Exception e) {
+			Log.e("nebula", "sip_manager: logout error: " + e.getMessage());
+			return LOGOUT_FAILURE;
+		}
+
+		return LOGOUT_SUCCESS;
+	}
+	// -- logout_success;
+	// -- logout_failure
+	// -- doLogout()
+	// -- sip.send(sip.bye) - we have only one dialogue
+	// -- sip.send(sip.register(0)) - refactor register - parameter = timeout
 }

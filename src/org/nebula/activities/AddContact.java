@@ -4,11 +4,8 @@
 
 package org.nebula.activities;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.apache.http.client.ClientProtocolException;
-import org.json.JSONException;
 import org.nebula.R;
 import org.nebula.client.rest.RESTGroupManager;
 import org.nebula.client.rest.Status;
@@ -18,8 +15,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -68,37 +65,29 @@ public class AddContact extends Activity
 					groupNames, 
 					selectedGroups,
 					new DialogSelectionClickHandler())
-			.setPositiveButton("OK",new OKHandler())
-			.create();
+					.setPositiveButton("OK",new OKHandler())
+					.create();
 
-		} catch (ClientProtocolException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return ad;
 	}
 
-	
 	protected class OKHandler implements DialogInterface.OnClickListener
 	{
-			String selectedGroupNames;
-			EditText text = (EditText) findViewById(R.id.etSelectedGroups);
+		String selectedGroupNames;
+		EditText text = (EditText) findViewById(R.id.etSelectedGroups);
 
-			public void onClick(DialogInterface dialog, int which) {
-				selectedGroupNames = "";
-				for (int i=0; i<groupNames.length;i++) {
-					if(selectedGroups[i]==true){
-						selectedGroupNames = selectedGroupNames + " [" + groupNames[i] + "] ";
-					}
+		public void onClick(DialogInterface dialog, int which) {
+			selectedGroupNames = "";
+			for (int i=0; i<groupNames.length;i++) {
+				if(selectedGroups[i]==true){
+					selectedGroupNames = selectedGroupNames + " [" + groupNames[i] + "] ";
 				}
-				text.setText(selectedGroupNames);
 			}
+			text.setText(selectedGroupNames);
+		}
 	}
 
 	public void doAddContact(View v)
@@ -121,35 +110,39 @@ public class AddContact extends Activity
 				status  = groupManager.addContact(contactName, nebulaId);
 				for(int i=0;i<selectedGroups.length;i++)
 				{
-					groupManager.insertUserIntoGroup(groups.get(i), nebulaId);
+					//TODO Remove this try catch and club the job of adding the new contact 
+					//	into the mentioned groups also into the REST call above
+					try
+					{
+						groupManager.insertUserIntoGroup(groups.get(i), nebulaId);
+					}
+					catch(Exception e) {}
 				}
-			} catch (ClientProtocolException e) {
-				doBack(v);
-				e.printStackTrace();
-			} catch (IOException e) {
-				doBack(v);
-				e.printStackTrace();
-			} catch (JSONException e) {
-				doBack(v);
+			} 
+			catch (Exception e) 
+			{
+				Toast.makeText(this.getApplicationContext(), e.getMessage(),
+						Toast.LENGTH_LONG).show();
+				Log.v("nebula","Add Contact: REST server error");
 				e.printStackTrace();
 			}
-			
-			setResult(status.isSuccess()?ADDCONTACT_SUCCESS:ADDCONTACT_FAILURE);
+
 			Toast.makeText(this.getApplicationContext(), status.getMessage(),
 					Toast.LENGTH_LONG).show();
-			finish();
-			Intent myIntent = new Intent(AddContact.this, Main.class);
-			startActivity(myIntent);
+
+			if(status !=null && status.isSuccess())
+			{
+				setResult(ADDCONTACT_SUCCESS);
+				finish();
+			}
 		}
 	}
 
 	public void doBack(View v) {
-		setResult(ADDCONTACT_SUCCESS);
+		setResult(ADDCONTACT_FAILURE);
 		finish();
-		Intent myIntent = new Intent(AddContact.this, Main.class);
-		startActivity(myIntent);
 	}
-	
+
 	protected class DialogSelectionClickHandler implements DialogInterface.OnMultiChoiceClickListener 
 	{
 		public void onClick(DialogInterface dialog, int clicked,

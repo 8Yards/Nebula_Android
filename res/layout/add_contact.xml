@@ -26,6 +26,7 @@
 		android:layout_y="120px">
 	</TextView>
 
+
 	<EditText
 		android:id="@+id/etNebulaID"
 		android:layout_width="178px"

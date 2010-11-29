@@ -1,5 +1,5 @@
 /*
- * author: prajwol kumar nakarmi, michel hognurand, saad aali
+ * author: prajwol kumar nakarmi, michel hognerud, saad aali
  */
 
 package org.nebula.models;

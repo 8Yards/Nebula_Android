@@ -300,12 +300,13 @@ public abstract class Resource {
 	 * sends a DELETE request
 	 * 
 	 * @param id the id of the element being deleted
-	 * 
+	 * @param method method to be called
 	 * @return Response response from the server
 	 */
-	protected Response delete(String id) throws ClientProtocolException,
+	protected Response delete(String method,String id) throws ClientProtocolException,
 			IOException, JSONException {
-		String requestURL = this.url + id + "/";
+		String requestURL = this.url + id + "/" + method;
+		
 		HttpDelete httpdelete = new HttpDelete(requestURL);
 		return send_and_receive(httpdelete);
 	}

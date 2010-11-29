@@ -19,7 +19,8 @@ public class MyIdentity {
 	private String sipServerIP;
 	private Integer sipServerPort;
 	private String sipServerName;
-	
+	private String mcuName;
+
 	private String restServerIP;
 
 	private List<Group> myGroups = new ArrayList<Group>();
@@ -34,7 +35,8 @@ public class MyIdentity {
 		sipServerIP = "192.16.124.211";
 		sipServerPort = 5060;
 		sipServerName = "Opensips";
-		
+		mcuName = "mcu";
+
 		restServerIP = "http://192.16.124.211/REST";
 	}
 
@@ -112,6 +114,14 @@ public class MyIdentity {
 
 	public void setSipServerName(String sipServerName) {
 		this.sipServerName = sipServerName;
+	}
+
+	public String getMcuName() {
+		return mcuName;
+	}
+
+	public void setMcuName(String mcuName) {
+		this.mcuName = mcuName;
 	}
 
 	public List<Group> getMyGroups() {

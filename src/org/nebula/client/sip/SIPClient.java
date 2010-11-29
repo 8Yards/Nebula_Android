@@ -1,6 +1,6 @@
 /*
  * author: michel hognurand
- * rearchitecture: prajwol kumar nakarmi, michel hognurand
+ * rearchitecture: prajwol kumar nakarmi, nina mulkijanyan, michel hognurand
  * 
  * version 1 - basic signalling
  * version 2 - extending Service
@@ -42,9 +42,7 @@ import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
-import javax.sip.header.ContentTypeHeader;
 import javax.sip.header.EventHeader;
-import javax.sip.header.ExpiresHeader;
 import javax.sip.header.FromHeader;
 import javax.sip.header.HeaderAddress;
 import javax.sip.header.HeaderFactory;
@@ -134,8 +132,8 @@ public class SIPClient implements SipListener {
 				.getMyUserName(), myIdentity.getMyIP());
 
 		// TODO:: well in production remove this
-		contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
-				"83.179.10.217");
+		// contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
+		// "83.179.10.217");
 
 		contactURI.setPort(sipProvider.getListeningPoint(transport).getPort());
 
@@ -241,65 +239,42 @@ public class SIPClient implements SipListener {
 	/*
 	 * contact - michel, prajwol Prepares a SIP REGISTER message
 	 */
+	// TODO:: test the refactor
 	public Request register() throws Exception {
-		SipURI requestURI = addressFactory.createSipURI(myIdentity
-				.getMyUserName(), myIdentity.getSipServerIP());
-		CallIdHeader callIdHeader = getNewCallIdHeader();
-		CSeqHeader cSeqHeader = getCSeqHeader(Request.REGISTER);
-		FromHeader fromHeader = (FromHeader) getHeader(myIdentity
-				.getMyUserName(), myIdentity.getMySIPDomain(), true);
-		ToHeader toHeader = (ToHeader) getHeader(myIdentity.getMyUserName(),
-				myIdentity.getMySIPDomain(), false);
-		List<ViaHeader> viaHeaders = getViaHeaders();
-		MaxForwardsHeader maxForwards = getMaxForwardsHeader();
+		Request registerReq = createRequest(myIdentity.getMyUserName(),
+				myIdentity.getMySIPDomain(), Request.REGISTER, addressFactory
+						.createSipURI(myIdentity.getMyUserName(), myIdentity
+								.getMySIPDomain()));
+		registerReq.setExpires(headerFactory.createExpiresHeader(3600));
 
-		Request request = messageFactory.createRequest(requestURI,
-				Request.REGISTER, callIdHeader, cSeqHeader, fromHeader,
-				toHeader, viaHeaders, maxForwards);
-
-		request.addHeader(createContactHeader());
-		request.addHeader(headerFactory.createHeader("Expires", "3600"));
-
-		return request;
+		return registerReq;
 	}
 
 	/*
 	 * contact - nina, prajwol
 	 */
+	// TODO:: test the refactor
 	public Request publish(String status, int expires) throws Exception {
-		CallIdHeader callIdHeader = getNewCallIdHeader();
-		CSeqHeader cSeqHeader = getCSeqHeader(Request.PUBLISH);
-		FromHeader fromHeader = (FromHeader) getHeader(myIdentity
-				.getMyUserName(), myIdentity.getMySIPDomain(), true);
-		ToHeader toHeader = (ToHeader) getHeader(myIdentity.getMyUserName(),
-				myIdentity.getMySIPDomain(), false);
-		List<ViaHeader> viaHeaders = getViaHeaders();
-		MaxForwardsHeader maxForwards = getMaxForwardsHeader();
+		Request publishReq = createRequest(myIdentity.getMyUserName(),
+				myIdentity.getMySIPDomain(), Request.PUBLISH, addressFactory
+						.createSipURI(myIdentity.getMyUserName(), myIdentity
+								.getMySIPDomain()));
 
-		ContentTypeHeader contTypeHeader = headerFactory
-				.createContentTypeHeader("application", "pidf+xml");
+		byte[] doc = getPidfPresenceStatus(status);
+
+		publishReq.setContent(doc, headerFactory.createContentTypeHeader(
+				"application", "pidf+xml"));
+		publishReq.setHeader(headerFactory.createExpiresHeader(expires));
+		publishReq.setHeader(headerFactory.createEventHeader("presence"));
 
 		// TODO:: eventually add the entity tag
 		SIPIfMatchHeader ifmHeader = null;
 		// ifmHeader = headerFactory.createSIPIfMatchHeader(this.distantPAET);
-
-		ExpiresHeader expHeader = headerFactory.createExpiresHeader(expires);
-		EventHeader evtHeader = headerFactory.createEventHeader("presence");
-		byte[] doc = getPidfPresenceStatus(status);
-
-		Request request = messageFactory.createRequest(toHeader.getAddress()
-				.getURI(), Request.PUBLISH, callIdHeader, cSeqHeader,
-				fromHeader, toHeader, viaHeaders, maxForwards, contTypeHeader,
-				doc);
-
-		request.setHeader(expHeader);
-		request.setHeader(evtHeader);
-
 		if (ifmHeader != null) {
-			request.setHeader(ifmHeader);
+			publishReq.setHeader(ifmHeader);
 		}
 
-		return request;
+		return publishReq;
 	}
 
 	/*
@@ -318,6 +293,53 @@ public class SIPClient implements SipListener {
 				.createSubscriptionStateHeader("active"));
 
 		return subscribeReq;
+	}
+
+	public Request invite(List<String> toSIPUsers) throws ParseException,
+			InvalidArgumentException, Exception {
+		return invite(toSIPUsers, myIdentity.getMySIPDomain());
+	}
+
+	// contact - prajwol
+	public Request invite(List<String> toSIPUsers, String toSIPDomain)
+			throws ParseException, InvalidArgumentException, Exception {
+		// do you know that we always invite mcu :):)
+		Request inviteReq = createRequest(myIdentity.getMcuName(), myIdentity
+				.getMySIPDomain(), Request.INVITE, addressFactory.createSipURI(
+				myIdentity.getMcuName(), myIdentity.getMySIPDomain()));
+		inviteReq.setExpires(headerFactory.createExpiresHeader(3600));
+
+		StringBuilder rclList = new StringBuilder();
+		for (int i = 0; i < toSIPUsers.size(); i++) {
+			if (i > 0) {
+				rclList.append(",");
+			}
+			rclList.append(toSIPUsers.get(i));
+		}
+
+		// TODO:: add the MIME in elegant way
+		String contentData = "--8Yards" + "\r\n"
+				+ "Content-type: application/sdp" + "\r\n" + "" + "\r\n"
+				+ "v=0" + "\r\n"
+				+ "o=conf 2890844343 2890844343 IN IP4 conference.example.com"
+				+ "\r\n" + "s=-" + "\r\n" + "c=IN IP4 192.0.2.5" + "\r\n"
+				+ "t=0 0" + "\r\n" + "m=audio 40000 RTP/AVP 0" + "\r\n"
+				+ "a=rtpmap:0 PCMU/8000" + "\r\n" + "m=video 40002 RTP/AVP 31"
+				+ "\r\n" + "a=rtpmap:31 H261/90000" + "\r\n" + "" + "\r\n"
+				+ "--8Yards" + "\r\n"
+				+ "Content-Type: application/resource-lists+xml" + "\r\n" + ""
+				+ "\r\n" + rclList.toString() + "\r\n" + "--8Yards--" + "\r\n";
+
+		inviteReq
+				.setContent(contentData.getBytes(), headerFactory
+						.createContentTypeHeader("multipart",
+								"mixed; boundary=8Yards"));
+
+		return inviteReq;
+	}
+	
+	public Request bye() throws SipException{
+		return dialog.createRequest(Request.BYE);
 	}
 
 	/*
@@ -425,13 +447,14 @@ public class SIPClient implements SipListener {
 
 		// we dont handle inactive subscriptions
 		// prajwol- using equals with whole header to check active is not
-		// sufficient since it can contains other parameters. i changed to comparing case insesitive check of 
+		// sufficient since it can contains other parameters. i changed to
+		// comparing case insesitive check of
 		// get state of header:)
 
 		if (request.getHeader("Subscription-State") != null
 				&& !((SubscriptionStateHeader) request
-						.getHeader("Subscription-State")).getState().equalsIgnoreCase(
-						SubscriptionStateHeader.ACTIVE)) {
+						.getHeader("Subscription-State")).getState()
+						.equalsIgnoreCase(SubscriptionStateHeader.ACTIVE)) {
 			return;
 		}
 
@@ -476,7 +499,8 @@ public class SIPClient implements SipListener {
 			if (noteList.getLength() > 0) {
 				if (eventHeader != null) {
 					eventHandler.processEvent(NOTIFY_PRESENCE, presence
-							.getAttribute(ENTITY_ATTRIBUTE), noteList.item(0).getFirstChild().getNodeValue());
+							.getAttribute(ENTITY_ATTRIBUTE), noteList.item(0)
+							.getFirstChild().getNodeValue());
 				}
 			}
 		}

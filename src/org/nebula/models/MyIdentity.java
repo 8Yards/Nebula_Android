@@ -23,6 +23,8 @@ public class MyIdentity {
 
 	private String restServerIP;
 
+	private String myStatus = "Online";// TODO:: update this
+
 	private List<Group> myGroups = new ArrayList<Group>();
 
 	public void loadConfiguration() throws Exception {
@@ -138,6 +140,14 @@ public class MyIdentity {
 
 	public void setRestServerIP(String restServerIP) {
 		this.restServerIP = restServerIP;
+	}
+
+	public String getMyStatus() {
+		return myStatus;
+	}
+
+	public void setMyStatus(String myStatus) {
+		this.myStatus = myStatus;
 	}
 
 }

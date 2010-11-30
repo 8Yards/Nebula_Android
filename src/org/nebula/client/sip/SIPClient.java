@@ -27,6 +27,7 @@ import javax.sip.InvalidArgumentException;
 import javax.sip.ListeningPoint;
 import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
+import javax.sip.ServerTransaction;
 import javax.sip.SipException;
 import javax.sip.SipFactory;
 import javax.sip.SipListener;
@@ -62,6 +63,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.nebula.main.NebulaApplication;
 import org.nebula.main.NebulaEventHandler;
 import org.nebula.models.MyIdentity;
+import org.nebula.utils.SDPUtils;
 import org.nebula.utils.Utils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -85,6 +87,7 @@ public class SIPClient implements SipListener {
 	private static final String NOTE_ELEMENT = "note";
 	private static final String ENTITY_ATTRIBUTE = "entity";
 	public static final String NOTIFY_PRESENCE = "NOTIFY_PRESENCE_EVENT";
+	public static final String NOTIFY_INVITE = "NOTIFY_INVITE_EVENT";
 
 	private static AddressFactory addressFactory;
 	private static MessageFactory messageFactory;
@@ -157,7 +160,7 @@ public class SIPClient implements SipListener {
 
 		this.response = null;
 		Tid.sendRequest();
-		wait(5000);// TODO: check this
+		wait(5000);// TODO: check this/ handle waiting times in timeout
 
 		if (this.response == null) {
 			throw new Exception("Response timeout");
@@ -307,12 +310,15 @@ public class SIPClient implements SipListener {
 	// contact - prajwol
 	public Request invite(List<String> toSIPUsers, String toSIPDomain)
 			throws ParseException, InvalidArgumentException, Exception {
-		// do you know that we always invite mcu :):)
-		Request inviteReq = createRequest(myIdentity.getMcuName(), myIdentity
+		// do you know that we always invite mcu :):) --myIdentity.getMcuName()
+
+		// TODO:: change this to MCU >.<
+		Request inviteReq = createRequest(toSIPUsers.get(0), myIdentity
 				.getMySIPDomain(), Request.INVITE, addressFactory.createSipURI(
-				myIdentity.getMcuName(), myIdentity.getMySIPDomain()));
+				toSIPUsers.get(0), myIdentity.getMySIPDomain()));
 		inviteReq.setExpires(headerFactory.createExpiresHeader(3600));
 
+		// TODO:: do actual XML
 		StringBuilder rclList = new StringBuilder();
 		for (int i = 0; i < toSIPUsers.size(); i++) {
 			if (i > 0) {
@@ -322,20 +328,15 @@ public class SIPClient implements SipListener {
 		}
 
 		// TODO:: add the MIME in elegant way
-		String contentData = "--8Yards" + "\r\n"
+		String myMIMEContent = "--8Yards" + "\r\n"
 				+ "Content-type: application/sdp" + "\r\n" + "" + "\r\n"
-				+ "v=0" + "\r\n"
-				+ "o=conf 2890844343 2890844343 IN IP4 conference.example.com"
-				+ "\r\n" + "s=-" + "\r\n" + "c=IN IP4 192.0.2.5" + "\r\n"
-				+ "t=0 0" + "\r\n" + "m=audio 40000 RTP/AVP 0" + "\r\n"
-				+ "a=rtpmap:0 PCMU/8000" + "\r\n" + "m=video 40002 RTP/AVP 31"
-				+ "\r\n" + "a=rtpmap:31 H261/90000" + "\r\n" + "" + "\r\n"
-				+ "--8Yards" + "\r\n"
-				+ "Content-Type: application/resource-lists+xml" + "\r\n" + ""
-				+ "\r\n" + rclList.toString() + "\r\n" + "--8Yards--" + "\r\n";
+				+ SDPUtils.getMySDP() + "\r\n" + "--8Yards" + "\r\n"
+				+ "Content-Type: application/resource-lists+xml" + "\r\n"
+				+ rclList.toString() + "\r\n" + "--8Yards--";
+		Log.v("nebula", "sipClient: " + myMIMEContent);
 
 		inviteReq
-				.setContent(contentData.getBytes(), headerFactory
+				.setContent(myMIMEContent.getBytes(), headerFactory
 						.createContentTypeHeader("multipart",
 								"mixed; boundary=8Yards"));
 
@@ -420,28 +421,41 @@ public class SIPClient implements SipListener {
 	public void processRequest(RequestEvent requestReceivedEvent) {
 		Log.v("nebula", "sipclient:"
 				+ requestReceivedEvent.getRequest().getMethod());
-		if (requestReceivedEvent.getRequest().getMethod()
-				.equals(Request.NOTIFY)) {
-			try {
-				processNotify(requestReceivedEvent);
-			} catch (Exception e) {
-				// we have been lazy here and yeah. lazy :|
-				Log.e("nebula", "sipclient:" + e.getMessage());
+
+		try {
+			Request request = requestReceivedEvent.getRequest();
+			ServerTransaction serverTransaction = requestReceivedEvent
+					.getServerTransaction();
+			if (serverTransaction == null) {
+				serverTransaction = sipProvider
+						.getNewServerTransaction(request);
 			}
+
+			String method = request.getMethod();
+			if (method.equals(Request.NOTIFY)) {
+				processNotify(request, serverTransaction);
+
+			} else if (method.equals(Request.INVITE)) {
+				processInvite(request, serverTransaction);
+			} else {
+				throw new Exception("I don't know how to handle: " + method);
+			}
+		} catch (Exception e) {
+			// we have been lazy here and yeah. lazy :|
+			Log.e("nebula", "sipclient:" + e.getMessage());
 		}
 	}
 
 	// contact - nina, prajwol
-	private void processNotify(RequestEvent requestReceivedEvent)
-			throws ParseException, SipException, InvalidArgumentException,
+	private void processNotify(Request request,
+			ServerTransaction serverTransaction) throws ParseException,
+			SipException, InvalidArgumentException,
 			ParserConfigurationException, FactoryConfigurationError,
 			SAXException, IOException {
 
-		Request request = requestReceivedEvent.getRequest();
-
 		// send 200 OK -) not to get the retrying packets??
 		Response okResponse = messageFactory.createResponse(200, request);
-		requestReceivedEvent.getServerTransaction().sendResponse(okResponse);
+		serverTransaction.sendResponse(okResponse);
 
 		EventHeader eventHeader = (EventHeader) request
 				.getHeader(EventHeader.NAME);
@@ -503,12 +517,51 @@ public class SIPClient implements SipListener {
 			NodeList noteList = tuple.getElementsByTagName(NOTE_ELEMENT);
 
 			if (noteList.getLength() > 0) {
-				if (eventHeader != null) {
+				if (eventHandler != null) {
 					eventHandler.processEvent(NOTIFY_PRESENCE, presence
 							.getAttribute(ENTITY_ATTRIBUTE), noteList.item(0)
 							.getFirstChild().getNodeValue());
 				}
 			}
+		}
+	}
+
+	private void processInvite(Request request,
+			ServerTransaction serverTransaction) throws Exception {
+
+		if (myIdentity.getMyStatus().equals("Online")) {
+			Response response = messageFactory.createResponse(Response.OK,
+					request);
+			response.addHeader(createContactHeader());
+
+			String requestContent = new String(request.getRawContent());
+			String requestSDP = SDPUtils.getSDP(requestContent);
+			String requestRCL = SDPUtils.getRCL(requestContent);
+
+			String mySDP = SDPUtils.getMySDP();
+
+			// TODO:: add the MIME in elegant way
+			String myMIMEContent = "--8Yards" + "\r\n"
+					+ "Content-type: application/sdp" + "\r\n" + "" + "\r\n"
+					+ mySDP + "\r\n" + "--8Yards" + "\r\n"
+					+ "Content-Type: application/resource-lists+xml" + "\r\n"
+					+ requestRCL + "\r\n" + "--8Yards--";
+
+			response.setContent(myMIMEContent.getBytes(), headerFactory
+					.createContentTypeHeader("multipart",
+							"mixed; boundary=8Yards"));
+
+			serverTransaction.sendResponse(response);
+
+			if (eventHandler != null) {
+				// TODO Good SDP Parsing
+				eventHandler.processEvent(NOTIFY_INVITE, SDPUtils
+						.retrieveIP(requestSDP), SDPUtils
+						.retrievePort(requestSDP));
+			}
+		} else {
+			// TODO:: common handle this
+			throw new Exception("I am busy :P");
 		}
 	}
 
@@ -522,7 +575,7 @@ public class SIPClient implements SipListener {
 			// RFC3261: MUST respond to every 2xx
 			if (ackRequest != null && dialog != null) {
 				try {
-					tid.getDialog().sendAck(ackRequest);
+					dialog.sendAck(ackRequest);
 				} catch (SipException se) {
 					Log.e("nebula", se.getMessage());
 				}
@@ -570,7 +623,8 @@ public class SIPClient implements SipListener {
 
 	public void processTimeout(TimeoutEvent arg0) {
 		// TODO Handle this more gracefully
-		// notify();
+		Log.v("nebula", "sip_client: " + "timeout occured");
+		notify();
 	}
 
 	public void processTransactionTerminated(TransactionTerminatedEvent arg0) {

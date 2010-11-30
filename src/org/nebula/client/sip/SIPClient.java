@@ -157,7 +157,7 @@ public class SIPClient implements SipListener {
 
 		this.response = null;
 		Tid.sendRequest();
-		wait(5000);// TODO: check this
+		wait(5000);// TODO: check this/ handle waiting times in timeout
 
 		if (this.response == null) {
 			throw new Exception("Response timeout");
@@ -313,6 +313,7 @@ public class SIPClient implements SipListener {
 				myIdentity.getMcuName(), myIdentity.getMySIPDomain()));
 		inviteReq.setExpires(headerFactory.createExpiresHeader(3600));
 
+		//TODO:: do actual XML
 		StringBuilder rclList = new StringBuilder();
 		for (int i = 0; i < toSIPUsers.size(); i++) {
 			if (i > 0) {
@@ -429,6 +430,7 @@ public class SIPClient implements SipListener {
 				Log.e("nebula", "sipclient:" + e.getMessage());
 			}
 		}
+		else -- handle invite parse MIME - SDP + RCL
 	}
 
 	// contact - nina, prajwol
@@ -522,7 +524,7 @@ public class SIPClient implements SipListener {
 			// RFC3261: MUST respond to every 2xx
 			if (ackRequest != null && dialog != null) {
 				try {
-					tid.getDialog().sendAck(ackRequest);
+					dialog.sendAck(ackRequest);
 				} catch (SipException se) {
 					Log.e("nebula", se.getMessage());
 				}
@@ -570,7 +572,8 @@ public class SIPClient implements SipListener {
 
 	public void processTimeout(TimeoutEvent arg0) {
 		// TODO Handle this more gracefully
-		// notify();
+		Log.v("nebula", "sip_client: " + "timeout occured");
+		notify();
 	}
 
 	public void processTransactionTerminated(TransactionTerminatedEvent arg0) {

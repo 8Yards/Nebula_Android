@@ -313,9 +313,9 @@ public class SIPClient implements SipListener {
 		// do you know that we always invite mcu :):) --myIdentity.getMcuName()
 
 		// TODO:: change this to MCU >.<
-		Request inviteReq = createRequest(toSIPUsers.get(0), myIdentity
+		Request inviteReq = createRequest(myIdentity.getMcuName(), myIdentity
 				.getMySIPDomain(), Request.INVITE, addressFactory.createSipURI(
-				toSIPUsers.get(0), myIdentity.getMySIPDomain()));
+				myIdentity.getMcuName(), myIdentity.getMySIPDomain()));
 		inviteReq.setExpires(headerFactory.createExpiresHeader(3600));
 
 		// TODO:: do actual XML
@@ -324,14 +324,15 @@ public class SIPClient implements SipListener {
 			if (i > 0) {
 				rclList.append(",");
 			}
-			rclList.append(toSIPUsers.get(i));
+			rclList.append(toSIPUsers.get(i) + "@"
+					+ myIdentity.getMySIPDomain());
 		}
 
 		// TODO:: add the MIME in elegant way
 		String myMIMEContent = "--8Yards" + "\r\n"
 				+ "Content-type: application/sdp" + "\r\n" + "" + "\r\n"
 				+ SDPUtils.getMySDP() + "\r\n" + "--8Yards" + "\r\n"
-				+ "Content-Type: application/resource-lists+xml" + "\r\n"
+				+ "Content-type: application/resource-lists+xml" + "\r\n"
 				+ rclList.toString() + "\r\n" + "--8Yards--";
 		Log.v("nebula", "sipClient: " + myMIMEContent);
 
@@ -544,7 +545,7 @@ public class SIPClient implements SipListener {
 			String myMIMEContent = "--8Yards" + "\r\n"
 					+ "Content-type: application/sdp" + "\r\n" + "" + "\r\n"
 					+ mySDP + "\r\n" + "--8Yards" + "\r\n"
-					+ "Content-Type: application/resource-lists+xml" + "\r\n"
+					+ "Content-type: application/resource-lists+xml" + "\r\n"
 					+ requestRCL + "\r\n" + "--8Yards--";
 
 			response.setContent(myMIMEContent.getBytes(), headerFactory
@@ -592,6 +593,7 @@ public class SIPClient implements SipListener {
 		try {
 			if (response.getStatusCode() == Response.OK) {
 				if (cseq.getMethod().equals(Request.INVITE)) {
+					Log.e("nebula", "sipClient: " + "seding ACK");
 					tid.getDialog().sendAck(ackRequest);
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
 					if (tid.getDialog().getState() == DialogState.CONFIRMED) {
@@ -607,7 +609,7 @@ public class SIPClient implements SipListener {
 				}
 			}
 		} catch (Exception ex) {
-			Log.e("nebula", ex.getMessage());
+			Log.e("nebula", "sipClient: " + ex.getMessage());
 		}
 	}
 

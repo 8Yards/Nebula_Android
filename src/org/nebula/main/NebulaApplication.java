@@ -103,7 +103,7 @@ public class NebulaApplication extends Application implements
 		}
 	}
 
-	private void establishRTP(String destAddressRTP, int destPortRTP) {
+	public void establishRTP(String destAddressRTP, int destPortRTP) {
 		myRTPSender.setRtpSender(myRTPClient);
 
 		Log.v("nebula", "nebulaApp: desc ip/prt = " + destAddressRTP + "/"

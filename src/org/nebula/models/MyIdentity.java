@@ -37,7 +37,7 @@ public class MyIdentity {
 		sipServerIP = "192.16.124.217";
 		sipServerPort = 5060;
 		sipServerName = "Opensips";
-		mcuName = "mcu";
+		mcuName = "mcu2";
 
 		restServerIP = "http://192.16.124.217/REST";
 	}

@@ -23,7 +23,7 @@ public class SDPUtils {
 	public static String getRCL(String content) throws Exception {
 		Pattern p1 = Pattern
 				.compile(
-						"Content-Type: application/resource-lists\\+xml\r\n(.*?)--8Yards",
+						"Content-type: application/resource-lists\\+xml\r\n(.*?)--8Yards",
 						Pattern.MULTILINE | Pattern.DOTALL);
 		Matcher m1 = p1.matcher(content);
 		if (m1.find()) {

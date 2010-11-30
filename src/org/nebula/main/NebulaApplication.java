@@ -4,7 +4,6 @@
 package org.nebula.main;
 
 import java.net.DatagramSocket;
-import java.net.SocketException;
 
 import jlibrtp.Participant;
 import jlibrtp.RTPSession;
@@ -55,6 +54,7 @@ public class NebulaApplication extends Application implements
 
 			bindService(new Intent(NebulaApplication.this, RTPSender.class),
 					senderConnection, Context.BIND_AUTO_CREATE);
+			Log.v("nebula", "nebulaAPP: " + "sender service started");
 			startService(new Intent(NebulaApplication.this, RTPSender.class));
 
 			myRTPReceiver = new RTPReceiver(); // TODO:: do we need this??
@@ -78,7 +78,7 @@ public class NebulaApplication extends Application implements
 					params));
 		} else if (eventName.equals(SIPClient.NOTIFY_INVITE)) {
 			establishRTP(params[1].toString(), Integer.valueOf(
-					params[2].toString()).intValue());			
+					params[2].toString()).intValue());
 		}
 	}
 
@@ -106,6 +106,8 @@ public class NebulaApplication extends Application implements
 	private void establishRTP(String destAddressRTP, int destPortRTP) {
 		myRTPSender.setRtpSender(myRTPClient);
 
+		Log.v("nebula", "nebulaApp: desc ip/prt = " + destAddressRTP + "/"
+				+ destPortRTP);
 		Participant p = new Participant(destAddressRTP, destPortRTP,
 				destPortRTP + 1);
 		int participants = myRTPSender.numberOfReceivers();

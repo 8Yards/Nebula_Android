@@ -85,21 +85,22 @@ public class RTPSender extends Service {
 		// TODO:: check how AsyncTask can be used to update the progress and UI
 		new Thread(new Runnable() {
 			public void run() {
-				Log.v("nebula", "servicesender: call record");
-
 				isRecording = true;
 				// TODO:: check if new AudioRecord is necessary or not
 				config.audioRecord.startRecording();
 
-				Log.v("nebula", "servicesender: recording...");
+				Log.v("nebula", "rtpSender: recording...");
 				while (isRecording) {
 					int bufferReadResult = config.audioRecord.read(
 							config.buffer, 0, config.bufferSize);
 					sendRTP(config.buffer, bufferReadResult);
+					Log
+							.v("nebula", "rtpSender: sent - "
+									+ bufferReadResult);
 				}
 
 				config.audioRecord.stop();
-				Log.v("nebula", "servicesender: recording stopped.");
+				Log.v("nebula", "rtpSender: recording stopped.");
 			}
 		}).start();
 	}

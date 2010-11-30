@@ -315,7 +315,7 @@ public class SIPClient implements SipListener {
 		// TODO:: change this to MCU >.<
 		Request inviteReq = createRequest(toSIPUsers.get(0), myIdentity
 				.getMySIPDomain(), Request.INVITE, addressFactory.createSipURI(
-				myIdentity.getMcuName(), myIdentity.getMySIPDomain()));
+				toSIPUsers.get(0), myIdentity.getMySIPDomain()));
 		inviteReq.setExpires(headerFactory.createExpiresHeader(3600));
 
 		// TODO:: do actual XML
@@ -534,7 +534,7 @@ public class SIPClient implements SipListener {
 					request);
 			response.addHeader(createContactHeader());
 
-			String requestContent = (String) request.getContent();
+			String requestContent = new String(request.getRawContent());
 			String requestSDP = SDPUtils.getSDP(requestContent);
 			String requestRCL = SDPUtils.getRCL(requestContent);
 

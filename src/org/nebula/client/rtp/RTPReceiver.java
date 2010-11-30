@@ -39,9 +39,9 @@ public class RTPReceiver implements RTPAppIntf {
 	}
 
 	public void receiveData(final DataFrame frame, final Participant participant) {
-		Log.v("nebula", "servicereceiver: receiving...");
 		final byte[] data = frame.getConcatenatedData();
-		conf.audioTrack.write(data, 0, data.length);
+		conf.audioTrack.write(data, 0, data.length);		
+		Log.v("nebula", "servicereceiver: received - " + data.length);
 	}
 
 	// interface method

@@ -45,18 +45,20 @@ public class SDPUtils {
 	public static String retrieveIP(String sdp) throws Exception {
 		Pattern p1 = Pattern.compile("c=[^ ]+ [^ ]+ (.*)");
 		Matcher m1 = p1.matcher(sdp);
-		if (m1.find())
-			return m1.group(1);
-		else
+		if (m1.find()) {
+			return m1.group(1).trim();
+		} else {
 			throw new Exception("No IP found");
+		}
 	}
 
 	public static int retrievePort(String sdp) throws Exception {
 		Pattern p2 = Pattern.compile("m=audio ([0-9]+) ");
 		Matcher m2 = p2.matcher(sdp);
-		if (m2.find())
+		if (m2.find()) {
 			return Integer.parseInt(m2.group(1));
-		else
-			throw new Exception("No IP found");
+		} else {
+			throw new Exception("No Port found");
+		}
 	}
 }

@@ -40,42 +40,41 @@ public class Register extends Activity {
 	public void doRegsiterToNebula(View v) {
 		if (userName.length() <= 0 || fullName.length() <= 0
 				|| password.length() <= 0 || emailAddress.length() <= 0) {
-				Toast.makeText(v.getContext(), "Please fill all fields!",
-				Toast.LENGTH_LONG).show();
-		}
-		else
-		{
-		RESTProfileManager profileManager = new RESTProfileManager();
-		Profile newProfile = new Profile(0, userName.getText().toString(),
-				fullName.getText().toString(), emailAddress.getText()
-						.toString(), password.getText().toString());
-
-		MyIdentity myIdentity = NebulaApplication.getInstance().getMyIdentity();
-
-		try {
-			Status status = profileManager.register(newProfile);
-
-			if (status.isSuccess() == false) {
-				throw new Exception(status.getMessage());
-			} else {
-				myIdentity.setMyUserName(userName.getText().toString());
-				myIdentity.setMyPassword(password.getText().toString());
-
-				Toast.makeText(getApplicationContext(),
-						"Account Created Successfully", Toast.LENGTH_LONG)
-						.show();
-
-				setResult(REGISTER_SUCCESSFULL);
-				finish();
-			}
-		} catch (Exception e) {
-			myIdentity.setMyUserName("");
-			myIdentity.setMyPassword("");
-
-			Toast.makeText(getApplicationContext(), e.getMessage(),
+			Toast.makeText(v.getContext(), "Please fill all fields!",
 					Toast.LENGTH_LONG).show();
-			setResult(REGISTER_FAILURE);
-		}
+		} else {
+			RESTProfileManager profileManager = new RESTProfileManager();
+			Profile newProfile = new Profile(0, userName.getText().toString(),
+					fullName.getText().toString(), emailAddress.getText()
+							.toString(), password.getText().toString());
+
+			MyIdentity myIdentity = NebulaApplication.getInstance()
+					.getMyIdentity();
+
+			try {
+				Status status = profileManager.register(newProfile);
+
+				if (status.isSuccess() == false) {
+					throw new Exception(status.getMessage());
+				} else {
+					myIdentity.setMyUserName(userName.getText().toString());
+					myIdentity.setMyPassword(password.getText().toString());
+
+					Toast.makeText(getApplicationContext(),
+							"Account Created Successfully", Toast.LENGTH_LONG)
+							.show();
+
+					setResult(REGISTER_SUCCESSFULL);
+					finish();
+				}
+			} catch (Exception e) {
+				myIdentity.setMyUserName("");
+				myIdentity.setMyPassword("");
+
+				setResult(REGISTER_FAILURE);
+				Toast.makeText(getApplicationContext(), e.getMessage(),
+						Toast.LENGTH_LONG).show();
+			}
 		}
 	}
 

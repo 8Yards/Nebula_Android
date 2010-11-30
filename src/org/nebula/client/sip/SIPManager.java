@@ -105,6 +105,8 @@ public class SIPManager {
 		Log.v("nebula", "sip_manager: logout called");
 
 		try {
+			doPublish("Offline"); // :P
+
 			// bye should be sent to all active peers
 			SIPClient sip = NebulaApplication.getInstance().getMySIPClient();
 			// Response resp ;= sip.send(sip.bye());
@@ -120,9 +122,4 @@ public class SIPManager {
 
 		return LOGOUT_SUCCESS;
 	}
-	// -- logout_success;
-	// -- logout_failure
-	// -- doLogout()
-	// -- sip.send(sip.bye) - we have only one dialogue
-	// -- sip.send(sip.register(0)) - refactor register - parameter = timeout
 }

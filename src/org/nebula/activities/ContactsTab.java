@@ -38,19 +38,19 @@ import android.widget.TextView;
 
 public class ContactsTab extends ExpandableListActivity implements
 		OnItemSelectedListener {
-
-	private PresenceReceiver presenceReceiver = null;
+	private static final int SHOW_SUB_ACTIVITY_ADDGROUP = 1;
+	private static final int SHOW_SUB_ACTIVITY_ADDCONTACT = 2;
 
 	private List<Map<String, String>> groupData = new ArrayList<Map<String, String>>();
 	private List<List<Map<String, String>>> childData = new ArrayList<List<Map<String, String>>>();
 	private SimpleExpandableListAdapter expListAdapter;
+
 	private ArrayAdapter<CharSequence> adapter;
 	private Spinner spinner;
 	private TextView presence;
-	public MyIdentity myIdentity;
+	private PresenceReceiver presenceReceiver = null;
 
-	private static final int SHOW_SUB_ACTIVITY_ADDGROUP = 1;
-	private static final int SHOW_SUB_ACTIVITY_ADDCONTACT = 2;
+	public MyIdentity myIdentity;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -104,10 +104,11 @@ public class ContactsTab extends ExpandableListActivity implements
 
 			List<Map<String, String>> children = new ArrayList<Map<String, String>>();
 			for (Profile individualProfile : individualGroup.getContacts()) {
-				if(!individualProfile.getUsername().equals("null")){
-				Map<String, String> curChildMap = new HashMap<String, String>();
-				children.add(curChildMap);
-				curChildMap.put("userName", individualProfile.getUsername());
+				if (!individualProfile.getUsername().equals("null")) {
+					Map<String, String> curChildMap = new HashMap<String, String>();
+					children.add(curChildMap);
+					curChildMap
+							.put("userName", individualProfile.getUsername());
 				}
 			}
 			childData.add(children);
@@ -147,16 +148,14 @@ public class ContactsTab extends ExpandableListActivity implements
 			// startActivity(intent);
 			break;
 		case R.id.iDelete:
-		//	intent = new Intent(ContactsTab.this, Delete.class);
-		//	startActivity(intent);
+			// intent = new Intent(ContactsTab.this, Delete.class);
+			// startActivity(intent);
 			break;
-		case R.id.iSignout:
-			finish();
+		case R.id.iSignout:						
 			SIPManager.doLogout();
 			myIdentity = NebulaApplication.getInstance().getMyIdentity();
 			myIdentity.setMyUserName(null);
-			//intent = new Intent(ContactsTab.this, Main.class);
-			//startActivity(intent);
+			finish();
 			System.exit(-1);
 			break;
 		}
@@ -215,10 +214,6 @@ public class ContactsTab extends ExpandableListActivity implements
 				Log.v("nebula", "main:" + "param-" + params[i]);
 			}
 		}
-	}
-
-	public void alert(String message) {
-		new AlertDialog.Builder(this).setMessage(message).show();
 	}
 
 	public void updateStatus(String username, String status) {

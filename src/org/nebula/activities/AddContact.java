@@ -24,15 +24,16 @@ import android.widget.Toast;
 public class AddContact extends Activity implements
 		DialogInterface.OnClickListener,
 		DialogInterface.OnMultiChoiceClickListener {
-	private RESTGroupManager groupManager;
 
-	private Status status;
 	public static final int ADDCONTACT_SUCCESS = 1;
 	public static final int ADDCONTACT_FAILURE = 0;
-
+	
+	private RESTGroupManager groupManager;
 	private List<Group> groups;
 	private String[] groupNames;
 	private boolean[] selectedGroups;
+
+	private Status status;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);

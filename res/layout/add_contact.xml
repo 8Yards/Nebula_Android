@@ -102,4 +102,13 @@
 		android:enabled="false">
 	</EditText>
 
+	<TextView 
+		android:id="@+id/tvNebulaDomain" 
+		android:text="nebula.com" 
+		android:layout_width="wrap_content" 
+		android:layout_height="wrap_content" 
+		android:layout_x="190dip" 
+		android:layout_y="155dip">
+	</TextView>
+	
 </AbsoluteLayout>

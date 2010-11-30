@@ -84,6 +84,7 @@ public class ContactsTab extends ExpandableListActivity implements
 			registerReceiver(presenceReceiver, new IntentFilter(
 					SIPClient.NOTIFY_PRESENCE));
 		}
+		reloadContactList();
 		super.onResume();
 	}
 
@@ -102,9 +103,11 @@ public class ContactsTab extends ExpandableListActivity implements
 
 			List<Map<String, String>> children = new ArrayList<Map<String, String>>();
 			for (Profile individualProfile : individualGroup.getContacts()) {
+				if(!individualProfile.getUsername().equals("null")){
 				Map<String, String> curChildMap = new HashMap<String, String>();
 				children.add(curChildMap);
 				curChildMap.put("userName", individualProfile.getUsername());
+				}
 			}
 			childData.add(children);
 		}
@@ -138,16 +141,17 @@ public class ContactsTab extends ExpandableListActivity implements
 			// startActivity(intent);
 			break;
 		case R.id.iDelete:
-			// Intent intent = new Intent(ContactsTab.this, Editcontacts.class);
-			// startActivity(intent);
+		//	intent = new Intent(ContactsTab.this, Delete.class);
+		//	startActivity(intent);
 			break;
 		case R.id.iSignout:
 			finish();
-
+			SIPManager.doLogout();
 			myIdentity = NebulaApplication.getInstance().getMyIdentity();
 			myIdentity.setMyUserName(null);
-			intent = new Intent(ContactsTab.this, Main.class);
-			startActivity(intent);
+			//intent = new Intent(ContactsTab.this, Main.class);
+			//startActivity(intent);
+			System.exit(-1);
 			break;
 		}
 		return true;

@@ -31,13 +31,13 @@ public class MyIdentity {
 		myRTPPort = Utils.getNextRandomPort();
 
 		// TODO: externalize this
-		mySIPDomain = "192.16.124.211";
-		sipServerIP = "192.16.124.211";
+		mySIPDomain = "192.16.124.217";
+		sipServerIP = "192.16.124.217";
 		sipServerPort = 5060;
 		sipServerName = "Opensips";
 		mcuName = "mcu";
 
-		restServerIP = "http://192.16.124.211/REST";
+		restServerIP = "http://192.16.124.217/REST";
 	}
 
 	public String getMySIPURI() {

@@ -3,6 +3,8 @@
  */
 package org.nebula.client.sip;
 
+import java.util.List;
+
 import javax.sip.message.Response;
 
 import org.nebula.main.NebulaApplication;
@@ -17,8 +19,10 @@ public class SIPManager {
 	public static final int SUBSCRIBE_SUCCESSFUL = 3;
 	public static final int PUBLISH_FAILURE = 4;
 	public static final int PUBLISH_SUCCESSFUL = 5;
-	private static final int LOGOUT_FAILURE = 0;
-	private static final int LOGOUT_SUCCESS = 0;
+	private static final int LOGOUT_FAILURE = 6;
+	private static final int LOGOUT_SUCCESS = 7;
+	private static final int CALL_FAILURE = 8;
+	private static final int CALL_SUCCESS = 9;
 
 	public static int doLogin(String userName, String password) {
 		try {
@@ -72,16 +76,33 @@ public class SIPManager {
 		}
 	}
 
+	// contact- prajwol, michel
+	public static int doCall(List<String> toUsers) {
+		try {
+			SIPClient sip = NebulaApplication.getInstance().getMySIPClient();
+			Log.v("nebula", "sipManager: " + "calling " + toUsers.get(0));
+			Response response = sip.send(sip.invite(toUsers));
+			if (response.getStatusCode() == 200) {
+				return CALL_SUCCESS;
+			} else {
+				throw new Exception("Call didn't succeed");
+			}
+		} catch (Exception e) {
+			Log.e("nebula", "sip_manager:" + e.getMessage());
+			return CALL_FAILURE;
+		}
+	}
+
 	/*
 	 * contact nina
 	 */
 	public static int doLogout() {
 		Log.v("nebula", "sip_manager: logout called");
-		
+
 		try {
 			// bye should be sent to all active peers
 			SIPClient sip = NebulaApplication.getInstance().getMySIPClient();
-//			Response resp ;= sip.send(sip.bye());
+			// Response resp ;= sip.send(sip.bye());
 
 			Response resp = sip.send(sip.register(0));
 			if (resp.getStatusCode() == Response.OK) {

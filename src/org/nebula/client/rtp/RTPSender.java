@@ -2,7 +2,7 @@
  * author - michel
  * refactor - michel, prajwol
  */
-package org.nebula.services;
+package org.nebula.client.rtp;
 
 import java.util.Iterator;
 
@@ -17,7 +17,7 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
 
-public class ServiceSender extends Service {
+public class RTPSender extends Service {
 	private final IBinder binder = new SenderBinder();
 
 	// TODO:: check the thread-safety of this variable
@@ -81,35 +81,25 @@ public class ServiceSender extends Service {
 		rtpSender.sendData(currentBuffer);
 	}
 
-	/*
-	 * Record and send RTP
-	 */
-	public void record() {
-		Log.v("nebula", "servicesender: call record");
-
-		isRecording = true;
-		// TODO:: check if new AudioRecord is necessary or not
-		config.audioRecord.startRecording();
-
-		Log.v("nebula", "servicesender: recording...");
-		while (isRecording) {
-			int bufferReadResult = config.audioRecord.read(config.buffer, 0,
-					config.bufferSize);
-			sendRTP(config.buffer, bufferReadResult);
-		}
-
-		config.audioRecord.stop();
-		Log.v("nebula", "servicesender: recording stopped.");
-	}
-
-	/*
-	 * Start recording
-	 */
-	public void startRecording() {
+	public void startRecordingAndSending() {
 		// TODO:: check how AsyncTask can be used to update the progress and UI
 		new Thread(new Runnable() {
 			public void run() {
-				record();
+				Log.v("nebula", "servicesender: call record");
+
+				isRecording = true;
+				// TODO:: check if new AudioRecord is necessary or not
+				config.audioRecord.startRecording();
+
+				Log.v("nebula", "servicesender: recording...");
+				while (isRecording) {
+					int bufferReadResult = config.audioRecord.read(
+							config.buffer, 0, config.bufferSize);
+					sendRTP(config.buffer, bufferReadResult);
+				}
+
+				config.audioRecord.stop();
+				Log.v("nebula", "servicesender: recording stopped.");
 			}
 		}).start();
 	}
@@ -121,8 +111,8 @@ public class ServiceSender extends Service {
 	}
 
 	public class SenderBinder extends Binder {
-		public ServiceSender getService() {
-			return ServiceSender.this;
+		public RTPSender getService() {
+			return RTPSender.this;
 		}
 	}
 

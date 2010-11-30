@@ -63,7 +63,8 @@ public class ContactsTab extends ExpandableListActivity implements
 		spinner = (Spinner) findViewById(R.id.sStatus);
 		adapter = ArrayAdapter.createFromResource(this, R.array.status,
 				android.R.layout.simple_spinner_item);
-		adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+		adapter
+				.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 		spinner.setAdapter(adapter);
 		spinner.setOnItemSelectedListener(this);
 
@@ -124,6 +125,11 @@ public class ContactsTab extends ExpandableListActivity implements
 
 		switch (item.getItemId()) {
 		case R.id.iInstantTalk:
+			Log.v("nebula", "conversationTab: " + "calling testb");
+			List<String> callee = new ArrayList<String>();
+			callee.add("testb");
+
+			SIPManager.doCall(callee);
 			break;
 		case R.id.iAddContact:
 			intent = new Intent(ContactsTab.this, AddContact.class);

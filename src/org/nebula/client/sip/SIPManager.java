@@ -9,6 +9,7 @@ import javax.sip.message.Response;
 
 import org.nebula.main.NebulaApplication;
 import org.nebula.models.MyIdentity;
+import org.nebula.utils.SDPUtils;
 
 import android.util.Log;
 
@@ -83,6 +84,10 @@ public class SIPManager {
 			Log.v("nebula", "sipManager: " + "calling " + toUsers.get(0));
 			Response response = sip.send(sip.invite(toUsers));
 			if (response.getStatusCode() == 200) {
+				String requestContent = new String(response.getRawContent());
+				NebulaApplication.getInstance().establishRTP(
+						SDPUtils.retrieveIP(requestContent),
+						SDPUtils.retrievePort(requestContent));
 				return CALL_SUCCESS;
 			} else {
 				throw new Exception("Call didn't succeed");

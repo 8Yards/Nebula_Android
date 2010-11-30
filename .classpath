@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="src_others"/>
 	<classpathentry kind="lib" path="lib/jain-sip-api-1.2.jar" sourcepath="/jain-sip"/>
 	<classpathentry kind="lib" path="lib/jain-sip-ri-1.2.85.jar" sourcepath="/jain-sip"/>
 	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>

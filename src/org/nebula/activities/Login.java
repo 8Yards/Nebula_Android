@@ -37,7 +37,7 @@ public class Login extends Activity {
 		if (status == SIPManager.LOGIN_SUCCESSFUL) {
 			finish();
 		} else if (status == SIPManager.LOGIN_FAILURE) {
-			showAlert("Bad credentials :P");
+			showAlert("Invalid credentials or Need internet connection");
 		}
 	}
 

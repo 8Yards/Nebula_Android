@@ -63,7 +63,7 @@
 	</TextView>
 	
 	<EditText
-		android:id="@+id/etEmailAddress"
+		android:id="@+id/etPassword"
 		android:layout_width="300px"
 		android:layout_height="50px"
 		android:textSize="18sp"
@@ -72,7 +72,7 @@
 	</EditText>
 	
 	<EditText
-		android:id="@+id/etPassword"
+		android:id="@+id/etEmailAddress"
 		android:layout_width="300px"
 		android:layout_height="50px"
 		android:textSize="18sp"

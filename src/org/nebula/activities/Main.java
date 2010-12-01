@@ -10,13 +10,9 @@ import org.nebula.client.sip.SIPManager;
 import org.nebula.main.NebulaApplication;
 import org.nebula.models.MyIdentity;
 
-import android.app.AlertDialog;
 import android.app.TabActivity;
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 
@@ -56,37 +52,27 @@ public class Main extends TabActivity {
 			startActivityForResult(myIntent, SHOW_SUB_ACTIVITY_LOGIN);
 		} else {
 			setContentView(R.layout.main);
+			NebulaApplication.getInstance().reloadMyGroups();
+			
 			TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
 
-			TabSpec contactSpec = tabHost.newTabSpec("contacts").setIndicator(
-					"Contacts",
-					getResources().getDrawable(R.drawable.ic_tab_albums))
+			TabSpec contactSpec = tabHost
+					.newTabSpec("contacts")
+					.setIndicator(
+							"Contacts",
+							getResources()
+									.getDrawable(R.drawable.ic_tab_albums))
 					.setContent(new Intent(Main.this, ContactsTab.class));
 
-			TabSpec conversationSpec = tabHost.newTabSpec("conversation")
+			TabSpec conversationSpec = tabHost
+					.newTabSpec("conversation")
 					.setIndicator(
 							"Conversation",
 							getResources().getDrawable(
-									R.drawable.ic_tab_artists)).setContent(
-							new Intent(Main.this, ConversationTab.class));
+									R.drawable.ic_tab_artists))
+					.setContent(new Intent(Main.this, ConversationTab.class));
 			tabHost.addTab(contactSpec);
 			tabHost.addTab(conversationSpec);
 		}
-	}
-
-	public class PresenceReceiver extends BroadcastReceiver {
-		@Override
-		public void onReceive(Context context, Intent intent) {
-			Object[] params = (Object[]) intent.getExtras().get("params");
-			Log.v("nebula", "main:" + "params_len=" + params.length);
-			for (int i = 0; i < params.length; i++) {
-				Log.v("nebula", "main:" + "param-" + params[i]);
-			}
-			alert(params[1] + ", " + params[2]);
-		}
-	}
-
-	public void alert(String message) {
-		new AlertDialog.Builder(this).setMessage(message).show();
 	}
 }

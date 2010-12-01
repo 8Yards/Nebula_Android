@@ -24,15 +24,16 @@ import android.widget.Toast;
 public class AddContact extends Activity implements
 		DialogInterface.OnClickListener,
 		DialogInterface.OnMultiChoiceClickListener {
-	private RESTGroupManager groupManager;
 
-	private Status status;
 	public static final int ADDCONTACT_SUCCESS = 1;
 	public static final int ADDCONTACT_FAILURE = 0;
-
+	
+	private RESTGroupManager groupManager;
 	private List<Group> groups;
 	private String[] groupNames;
 	private boolean[] selectedGroups;
+
+	private Status status;
 
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -95,7 +96,7 @@ public class AddContact extends Activity implements
 		}
 
 		try {
-			status = groupManager.addContact(contactName, nebulaId);
+			status = groupManager.addContact(nebulaId, contactName);
 
 			if (!status.isSuccess()) {
 				throw new Exception(status.getMessage());
@@ -110,6 +111,7 @@ public class AddContact extends Activity implements
 			return;
 		}
 
+		if(selectedGroups!=null){
 		for (int i = 0; i < selectedGroups.length; i++) {
 			// TODO Remove this try catch and club the job of adding the
 			// new contact
@@ -123,7 +125,7 @@ public class AddContact extends Activity implements
 				Log.e("nebula", "addcontact: " + e.getMessage());
 			}
 		}
-
+		}
 		Toast.makeText(this.getApplicationContext(), status.getMessage(),
 				Toast.LENGTH_LONG).show();
 		setResult(ADDCONTACT_SUCCESS);

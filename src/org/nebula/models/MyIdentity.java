@@ -23,6 +23,8 @@ public class MyIdentity {
 
 	private String restServerIP;
 
+	private String myStatus = "Online";// TODO:: update this
+
 	private List<Group> myGroups = new ArrayList<Group>();
 
 	public void loadConfiguration() throws Exception {
@@ -31,13 +33,13 @@ public class MyIdentity {
 		myRTPPort = Utils.getNextRandomPort();
 
 		// TODO: externalize this
-		mySIPDomain = "192.16.124.211";
-		sipServerIP = "192.16.124.211";
+		mySIPDomain = "192.16.124.217";
+		sipServerIP = "192.16.124.217";
 		sipServerPort = 5060;
 		sipServerName = "Opensips";
-		mcuName = "mcu";
+		mcuName = "mcu2";
 
-		restServerIP = "http://192.16.124.211/REST";
+		restServerIP = "http://192.16.124.217/REST";
 	}
 
 	public String getMySIPURI() {
@@ -138,6 +140,14 @@ public class MyIdentity {
 
 	public void setRestServerIP(String restServerIP) {
 		this.restServerIP = restServerIP;
+	}
+
+	public String getMyStatus() {
+		return myStatus;
+	}
+
+	public void setMyStatus(String myStatus) {
+		this.myStatus = myStatus;
 	}
 
 }

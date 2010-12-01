@@ -311,6 +311,48 @@ public abstract class Resource {
 	}
 
 	/*
+	 * sends a DELETE request
+	 * 
+	 * @param id the id of the element being deleted
+	 * @param method method to be called
+	 * @return Response response from the server
+	 */
+	protected Response delete(String method,String id) throws ClientProtocolException,
+			IOException, JSONException {
+		String requestURL = this.url + id + "/" + method;
+		
+		HttpDelete httpdelete = new HttpDelete(requestURL);
+		return send_and_receive(httpdelete);
+	}
+	
+	protected Response delete(String method, Map<String, String> params) throws ClientProtocolException,
+	IOException, JSONException {
+		String requestURL = this.url;
+		if (params.containsKey("id"))
+			requestURL = requestURL + params.get("id") + "/";
+		requestURL += method;
+		String optionsStr = "";
+		Iterator it = params.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry pairs = (Map.Entry) it.next();
+			if (!((String) pairs.getKey()).toLowerCase().equals("id"))
+				optionsStr = optionsStr + pairs.getKey() + "="
+						+ pairs.getValue() + "&";
+		}
+
+		requestURL = requestURL + method;
+		if (!optionsStr.equals(""))
+			requestURL = requestURL + "?" + optionsStr;
+					
+		System.out.println(requestURL);
+		//HttpDelete httpdelete = new HttpDelete(requestURL);
+		
+		//return send_and_receive(httpdelete);
+		return null;
+	}
+	
+	
+	/*
 	 * converts a HashMap to a List
 	 * 
 	 * @param options the hashmap being converted

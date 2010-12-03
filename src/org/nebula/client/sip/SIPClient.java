@@ -576,7 +576,7 @@ public class SIPClient implements SipListener {
 			// RFC3261: MUST respond to every 2xx
 			if (ackRequest != null && dialog != null) {
 				try {
-					dialog.sendAck(ackRequest);
+					tid.getDialog().sendAck(ackRequest);
 				} catch (SipException se) {
 					Log.e("nebula", se.getMessage());
 				}
@@ -593,7 +593,8 @@ public class SIPClient implements SipListener {
 		try {
 			if (response.getStatusCode() == Response.OK) {
 				if (cseq.getMethod().equals(Request.INVITE)) {
-					Log.e("nebula", "sipClient: " + "seding ACK");
+					ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
+					Log.e("nebula", "sipClient: " + "sending ACK") ;
 					tid.getDialog().sendAck(ackRequest);
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
 					if (tid.getDialog().getState() == DialogState.CONFIRMED) {
@@ -610,7 +611,6 @@ public class SIPClient implements SipListener {
 					
 					SIPETagHeader sipETag = (SIPETagHeader) response.getHeader("SIP-ETag") ;
 					myIdentity.setSipETag(sipETag.getETag());
-//					Log.i("nebula", "Received response to PUBLISH;ETag " + sipETag.getETag());
 				} 
 			}
 		} catch (Exception ex) {

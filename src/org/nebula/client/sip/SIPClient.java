@@ -274,8 +274,7 @@ public class SIPClient implements SipListener {
 				"application", "pidf+xml"));
 		publishReq.setHeader(headerFactory.createExpiresHeader(expires));
 		publishReq.setHeader(headerFactory.createEventHeader("presence"));
-
-		
+	
 		//replace the previous publish messages
 		if (myIdentity.getSipETag().length() > 0) {
 				publishReq.addHeader(headerFactory.createSIPIfMatchHeader(myIdentity.getSipETag())) ;
@@ -608,7 +607,6 @@ public class SIPClient implements SipListener {
 					tid.getDialog().notify();
 					// tid.notify() ;
 				} else if (cseq.getMethod().equals(Request.PUBLISH)) {
-					
 					SIPETagHeader sipETag = (SIPETagHeader) response.getHeader("SIP-ETag") ;
 					myIdentity.setSipETag(sipETag.getETag());
 				} 

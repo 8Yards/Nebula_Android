@@ -45,7 +45,6 @@ import org.nebula.models.MyIdentity;
 import org.nebula.utils.Base64;
 import org.nebula.utils.Utils;
 
-import android.util.Log;
 
 /*
  * Class used by Profiles, Contacts, Groups classes
@@ -151,6 +150,7 @@ public abstract class Resource {
 			requestURL = requestURL + "?"
 					+ new UrlEncodedFormEntity(convertToList(params));
 
+		System.out.println(requestURL);
 		HttpGet httpget = new HttpGet(requestURL);
 		return send_and_receive(httpget);
 	}
@@ -261,12 +261,12 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response put(String method, HashMap<String, Object> options)
+	protected Response put(String method, Map<String, Object> options)
 			throws ClientProtocolException, IOException, JSONException {
 		String requestURL = this.url;
 
-		if (this.data.containsKey("id"))
-			requestURL = requestURL + this.data.get("id") + "/";
+		if (options.containsKey("id"))
+			requestURL = requestURL + options.get("id") + "/";
 
 		requestURL += method;
 
@@ -300,20 +300,6 @@ public abstract class Resource {
 	 * sends a DELETE request
 	 * 
 	 * @param id the id of the element being deleted
-	 * 
-	 * @return Response response from the server
-	 */
-	protected Response delete(String id) throws ClientProtocolException,
-			IOException, JSONException {
-		String requestURL = this.url + id + "/";
-		HttpDelete httpdelete = new HttpDelete(requestURL);
-		return send_and_receive(httpdelete);
-	}
-
-	/*
-	 * sends a DELETE request
-	 * 
-	 * @param id the id of the element being deleted
 	 * @param method method to be called
 	 * @return Response response from the server
 	 */
@@ -330,28 +316,32 @@ public abstract class Resource {
 		String requestURL = this.url;
 		if (params.containsKey("id"))
 			requestURL = requestURL + params.get("id") + "/";
-		requestURL += method;
 		String optionsStr = "";
 		Iterator it = params.entrySet().iterator();
+		//if it's not the first parameter add initially & to concat them
+		int adds = 0;
 		while (it.hasNext()) {
 			Map.Entry pairs = (Map.Entry) it.next();
 			if (!((String) pairs.getKey()).toLowerCase().equals("id"))
+			{
+				
+				if(adds != 0)
+					optionsStr += "&";
 				optionsStr = optionsStr + pairs.getKey() + "="
-						+ pairs.getValue() + "&";
+						+ pairs.getValue() ;
+				adds++;
+			}
 		}
 
 		requestURL = requestURL + method;
 		if (!optionsStr.equals(""))
 			requestURL = requestURL + "?" + optionsStr;
 					
-		System.out.println(requestURL);
-		//HttpDelete httpdelete = new HttpDelete(requestURL);
+		HttpDelete httpdelete = new HttpDelete(requestURL);
 		
-		//return send_and_receive(httpdelete);
-		return null;
+		return send_and_receive(httpdelete);
 	}
-	
-	
+
 	/*
 	 * converts a HashMap to a List
 	 * 
@@ -424,12 +414,14 @@ public abstract class Resource {
 					"Basic " + base64.replace("\r\n", ""));
 		}
 		HttpResponse response = httpclient.execute(request);
+		
 		InputStream instream = response.getEntity().getContent();
 		String result = Utils.convertStreamToString(instream);
 
 		int status = response.getStatusLine().getStatusCode();
-
+		System.out.println(result);
 		// prajwol - well, you dont have right to trim the result :@
+		
 		return new Response(status, new JSONObject(result));
 	}
 }

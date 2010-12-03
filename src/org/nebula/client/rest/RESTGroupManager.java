@@ -101,6 +101,25 @@ public class RESTGroupManager extends Resource {
 		return myGroups;
 	}
 
+	public Status modifyContact(Profile p, String nickname, List<Group> groupList) throws ClientProtocolException,
+	IOException, JSONException {
+		Map<String, Object> h = new HashMap<String, Object>();
+		h.put("contactID", p.getId());
+		h.put("groupsNumber", groupList.size());
+		if(!nickname.equals(""))
+			h.put("contactNickame", nickname);
+		for(int i=0; i<groupList.size(); i++){
+			h.put("groups" + (i+1) + "ID", groupList.get(i).getId());
+		}
+		Response r = this.put("modifyContact", h);
+		System.out.println(""+r.getResult());
+		if (r.getStatus() == 201) {
+			return new Status(true, r.getResult().getString("result"));
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
+	}
+	
 	/**
 	 * Insert the Profiles that belongs to group object into it in the DB
 	 * 

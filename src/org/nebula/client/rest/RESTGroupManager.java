@@ -221,8 +221,9 @@ public class RESTGroupManager extends Resource {
 	 * @param id id of the group to be dropped
 	 * @return status of the performed operation
 	 */
-	public Status deleteGroup(int id) throws ClientProtocolException, IOException, JSONException{
-		Response r = this.delete("deleteGroup", "" + id);
+	public Status deleteGroup(Group g) throws ClientProtocolException, IOException, JSONException{
+		
+		Response r = this.delete("deleteGroup", "" + g.getId());
 		if ((r.getStatus() >= 200) && (r.getStatus() < 300)) {
 			return new Status(true, "Group dropped successfully");
 		} else {
@@ -235,8 +236,8 @@ public class RESTGroupManager extends Resource {
 	 * @param id id of the contact to be dropped
 	 * @return status of the performed operation
 	 */
-	public Status deleteContact(int id) throws ClientProtocolException, IOException, JSONException{
-		Response r = this.delete("deleteContact", "" + id);
+	public Status deleteContact(Profile p) throws ClientProtocolException, IOException, JSONException{
+		Response r = this.delete("deleteContact", "" + p.getId());
 		if ((r.getStatus() >= 200) && (r.getStatus() < 300)) {
 			return new Status(true, "Contact dropped successfully");
 		} else {
@@ -244,10 +245,10 @@ public class RESTGroupManager extends Resource {
 		}
 	}
 	//TODO: retrieve usertouser.id
-public Status deleteContactFromGroup(int contactID, int groupID) throws ClientProtocolException, IOException, JSONException{
+public Status deleteContactFromGroup(Profile p, Group g) throws ClientProtocolException, IOException, JSONException{
 		Map<String, String> hM = new HashMap<String, String>();
-		hM.put("contactID", "" + contactID);
-		hM.put("groupID", "" + groupID);
+		hM.put("contactID", "" + p.getId());
+		hM.put("groupID", "" + g.getId());
 		Response r = this.delete("deleteContactFromGroup", hM);
 		if ((r.getStatus() >= 200) && (r.getStatus() < 300)) {
 			return new Status(true, "Contact dropped successfully");

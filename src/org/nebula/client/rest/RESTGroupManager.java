@@ -101,6 +101,20 @@ public class RESTGroupManager extends Resource {
 		return myGroups;
 	}
 
+	public Status modifyGroup(Group g) throws ClientProtocolException,
+	IOException, JSONException {
+		Map<String, Object> h = new HashMap<String, Object>();
+		h.put("groupName", g.getGroupName());
+		h.put("status", g.getGroupStatus());
+		
+		Response r = this.put("modifyGroup", h);
+		if (r.getStatus() == 201) {
+			return new Status(true, r.getResult().getString("result"));
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
+	}
+	
 	public Status modifyContact(Profile p, String nickname, List<Group> groupList) throws ClientProtocolException,
 	IOException, JSONException {
 		Map<String, Object> h = new HashMap<String, Object>();
@@ -112,9 +126,8 @@ public class RESTGroupManager extends Resource {
 			h.put("groups" + (i+1) + "ID", groupList.get(i).getId());
 		}
 		Response r = this.put("modifyContact", h);
-		System.out.println(""+r.getResult());
 		if (r.getStatus() == 201) {
-			return new Status(true, r.getResult().getString("result"));
+			return new Status(true, "Group retrieved successfully");
 		} else {
 			return new Status(false, r.getResult().getString("result"));
 		}

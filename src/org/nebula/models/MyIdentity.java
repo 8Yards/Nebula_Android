@@ -4,9 +4,14 @@
 
 package org.nebula.models;
 
+
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+
 import org.nebula.utils.Utils;
+
+import android.util.Log;
 
 public class MyIdentity {
 	private String myIP;
@@ -28,20 +33,22 @@ public class MyIdentity {
 	private String sipETag = "";
 
 	private List<Group> myGroups = new ArrayList<Group>();
-
+	private List<ConversationThread> myThreads = new ArrayList<ConversationThread>();
+	
+		
 	public void loadConfiguration() throws Exception {
 		myIP = Utils.getLocalIpAddress();
 		mySIPPort = Utils.getNextRandomPort();
 		myRTPPort = Utils.getNextRandomPort();
 
 		// TODO: externalize this
-		mySIPDomain = "192.16.124.217";
-		sipServerIP = "192.16.124.217";
+		mySIPDomain = "192.16.124.211";
+		sipServerIP = "192.16.124.211";
 		sipServerPort = 5060;
 		sipServerName = "Opensips";
-		mcuName = "mcu2";
+		mcuName = "mcu";
 
-		restServerIP = "http://192.16.124.217/REST";
+		restServerIP = "http://192.16.124.211/REST";
 	}
 
 	public String getMySIPURI() {
@@ -159,5 +166,58 @@ public class MyIdentity {
 	public void setSipETag(String sipETag) {
 		this.sipETag = sipETag ;
 	}
+		
+	/*
+	 * contact nina
+	 */
+	public ConversationThread getThreadById(String threadId)
+	{
+		ConversationThread thread ;
+		Iterator <ConversationThread> iter = myThreads.iterator() ;
+				
+		while (iter.hasNext())
+		{
+			thread = iter.next();
+			if (thread.getId().equals(threadId))
+				return thread;
+		}
+		
+		Log.e("nebula", "MyIdentity: Conversation thread " + threadId + " does not exist") ;
+		return null;
+	}
+	
+	public Boolean existsThread(String threadId) {
+
+		ConversationThread thread ;
+		Iterator <ConversationThread> iter = myThreads.iterator() ;
+				
+		while (iter.hasNext())
+		{
+			thread = iter.next();
+			if (thread.getId().equals(threadId))
+				return true;
+		}
+		
+		return false; 
+	}
+	
+	public List<ConversationThread> getMyThreads() {
+		
+		return myThreads;		
+	}
+	
+	
+	public ConversationThread createThread() {
+		ConversationThread newThread = new ConversationThread(ConversationThread.createNewThreadId(myUserName), myUserName) ;
+		myThreads.add(newThread) ;
+		return newThread;
+	}
+	
+	public ConversationThread createThread(String threadId) {
+		ConversationThread newThread = new ConversationThread(threadId, myUserName) ;
+		myThreads.add(newThread) ;
+		return newThread;
+	}
+	
 
 }

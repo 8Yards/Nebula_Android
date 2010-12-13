@@ -594,6 +594,7 @@ public class SIPClient implements SipListener {
 			if (response.getStatusCode() == Response.OK) {
 				if (cseq.getMethod().equals(Request.INVITE)) {
 					Log.e("nebula", "sipClient: " + "seding ACK");
+					ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
 					tid.getDialog().sendAck(ackRequest);
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
 					if (tid.getDialog().getState() == DialogState.CONFIRMED) {

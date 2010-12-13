@@ -5,109 +5,70 @@
 package org.nebula.models;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Iterator;
 import java.util.List;
 
+import org.nebula.main.NebulaApplication;
+
 public class ConversationThread {
-	
-	private String id ;
-	private List<Conversation> myConversations = new ArrayList<Conversation>();
+	private String id;
 	private int seqNo = 0;
-	private String myUsername ;
-	
-	private static String dateFormatString = "yyyyMMddhhmmss";
-	private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormatString) ;
-	private static Calendar calendar = Calendar.getInstance() ;
+	private List<Conversation> myConversations = new ArrayList<Conversation>();
 
-	
-	public ConversationThread(String id, String myUsername ) {
-		this.id = id ;
-		this.myUsername = myUsername ;
+	private Calendar calendar = Calendar.getInstance();
+	private SimpleDateFormat simpleDateFormat = new SimpleDateFormat(
+			"yyyyMMddhhmmss");
+
+	public ConversationThread() {
+		this.id = createNewThreadId();
 	}
-	
-	public String getId() {
-		return id ;
+
+	public ConversationThread(String id) {
+		this.id = id;
 	}
-	
-	public List<Conversation> getConversations() {
-		return myConversations ; 
-	}
-	
-	public Conversation addConversation(String conversationId, String rcl) {
-		Conversation newConversation = new Conversation(conversationId, rcl) ;
-		myConversations.add(newConversation) ;
+
+	public Conversation addConversation(String newConversationId, String rcl) {
+		Conversation newConversation = new Conversation(newConversationId, rcl);
+		myConversations.add(newConversation);
 		return newConversation;
 	}
-	
+
 	public Conversation addConversation(String rcl) {
-		
-		Conversation newConversation = new Conversation(createNewConversationId(), rcl) ;
-		myConversations.add(newConversation) ;
+		Conversation newConversation = new Conversation(
+				createNewConversationId(), rcl);
+		myConversations.add(newConversation);
 		return newConversation;
 	}
-	
-	public String createNewConversationId() {
-		
-		seqNo++;
-		return myUsername + seqNo ;
+
+	private String createNewConversationId() {
+		return NebulaApplication.getInstance().getMyIdentity().getMyUserName()
+				+ seqNo++;
 	}
 
-	public static String createNewThreadId(String username) {
-		return  username + simpleDateFormat.format(calendar.getTime()) ;
+	public String createNewThreadId() {
+		return NebulaApplication.getInstance().getMyIdentity().getMyUserName()
+				+ simpleDateFormat.format(calendar.getTime());
 	}
 
-	
 	public Conversation getConversation(String id) throws Exception {
+		for (Conversation curConversation : myConversations) {
+			if (curConversation.getId().equals(id)) {
+				return curConversation;
+			}
+		}
+		return null;
+	}
 
-		Conversation curConversation ;
-		Iterator<Conversation> iter = myConversations.iterator() ;
-		
-		while (iter.hasNext()) {
-			curConversation = iter.next() ;
-			if (curConversation.getId().equals(id))
-					return curConversation ;
-		}
-		return null ;
-	}
-	
-	public Conversation getLatestConversation() throws Exception{
-		
-		if (myConversations.size() == 0)
-			throw new Exception("Conversation thread is empty") ;
-		
-		Conversation maxConversation;
-		Conversation curConversation ;
-		
-		Iterator<Conversation> iter = myConversations.iterator() ;
-		
-		maxConversation = myConversations.get(0) ;
-		
-		while (iter.hasNext()) {
-			curConversation = iter.next() ;
-			if (curConversation.getDate().compareTo(maxConversation.getDate()) > 0)
-					maxConversation = curConversation ;
-		}
-		
-		return maxConversation;
-	}
-	
 	public int getSeqNo() {
-		return seqNo ;
-	}
-	
-	public String updateOldConversation (String oldId) throws Exception {
-		String newId = createNewConversationId() ;
-		getConversation(oldId).setId(newId) ;
-		return newId ;
-	}
-	
-	public void updateOldConversation (String oldId, String newId) throws Exception {
-
-		if (getConversation(oldId) != null)
-			getConversation(oldId).setId(newId) ;
+		return seqNo;
 	}
 
+	public String getId() {
+		return id;
+	}
+
+	public List<Conversation> getMyConversations() {
+		return myConversations;
+	}
 }

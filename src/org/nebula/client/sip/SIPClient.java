@@ -8,13 +8,8 @@
 
 package org.nebula.client.sip;
 
-import gov.nist.javax.sip.header.SIPHeader;
-
 import java.io.IOException;
-
 import java.io.StringReader;
-import java.security.Identity;
-import java.sql.Date;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +17,6 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.Calendar;
 
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -51,16 +45,14 @@ import javax.sip.header.CallIdHeader;
 import javax.sip.header.ContactHeader;
 import javax.sip.header.EventHeader;
 import javax.sip.header.FromHeader;
-import javax.sip.header.Header;
 import javax.sip.header.HeaderAddress;
 import javax.sip.header.HeaderFactory;
 import javax.sip.header.MaxForwardsHeader;
-import javax.sip.header.ReferToHeader;
 import javax.sip.header.SIPETagHeader;
-import javax.sip.header.SIPIfMatchHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
+import javax.sip.header.ReferToHeader;
 import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -71,9 +63,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.nebula.main.NebulaApplication;
 import org.nebula.main.NebulaEventHandler;
+import org.nebula.models.MyIdentity;
 import org.nebula.models.Conversation;
 import org.nebula.models.ConversationThread;
-import org.nebula.models.MyIdentity;
 import org.nebula.utils.SDPUtils;
 import org.nebula.utils.Utils;
 import org.w3c.dom.Document;
@@ -83,11 +75,9 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import android.os.RemoteCallbackList;
 import android.util.Log;
 
-import java.text.SimpleDateFormat;
-
+import gov.nist.javax.sip.header.SIPHeader;
 /**
  * Class for the SIP Client
  */
@@ -102,10 +92,9 @@ public class SIPClient implements SipListener {
 	private static final String ENTITY_ATTRIBUTE = "entity";
 	public static final String NOTIFY_PRESENCE = "NOTIFY_PRESENCE_EVENT";
 	public static final String NOTIFY_INVITE = "NOTIFY_INVITE_EVENT";
-	public static final String THREAD_PARAMETER = "thread" ;
-	public static final String CONVERSATION_PARAMETER = "conv" ;
-	public static final String NEW_VALUE_PARAMETER = "newvalue" ;
-	
+	public static final String THREAD_PARAMETER = "thread";
+	public static final String CONVERSATION_PARAMETER = "conv";
+	public static final String OLD_CONVERSATION_PARAMETER = "newvalue";
 
 	private static AddressFactory addressFactory;
 	private static MessageFactory messageFactory;
@@ -114,7 +103,7 @@ public class SIPClient implements SipListener {
 	private static SipProvider sipProvider;
 	private static SipStack sipStack;
 	private NebulaEventHandler eventHandler = null;
-	public MyIdentity myIdentity; // should be private!
+	private MyIdentity myIdentity;
 
 	private ClientTransaction Tid;
 	private Dialog dialog;
@@ -125,9 +114,7 @@ public class SIPClient implements SipListener {
 
 	private ListeningPoint localUDPListeningPoint;
 	private String transport = "udp";
-	
-	private Calendar calendar ;
-	
+
 	public SIPClient() throws Exception {
 		myIdentity = NebulaApplication.getInstance().getMyIdentity();
 
@@ -155,8 +142,8 @@ public class SIPClient implements SipListener {
 				.getMyUserName(), myIdentity.getMyIP());
 
 		// TODO:: well in production remove this
-		 contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
-		 "130.229.153.214");
+		// contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
+		// "130.229.153.214");
 
 		contactURI.setPort(sipProvider.getListeningPoint(transport).getPort());
 
@@ -240,7 +227,9 @@ public class SIPClient implements SipListener {
 	 * contact - nin B-)
 	 */
 	private Request createRequest(String toSIPUser, String toSIPDomain,
-			String reqType, SipURI requestURI) throws ParseException, InvalidArgumentException, Exception {
+			String reqType, SipURI requestURI
+
+	) throws ParseException, InvalidArgumentException, Exception {
 		CallIdHeader callIdHeader = getNewCallIdHeader();
 		CSeqHeader cSeqHeader = getCSeqHeader(reqType);
 		FromHeader fromHeader = (FromHeader) getHeader(myIdentity
@@ -256,7 +245,7 @@ public class SIPClient implements SipListener {
 
 		return request;
 	}
-	
+
 	/*
 	 * contact - michel, prajwol Prepares a SIP REGISTER message
 	 */
@@ -332,9 +321,8 @@ public class SIPClient implements SipListener {
 		Request inviteReq = createRequest(myIdentity.getMcuName(), myIdentity
 				.getMySIPDomain(), Request.INVITE, addressFactory.createSipURI(
 				myIdentity.getMcuName(), myIdentity.getMySIPDomain()));
-				
 		inviteReq.setExpires(headerFactory.createExpiresHeader(3600));
-		
+
 		// TODO:: do actual XML
 		StringBuilder rclList = new StringBuilder();
 		for (int i = 0; i < toSIPUsers.size(); i++) {
@@ -357,18 +345,16 @@ public class SIPClient implements SipListener {
 				.setContent(myMIMEContent.getBytes(), headerFactory
 						.createContentTypeHeader("multipart",
 								"mixed; boundary=8Yards"));
-		
+
 		ConversationThread thread = myIdentity.createThread();
 		Conversation conversation = thread.addConversation(rclList.toString());
-		
-//		add thread and conversation parameters
-		ToHeader toHeader = (ToHeader) inviteReq.getHeader(SIPHeader.TO) ;
+
+		// add thread and conversation parameters
+		ToHeader toHeader = (ToHeader) inviteReq.getHeader(SIPHeader.TO);
 		toHeader.setParameter(THREAD_PARAMETER, thread.getId());
-		toHeader.setParameter(CONVERSATION_PARAMETER, conversation.getId()) ;
+		toHeader.setParameter(CONVERSATION_PARAMETER, conversation.getId());
 		inviteReq.setHeader(toHeader);
-		
-//		TO DO: REST method for updating DB
-		
+
 		return inviteReq;
 	}
 
@@ -466,7 +452,7 @@ public class SIPClient implements SipListener {
 
 			} else if (method.equals(Request.INVITE)) {
 				processInvite(request, serverTransaction);
-			} else if (!method.equals(Request.ACK)){
+			} else if (!method.equals(Request.ACK)) {
 				throw new Exception("I don't know how to handle: " + method);
 			}
 		} catch (Exception e) {
@@ -580,33 +566,20 @@ public class SIPClient implements SipListener {
 							"mixed; boundary=8Yards"));
 
 			serverTransaction.sendResponse(response);
-			
-//			add new thread and conversation
-			String threadId ;
-			String convId ;
-			String oldConvId;
-						
-			ToHeader toHeader = (ToHeader) request.getHeader(SIPHeader.TO) ;
-			threadId = toHeader.getParameter(THREAD_PARAMETER) ;
-			convId = toHeader.getParameter(CONVERSATION_PARAMETER); // current conversation id used for room creation in i2con
-			oldConvId = toHeader.getParameter(NEW_VALUE_PARAMETER) ; // new id for the old conversation with convId
-			String participants = requestRCL;
-			
-			if (myIdentity.existsThread(threadId) ) {
-				
-				ConversationThread oldThread = myIdentity.getThreadById(threadId) ;
-				oldThread.updateOldConversation(oldConvId, convId);
-				oldThread.addConversation(convId, participants) ;
+
+			// add new thread and conversation
+			ToHeader toHeader = (ToHeader) request.getHeader(SIPHeader.TO);
+			String threadId = toHeader.getParameter(THREAD_PARAMETER);
+			String convId = toHeader.getParameter(CONVERSATION_PARAMETER);
+			ConversationThread thread;
+
+			if (myIdentity.existsThread(threadId)) {
+				thread = myIdentity.getThreadById(threadId);
+			} else {
+				thread = myIdentity.createThread(threadId);
 			}
-			else {
-				//create new thread
-				ConversationThread newThread = myIdentity.createThread(threadId) ;
-				newThread.addConversation(convId, participants) ;
-			}
-			
-			
-//			TO DO: REST method for updating DB
-				
+			thread.addConversation(convId, requestRCL);
+
 			if (eventHandler != null) {
 				// TODO Good SDP Parsing
 				eventHandler.processEvent(NOTIFY_INVITE, SDPUtils
@@ -627,7 +600,7 @@ public class SIPClient implements SipListener {
 
 		if (tid == null) {
 			// RFC3261: MUST respond to every 2xx
-			if (ackRequest != null && dialog != null) {
+			if (ackRequest != null && tid.getDialog() != null) {
 				try {
 					tid.getDialog().sendAck(ackRequest);
 				} catch (SipException se) {
@@ -647,7 +620,7 @@ public class SIPClient implements SipListener {
 			if (response.getStatusCode() == Response.OK) {
 				if (cseq.getMethod().equals(Request.INVITE)) {
 					ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
-					Log.e("nebula", "sipClient: " + "sending ACK") ;
+					Log.e("nebula", "sipClient: " + "sending ACK");
 					tid.getDialog().sendAck(ackRequest);
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
 					if (tid.getDialog().getState() == DialogState.CONFIRMED) {
@@ -668,6 +641,41 @@ public class SIPClient implements SipListener {
 		} catch (Exception ex) {
 			Log.e("nebula", "sipClient: " + ex.getMessage());
 		}
+	}
+	
+	/*
+	 * contact nina
+	 */
+	public Request refer(String referSIPUser, String referSIPDomain,
+			String threadId, String oldConversationId) throws Exception {
+		// Create the request.
+		Request request = createRequest(myIdentity.getMcuName(), myIdentity
+				.getMySIPDomain(), Request.REFER, addressFactory.createSipURI(
+				myIdentity.getMcuName(), myIdentity.getMySIPDomain()));
+
+		SipURI referSIP = addressFactory.createSipURI(referSIPUser,
+				referSIPDomain);
+		Address referAddress = addressFactory.createAddress(referSIP);
+		ReferToHeader referToHeader = headerFactory
+				.createReferToHeader(referAddress);
+		request.addHeader(referToHeader);
+
+		// update old conversation and add new one
+		ConversationThread currentThread = myIdentity.getThreadById(threadId);
+
+		String newRcl = currentThread.getConversation(
+				oldConversationId).getRcl() + "," + referSIP.toString();
+
+		Conversation newConversation = currentThread.addConversation(newRcl);
+
+		// append thread and conversation parameters
+		ToHeader toHeader = (ToHeader) request.getHeader(SIPHeader.TO);
+		toHeader.setParameter(THREAD_PARAMETER, threadId);
+		toHeader.setParameter(CONVERSATION_PARAMETER, newConversation.getId());
+		toHeader.setParameter(OLD_CONVERSATION_PARAMETER, oldConversationId);
+		request.setHeader(toHeader);
+
+		return request;
 	}
 
 	public void processDialogTerminated(DialogTerminatedEvent arg0) {
@@ -698,42 +706,5 @@ public class SIPClient implements SipListener {
 	public void setEventHandler(NebulaEventHandler eventHandler) {
 		this.eventHandler = eventHandler;
 	}
-	
-	/*
-	 * contact nina
-	 */
-	public Request refer(String referSIPID, String referSIPDomain, String threadId, String conversationId) throws Exception {
-			// Create the request.
-			String toUser = myIdentity.getMcuName() ;
-			String toUserDomain = myIdentity.getMySIPDomain() ;
-			Request request = createRequest(toUser, toUserDomain,  Request.REFER, addressFactory.createSipURI(toUser, toUserDomain)) ;
 
-			SipURI referSIP = addressFactory.createSipURI(referSIPID,
-					referSIPDomain);
-			Address referAddress = addressFactory.createAddress(referSIP);
-			ReferToHeader referToHeader = headerFactory.createReferToHeader(referAddress);
-			request.addHeader(referToHeader);
-			
-			// update old conversation and add new one
-			ConversationThread currentThread = myIdentity.getThreadById(threadId) ;
-			String newId = currentThread.updateOldConversation(conversationId) ;
-			StringBuilder newRcl = new StringBuilder() ;
-			newRcl.append(myIdentity.getThreadById(threadId).getConversation(newId).getRcl());
-			newRcl.append(",") ;
-			newRcl.append(referSIP.toString());
-			currentThread.addConversation(conversationId, newRcl.toString());
-
-			// append thread and conversation parameters
-			ToHeader toHeader = (ToHeader) request.getHeader(SIPHeader.TO) ;
-			toHeader.setParameter(THREAD_PARAMETER, threadId);
-			toHeader.setParameter(CONVERSATION_PARAMETER, conversationId) ;
-			toHeader.setParameter(NEW_VALUE_PARAMETER, newId);
-			request.setHeader(toHeader);
-			
-			//TO DO: REST method for updating DB
-						
-			return request;
-	    }
-	
-	
 }

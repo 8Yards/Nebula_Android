@@ -4,14 +4,12 @@
 
 package org.nebula.models;
 
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.nebula.utils.Utils;
 
-import android.util.Log;
+import android.R.bool;
 
 public class MyIdentity {
 	private String myIP;
@@ -29,13 +27,12 @@ public class MyIdentity {
 	private String restServerIP;
 
 	private String myStatus = "Online";// TODO:: update this
-	
+
 	private String sipETag = "";
 
 	private List<Group> myGroups = new ArrayList<Group>();
 	private List<ConversationThread> myThreads = new ArrayList<ConversationThread>();
-	
-		
+
 	public void loadConfiguration() throws Exception {
 		myIP = Utils.getLocalIpAddress();
 		mySIPPort = Utils.getNextRandomPort();
@@ -49,6 +46,45 @@ public class MyIdentity {
 		mcuName = "mcu";
 
 		restServerIP = "http://192.16.124.211/REST";
+	}
+
+	/*
+	 * contact nina
+	 */
+	public ConversationThread getThreadById(String threadId) {
+		for (ConversationThread thread : myThreads) {
+			if (thread.getId().equals(threadId)) {
+				return thread;
+			}
+		}
+		return null;
+	}
+
+	public boolean existsThread(String threadId) {
+		for (ConversationThread thread : myThreads) {
+			if (thread.getId().equals(threadId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/*
+	 * is used when creating thread in the process of invite
+	 */
+	public ConversationThread createThread() {
+		ConversationThread newThread = new ConversationThread();
+		myThreads.add(newThread);
+		return newThread;
+	}
+
+	/*
+	 * is used when importing thread created by the others
+	 */
+	public ConversationThread createThread(String threadId) {
+		ConversationThread newThread = new ConversationThread(threadId);
+		myThreads.add(newThread);
+		return newThread;
 	}
 
 	public String getMySIPURI() {
@@ -158,66 +194,17 @@ public class MyIdentity {
 	public void setMyStatus(String myStatus) {
 		this.myStatus = myStatus;
 	}
-	
+
 	public String getSipETag() {
 		return sipETag;
 	}
-	
-	public void setSipETag(String sipETag) {
-		this.sipETag = sipETag ;
-	}
-		
-	/*
-	 * contact nina
-	 */
-	public ConversationThread getThreadById(String threadId)
-	{
-		ConversationThread thread ;
-		Iterator <ConversationThread> iter = myThreads.iterator() ;
-				
-		while (iter.hasNext())
-		{
-			thread = iter.next();
-			if (thread.getId().equals(threadId))
-				return thread;
-		}
-		
-		Log.e("nebula", "MyIdentity: Conversation thread " + threadId + " does not exist") ;
-		return null;
-	}
-	
-	public Boolean existsThread(String threadId) {
 
-		ConversationThread thread ;
-		Iterator <ConversationThread> iter = myThreads.iterator() ;
-				
-		while (iter.hasNext())
-		{
-			thread = iter.next();
-			if (thread.getId().equals(threadId))
-				return true;
-		}
-		
-		return false; 
+	public void setSipETag(String sipETag) {
+		this.sipETag = sipETag;
 	}
-	
+
 	public List<ConversationThread> getMyThreads() {
-		
-		return myThreads;		
+		return myThreads;
 	}
-	
-	
-	public ConversationThread createThread() {
-		ConversationThread newThread = new ConversationThread(ConversationThread.createNewThreadId(myUserName), myUserName) ;
-		myThreads.add(newThread) ;
-		return newThread;
-	}
-	
-	public ConversationThread createThread(String threadId) {
-		ConversationThread newThread = new ConversationThread(threadId, myUserName) ;
-		myThreads.add(newThread) ;
-		return newThread;
-	}
-	
 
 }

@@ -8,8 +8,6 @@ import java.util.List;
 import javax.sip.message.Response;
 
 import org.nebula.main.NebulaApplication;
-import org.nebula.models.Conversation;
-import org.nebula.models.ConversationThread;
 import org.nebula.models.MyIdentity;
 import org.nebula.utils.SDPUtils;
 
@@ -26,8 +24,8 @@ public class SIPManager {
 	private static final int LOGOUT_SUCCESS = 7;
 	private static final int CALL_FAILURE = 8;
 	private static final int CALL_SUCCESS = 9;
-	private static final int REFER_SUCCESS = 10 ;
-	private static final int REFER_FAILURE = 11 ;
+	private static final int REFER_SUCCESS = 10;
+	private static final int REFER_FAILURE = 11;
 
 	public static int doLogin(String userName, String password) {
 		try {
@@ -87,7 +85,7 @@ public class SIPManager {
 			SIPClient sip = NebulaApplication.getInstance().getMySIPClient();
 			Log.v("nebula", "sipManager: " + "calling " + toUsers.get(0));
 			Response response = sip.send(sip.invite(toUsers));
-			if (response.getStatusCode() == 200) {
+			if (response.getStatusCode() == Response.OK) {
 				String requestContent = new String(response.getRawContent());
 				NebulaApplication.getInstance().establishRTP(
 						SDPUtils.retrieveIP(requestContent),
@@ -111,7 +109,7 @@ public class SIPManager {
 		try {
 			doPublish("Offline"); // :P
 
-			// bye should be sent to all active peers
+			// TODO bye should be sent to all active peers
 			SIPClient sip = NebulaApplication.getInstance().getMySIPClient();
 			// Response resp ;= sip.send(sip.bye());
 
@@ -119,33 +117,31 @@ public class SIPManager {
 			if (resp.getStatusCode() == Response.OK) {
 				return LOGOUT_SUCCESS;
 			}
+			else {
+				throw new Exception("Logout did not succeed");	
+			}
 		} catch (Exception e) {
 			Log.e("nebula", "sip_manager: logout error: " + e.getMessage());
 			return LOGOUT_FAILURE;
 		}
-
-		return LOGOUT_SUCCESS;
 	}
-	
-	public static int doRefer(String referUserName, String referDomain) {
-		Log.v("nebula", "sipmanager: refer called") ;
-		
-		try{
-			SIPClient sip = NebulaApplication.getInstance().getMySIPClient() ;
-			ConversationThread	thread = sip.myIdentity.getMyThreads().get(0) ;
-			Conversation conv = thread.getConversations().get(0);
-			Response  resp = sip.send(sip.refer(referUserName, referDomain, thread.getId(), conv.getId()));
-			
+
+	public static int doRefer(String referSIPUser, String referSIPDomain,
+			String threadId, String oldConversationId) {
+		Log.v("nebula", "sipmanager: refer called");
+
+		try {
+			SIPClient sip = NebulaApplication.getInstance().getMySIPClient();
+			Response resp = sip.send(sip.refer(referSIPUser, referSIPDomain,
+					threadId, oldConversationId));
 			if (resp.getStatusCode() == Response.OK) {
-				return LOGOUT_SUCCESS;
+				return REFER_SUCCESS;
+			} else {
+				throw new Exception("REFER did not succeed");
 			}
-			
 		} catch (Exception e) {
-			Log.e("nebula", "sip_manager: refer error " + e.getMessage()) ;
-			return REFER_FAILURE ;
+			Log.e("nebula", "sip_manager: refer error " + e.getMessage());
+			return REFER_FAILURE;
 		}
-		
-		return REFER_SUCCESS ;
-		
 	}
 }

@@ -24,6 +24,8 @@ public class MyIdentity {
 	private String restServerIP;
 
 	private String myStatus = "Online";// TODO:: update this
+	
+	private String sipETag = "";
 
 	private List<Group> myGroups = new ArrayList<Group>();
 
@@ -148,6 +150,14 @@ public class MyIdentity {
 
 	public void setMyStatus(String myStatus) {
 		this.myStatus = myStatus;
+	}
+	
+	public String getSipETag() {
+		return sipETag;
+	}
+	
+	public void setSipETag(String sipETag) {
+		this.sipETag = sipETag ;
 	}
 
 }

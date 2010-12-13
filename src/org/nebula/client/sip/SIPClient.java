@@ -48,6 +48,7 @@ import javax.sip.header.FromHeader;
 import javax.sip.header.HeaderAddress;
 import javax.sip.header.HeaderFactory;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.SIPETagHeader;
 import javax.sip.header.SIPIfMatchHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
@@ -135,8 +136,8 @@ public class SIPClient implements SipListener {
 				.getMyUserName(), myIdentity.getMyIP());
 
 		// TODO:: well in production remove this
-		// contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
-		// "130.229.137.196 ");
+		 contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
+		 "130.229.158.239");
 
 		contactURI.setPort(sipProvider.getListeningPoint(transport).getPort());
 
@@ -273,14 +274,12 @@ public class SIPClient implements SipListener {
 				"application", "pidf+xml"));
 		publishReq.setHeader(headerFactory.createExpiresHeader(expires));
 		publishReq.setHeader(headerFactory.createEventHeader("presence"));
-
-		// TODO:: eventually add the entity tag
-		SIPIfMatchHeader ifmHeader = null;
-		// ifmHeader = headerFactory.createSIPIfMatchHeader(this.distantPAET);
-		if (ifmHeader != null) {
-			publishReq.setHeader(ifmHeader);
+	
+		//replace the previous publish messages
+		if (myIdentity.getSipETag().length() > 0) {
+				publishReq.addHeader(headerFactory.createSIPIfMatchHeader(myIdentity.getSipETag())) ;
 		}
-
+		
 		return publishReq;
 	}
 
@@ -576,7 +575,7 @@ public class SIPClient implements SipListener {
 			// RFC3261: MUST respond to every 2xx
 			if (ackRequest != null && dialog != null) {
 				try {
-					dialog.sendAck(ackRequest);
+					tid.getDialog().sendAck(ackRequest);
 				} catch (SipException se) {
 					Log.e("nebula", se.getMessage());
 				}
@@ -593,7 +592,8 @@ public class SIPClient implements SipListener {
 		try {
 			if (response.getStatusCode() == Response.OK) {
 				if (cseq.getMethod().equals(Request.INVITE)) {
-					Log.e("nebula", "sipClient: " + "seding ACK");
+					ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
+					Log.e("nebula", "sipClient: " + "sending ACK") ;
 					ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
 					tid.getDialog().sendAck(ackRequest);
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
@@ -607,7 +607,10 @@ public class SIPClient implements SipListener {
 				} else if (cseq.getMethod().equals(Request.REGISTER)) {
 					tid.getDialog().notify();
 					// tid.notify() ;
-				}
+				} else if (cseq.getMethod().equals(Request.PUBLISH)) {
+					SIPETagHeader sipETag = (SIPETagHeader) response.getHeader("SIP-ETag") ;
+					myIdentity.setSipETag(sipETag.getETag());
+				} 
 			}
 		} catch (Exception ex) {
 			Log.e("nebula", "sipClient: " + ex.getMessage());

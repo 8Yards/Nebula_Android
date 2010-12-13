@@ -49,7 +49,6 @@ import javax.sip.header.HeaderAddress;
 import javax.sip.header.HeaderFactory;
 import javax.sip.header.MaxForwardsHeader;
 import javax.sip.header.SIPETagHeader;
-import javax.sip.header.SIPIfMatchHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
@@ -136,8 +135,8 @@ public class SIPClient implements SipListener {
 				.getMyUserName(), myIdentity.getMyIP());
 
 		// TODO:: well in production remove this
-		 contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
-		 "130.229.158.239");
+		// contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
+		// "130.229.137.196 ");
 
 		contactURI.setPort(sipProvider.getListeningPoint(transport).getPort());
 
@@ -279,7 +278,7 @@ public class SIPClient implements SipListener {
 		if (myIdentity.getSipETag().length() > 0) {
 				publishReq.addHeader(headerFactory.createSIPIfMatchHeader(myIdentity.getSipETag())) ;
 		}
-		
+
 		return publishReq;
 	}
 
@@ -573,7 +572,7 @@ public class SIPClient implements SipListener {
 
 		if (tid == null) {
 			// RFC3261: MUST respond to every 2xx
-			if (ackRequest != null && dialog != null) {
+			if (ackRequest != null && tid.getDialog() != null) {
 				try {
 					tid.getDialog().sendAck(ackRequest);
 				} catch (SipException se) {
@@ -592,7 +591,6 @@ public class SIPClient implements SipListener {
 		try {
 			if (response.getStatusCode() == Response.OK) {
 				if (cseq.getMethod().equals(Request.INVITE)) {
-					ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
 					Log.e("nebula", "sipClient: " + "sending ACK") ;
 					ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
 					tid.getDialog().sendAck(ackRequest);

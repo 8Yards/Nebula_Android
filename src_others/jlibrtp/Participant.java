@@ -20,7 +20,7 @@ package jlibrtp;
 
 import java.net.InetSocketAddress;
 
-import org.nebula.client.rtp.ReceiverConfiguration;
+import org.nebula.client.rtp.RTPReceiverConfiguration;
 import android.media.AudioTrack;
 
 /**
@@ -111,7 +111,7 @@ public class Participant {
 	/** Unix time of second to last time we sent and RR to this user */
 	protected long secondLastRtcpRRPkt = -1; //Timestamp of 2nd to last time we sent this person an RR Packet
 	/** Prajwol:: audio track for this participant to play its media */
-	public AudioTrack track = ReceiverConfiguration.instance.getNewTrack();	
+	public AudioTrack track = RTPReceiverConfiguration.instance.getNewTrack();	
 	/**
 	 * Create a basic participant. If this is a <b>unicast</b> session you must provide network address (ipv4 or ipv6) and ports for RTP and RTCP, 
 	 * as well as a cname for this contact. These things should be negotiated through SIP or a similar protocol.

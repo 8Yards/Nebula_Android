@@ -227,7 +227,7 @@ public class RTPSession {
 			appCallerThrd = new AppCallerThread(this, rtpApp);
 			recvThrd.start();
 		 	appCallerThrd.start();
-		 	rtcpSession.start();
+		 	//rtcpSession.start(); prajwol:no rtcp support yet
 		 	return 0;
 		}
 	}

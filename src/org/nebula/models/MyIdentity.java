@@ -5,11 +5,9 @@
 package org.nebula.models;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import org.nebula.utils.Utils;
 
-import android.R.bool;
+import org.nebula.utils.Utils;
 
 public class MyIdentity {
 	private String myIP;

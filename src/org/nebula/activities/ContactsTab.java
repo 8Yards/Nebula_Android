@@ -137,8 +137,9 @@ public class ContactsTab extends ExpandableListActivity implements
 			SIPManager.doCall(callee);
 			break;
 		case R.id.iAddContact:
-			intent = new Intent(ContactsTab.this, AddContact.class);
-			startActivityForResult(intent, SHOW_SUB_ACTIVITY_ADDCONTACT);
+//			SIPManager.doRefer("user", "192.16.124.211");
+//			intent = new Intent(ContactsTab.this, AddContact.class);
+//			startActivityForResult(intent, SHOW_SUB_ACTIVITY_ADDCONTACT);
 			break;
 		case R.id.iAddGroup:
 			intent = new Intent(ContactsTab.this, AddGroup.class);

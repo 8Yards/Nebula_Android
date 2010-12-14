@@ -6,6 +6,7 @@ package org.nebula.models;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import org.nebula.utils.Utils;
 
 public class MyIdentity {
@@ -24,10 +25,11 @@ public class MyIdentity {
 	private String restServerIP;
 
 	private String myStatus = "Online";// TODO:: update this
-	
+
 	private String sipETag = "";
 
 	private List<Group> myGroups = new ArrayList<Group>();
+	private List<ConversationThread> myThreads = new ArrayList<ConversationThread>();
 
 	public void loadConfiguration() throws Exception {
 		myIP = Utils.getLocalIpAddress();
@@ -40,8 +42,17 @@ public class MyIdentity {
 		sipServerPort = 5060;
 		sipServerName = "Opensips";
 		mcuName = "mcu";
-
+		
 		restServerIP = "http://192.16.124.217/REST";
+	}
+
+	/*
+	 * is used when importing thread created by the others
+	 */
+	public ConversationThread createThread(String threadId) {
+		ConversationThread newThread = new ConversationThread(threadId);
+		myThreads.add(newThread);
+		return newThread;
 	}
 
 	public String getMySIPURI() {
@@ -151,13 +162,17 @@ public class MyIdentity {
 	public void setMyStatus(String myStatus) {
 		this.myStatus = myStatus;
 	}
-	
+
 	public String getSipETag() {
 		return sipETag;
 	}
-	
+
 	public void setSipETag(String sipETag) {
-		this.sipETag = sipETag ;
+		this.sipETag = sipETag;
+	}
+
+	public List<ConversationThread> getMyThreads() {
+		return myThreads;
 	}
 
 }

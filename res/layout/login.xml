@@ -23,7 +23,7 @@
 		android:textSize="18sp"
 		android:layout_x="46px"
 		android:layout_y="105px"
-		android:text="">
+		android:text="p">
 	</EditText>
 	
 	<TextView
@@ -43,7 +43,7 @@
 		android:password="true"
 		android:layout_x="46px"
 		android:layout_y="175px"
-		android:text="">
+		android:text="p">
 	</EditText>
 
 	<Button

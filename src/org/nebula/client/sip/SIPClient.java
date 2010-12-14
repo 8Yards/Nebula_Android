@@ -52,6 +52,7 @@ import javax.sip.header.SIPETagHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
+import javax.sip.header.ReferToHeader;
 import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -63,6 +64,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.nebula.main.NebulaApplication;
 import org.nebula.main.NebulaEventHandler;
 import org.nebula.models.MyIdentity;
+import org.nebula.models.Conversation;
+import org.nebula.models.ConversationThread;
 import org.nebula.utils.SDPUtils;
 import org.nebula.utils.Utils;
 import org.w3c.dom.Document;
@@ -74,6 +77,7 @@ import org.xml.sax.SAXException;
 
 import android.util.Log;
 
+import gov.nist.javax.sip.header.SIPHeader;
 /**
  * Class for the SIP Client
  */
@@ -88,6 +92,9 @@ public class SIPClient implements SipListener {
 	private static final String ENTITY_ATTRIBUTE = "entity";
 	public static final String NOTIFY_PRESENCE = "NOTIFY_PRESENCE_EVENT";
 	public static final String NOTIFY_INVITE = "NOTIFY_INVITE_EVENT";
+	public static final String THREAD_PARAMETER = "thread";
+	public static final String CONVERSATION_PARAMETER = "conv";
+	public static final String OLD_CONVERSATION_PARAMETER = "newvalue";
 
 	private static AddressFactory addressFactory;
 	private static MessageFactory messageFactory;
@@ -339,6 +346,15 @@ public class SIPClient implements SipListener {
 						.createContentTypeHeader("multipart",
 								"mixed; boundary=8Yards"));
 
+		ConversationThread thread = myIdentity.createThread();
+		Conversation conversation = thread.addConversation(rclList.toString());
+
+		// add thread and conversation parameters
+		ToHeader toHeader = (ToHeader) inviteReq.getHeader(SIPHeader.TO);
+		toHeader.setParameter(THREAD_PARAMETER, thread.getId());
+		toHeader.setParameter(CONVERSATION_PARAMETER, conversation.getId());
+		inviteReq.setHeader(toHeader);
+
 		return inviteReq;
 	}
 
@@ -436,7 +452,7 @@ public class SIPClient implements SipListener {
 
 			} else if (method.equals(Request.INVITE)) {
 				processInvite(request, serverTransaction);
-			} else {
+			} else if (!method.equals(Request.ACK)) {
 				throw new Exception("I don't know how to handle: " + method);
 			}
 		} catch (Exception e) {
@@ -536,7 +552,6 @@ public class SIPClient implements SipListener {
 			String requestContent = new String(request.getRawContent());
 			String requestSDP = SDPUtils.getSDP(requestContent);
 			String requestRCL = SDPUtils.getRCL(requestContent);
-
 			String mySDP = SDPUtils.getMySDP();
 
 			// TODO:: add the MIME in elegant way
@@ -551,6 +566,19 @@ public class SIPClient implements SipListener {
 							"mixed; boundary=8Yards"));
 
 			serverTransaction.sendResponse(response);
+
+			// add new thread and conversation
+			ToHeader toHeader = (ToHeader) request.getHeader(SIPHeader.TO);
+			String threadId = toHeader.getParameter(THREAD_PARAMETER);
+			String convId = toHeader.getParameter(CONVERSATION_PARAMETER);
+			ConversationThread thread;
+
+			if (myIdentity.existsThread(threadId)) {
+				thread = myIdentity.getThreadById(threadId);
+			} else {
+				thread = myIdentity.createThread(threadId);
+			}
+			thread.addConversation(convId, requestRCL);
 
 			if (eventHandler != null) {
 				// TODO Good SDP Parsing
@@ -613,6 +641,41 @@ public class SIPClient implements SipListener {
 		} catch (Exception ex) {
 			Log.e("nebula", "sipClient: " + ex.getMessage());
 		}
+	}
+	
+	/*
+	 * contact nina
+	 */
+	public Request refer(String referSIPUser, String referSIPDomain,
+			String threadId, String oldConversationId) throws Exception {
+		// Create the request.
+		Request request = createRequest(myIdentity.getMcuName(), myIdentity
+				.getMySIPDomain(), Request.REFER, addressFactory.createSipURI(
+				myIdentity.getMcuName(), myIdentity.getMySIPDomain()));
+
+		SipURI referSIP = addressFactory.createSipURI(referSIPUser,
+				referSIPDomain);
+		Address referAddress = addressFactory.createAddress(referSIP);
+		ReferToHeader referToHeader = headerFactory
+				.createReferToHeader(referAddress);
+		request.addHeader(referToHeader);
+
+		// update old conversation and add new one
+		ConversationThread currentThread = myIdentity.getThreadById(threadId);
+
+		String newRcl = currentThread.getConversation(
+				oldConversationId).getRcl() + "," + referSIP.toString();
+
+		Conversation newConversation = currentThread.addConversation(newRcl);
+
+		// append thread and conversation parameters
+		ToHeader toHeader = (ToHeader) request.getHeader(SIPHeader.TO);
+		toHeader.setParameter(THREAD_PARAMETER, threadId);
+		toHeader.setParameter(CONVERSATION_PARAMETER, newConversation.getId());
+		toHeader.setParameter(OLD_CONVERSATION_PARAMETER, oldConversationId);
+		request.setHeader(toHeader);
+
+		return request;
 	}
 
 	public void processDialogTerminated(DialogTerminatedEvent arg0) {

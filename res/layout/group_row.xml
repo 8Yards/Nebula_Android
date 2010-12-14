@@ -17,6 +17,7 @@
  	<CheckBox android:id="@+id/cbCheckGroup"
            android:focusable="false"
            android:layout_width="100px"
-           android:layout_height="wrap_content"/>
+           android:layout_height="wrap_content"
+           android:onClick="onGroupClick"/>
 </LinearLayout>
 

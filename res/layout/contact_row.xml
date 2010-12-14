@@ -15,16 +15,11 @@
    		android:paddingBottom="40px" 
    		android:padding="15px"/>     
      
-    <TextView android:id="@+id/tvContactName"
+    <CheckedTextView android:id="@+id/ctvContactName"
+         android:paddingLeft="50px"
          android:focusable="false"
          android:textSize="14px"
          android:textStyle="bold"
-         android:layout_width="200px"
-         android:layout_height="20px"/>
-    
-    <CheckBox android:id="@+id/cbCheckContact"
-           android:focusable="false"
-           android:layout_width="50px"
-           android:layout_height="20px"
-           android:onClick="checkboxContact"/>
+         android:layout_width="250px"
+         android:layout_height="wrap_content"/>    
 </LinearLayout>

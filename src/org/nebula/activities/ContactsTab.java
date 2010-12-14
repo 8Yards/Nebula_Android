@@ -1,13 +1,11 @@
 /*
- * author: saad
- * rearchitecture and refactor: prajwol, saad
+ * author: saad, michel, sujan
+ * rearchitecture and refactor: prajwol, saad, michel, sujan
  */
 package org.nebula.activities;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.nebula.R;
 import org.nebula.client.sip.SIPClient;
@@ -16,14 +14,16 @@ import org.nebula.main.NebulaApplication;
 import org.nebula.models.Group;
 import org.nebula.models.MyIdentity;
 import org.nebula.models.Profile;
-import org.nebula.ui.ContactExpandableListAdapter;
 import org.nebula.ui.ContactRow;
+import org.nebula.ui.ContactsTabExpandableListAdapter;
+import org.nebula.ui.GroupRow;
 
 import android.app.ExpandableListActivity;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -32,7 +32,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.SimpleExpandableListAdapter;
+import android.widget.BaseExpandableListAdapter;
+import android.widget.CheckBox;
+import android.widget.CheckedTextView;
+import android.widget.ExpandableListView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.AdapterView.OnItemSelectedListener;
@@ -42,9 +46,9 @@ public class ContactsTab extends ExpandableListActivity implements
 	private static final int SHOW_SUB_ACTIVITY_ADDGROUP = 1;
 	private static final int SHOW_SUB_ACTIVITY_ADDCONTACT = 2;
 
-	private List<Map<String, String>> groupData = new ArrayList<Map<String, String>>();
-	private List<List<Map<String, ContactRow>>> childData = new ArrayList<List<Map<String, ContactRow>>>();
-	private SimpleExpandableListAdapter expListAdapter;
+	private List<GroupRow> groups = new ArrayList<GroupRow>();
+	private List<List<ContactRow>> contacts = new ArrayList<List<ContactRow>>();
+	private BaseExpandableListAdapter expListAdapter = null;
 
 	private ArrayAdapter<CharSequence> adapter;
 	private Spinner spinner;
@@ -69,12 +73,8 @@ public class ContactsTab extends ExpandableListActivity implements
 		spinner.setAdapter(adapter);
 		spinner.setOnItemSelectedListener(this);
 
-		expListAdapter = new ContactExpandableListAdapter(this, groupData,
-				R.layout.group_row, new String[] { "groupName" },
-				new int[] { R.id.tvGroupName }, childData,
-				R.layout.contact_row, new String[] { "userName" }, new int[] {
-						R.id.ivPresence, R.id.tvContactName });
-
+		expListAdapter = new ContactsTabExpandableListAdapter(this, groups,
+				contacts);
 		setListAdapter(expListAdapter);
 		reloadContactList();
 	}
@@ -86,7 +86,6 @@ public class ContactsTab extends ExpandableListActivity implements
 			registerReceiver(presenceReceiver, new IntentFilter(
 					SIPClient.NOTIFY_PRESENCE));
 		}
-		reloadContactList();
 		super.onResume();
 	}
 
@@ -95,26 +94,42 @@ public class ContactsTab extends ExpandableListActivity implements
 		List<Group> myGroups = NebulaApplication.getInstance().getMyIdentity()
 				.getMyGroups();
 
-		groupData.clear();
-		childData.clear();
+		groups.clear();
+		contacts.clear();
 
 		for (Group individualGroup : myGroups) {
-			Map<String, String> curGroupMap = new HashMap<String, String>();
-			groupData.add(curGroupMap);
-			curGroupMap.put("groupName", individualGroup.getGroupName());
+			groups.add(new GroupRow(individualGroup.getGroupName()));
 
-			List<Map<String, ContactRow>> children = new ArrayList<Map<String, ContactRow>>();
+			List<ContactRow> children = new ArrayList<ContactRow>();
 			for (Profile individualProfile : individualGroup.getContacts()) {
 				if (!individualProfile.getUsername().equals("null")) {
-					Map<String, ContactRow> curChildMap = new HashMap<String, ContactRow>();
-					children.add(curChildMap);
-					curChildMap.put("userName", new ContactRow(
-							individualProfile.getUsername()));
+					children
+							.add(new ContactRow(individualProfile.getUsername()));
 				}
 			}
-			childData.add(children);
+			contacts.add(children);
 		}
 		expListAdapter.notifyDataSetChanged();
+	}
+
+	public void onGroupClick(View v){
+		CheckBox cb = (CheckBox) v;
+		LinearLayout groupRow = (LinearLayout) v.getParent();
+		String groupName = (String) ((TextView) groupRow
+				.findViewById(R.id.tvGroupName)).getText();
+		
+		for (int i = 0; i < groups.size(); i++) {
+			GroupRow g = groups.get(i);
+			if (g.getName().equals(groupName)) {
+				g.setChecked(cb.isChecked());
+				for (ContactRow individualContact : contacts.get(i)) {
+					individualContact.setChecked(cb.isChecked());
+				}
+				expListAdapter.notifyDataSetChanged();
+				
+				return;
+			}
+		}
 	}
 
 	@Override
@@ -138,9 +153,9 @@ public class ContactsTab extends ExpandableListActivity implements
 			SIPManager.doCall(callee);
 			break;
 		case R.id.iAddContact:
-//			SIPManager.doRefer("user", "192.16.124.211");
-//			intent = new Intent(ContactsTab.this, AddContact.class);
-//			startActivityForResult(intent, SHOW_SUB_ACTIVITY_ADDCONTACT);
+			// SIPManager.doRefer("user", "192.16.124.211");
+			// intent = new Intent(ContactsTab.this, AddContact.class);
+			// startActivityForResult(intent, SHOW_SUB_ACTIVITY_ADDCONTACT);
 			break;
 		case R.id.iAddGroup:
 			intent = new Intent(ContactsTab.this, AddGroup.class);
@@ -162,6 +177,24 @@ public class ContactsTab extends ExpandableListActivity implements
 			System.exit(-1);
 			break;
 		}
+		return true;
+	}
+
+	@Override
+	public boolean onChildClick(ExpandableListView parent, View v,
+			int groupPosition, int childPosition, long id) {
+
+		super.onChildClick(parent, v, groupPosition, childPosition, id);
+
+		CheckedTextView userName = (CheckedTextView) v
+				.findViewById(R.id.ctvContactName);
+		userName.toggle();
+		userName.setBackgroundColor(userName.isChecked() ? Color.DKGRAY
+				: Color.TRANSPARENT);
+
+		contacts.get(groupPosition).get(childPosition).setChecked(
+				userName.isChecked());
+
 		return true;
 	}
 
@@ -220,10 +253,10 @@ public class ContactsTab extends ExpandableListActivity implements
 	}
 
 	public void updateStatus(String username, String status) {
-		for (List<Map<String, ContactRow>> childList : childData) {
-			for (Map<String, ContactRow> map : childList) {
-				if (map.get("userName").getUserName().equals(username)) {
-					map.put("userName", new ContactRow(status, username, false));					
+		for (List<ContactRow> contactList : contacts) {
+			for (ContactRow contact : contactList) {
+				if (contact.getUserName().equals(username)) {
+					contact.setStatus(status);
 				}
 			}
 		}

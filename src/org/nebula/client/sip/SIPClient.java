@@ -85,6 +85,8 @@ public class SIPClient implements SipListener {
 
 	public static final String PRESENCE_ONLINE = "Online";
 	public static final String PRESENCE_BUSY = "Busy";
+	public static final String PRESENCE_AWAY = "Away";
+	public static final String PRESENCE_OFFLINE = "Offline";
 	private static final String PIDF_NS_VALUE = "urn:ietf:params:xml:ns:pidf";
 	private static final String PRESENCE_ELEMENT = "presence";
 	private static final String TUPLE_ELEMENT = "tuple";

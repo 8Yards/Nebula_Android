@@ -129,9 +129,10 @@ public class ContactsTab extends ExpandableListActivity implements
 
 		switch (item.getItemId()) {
 		case R.id.iInstantTalk:
-			Log.v("nebula", "conversationTab: " + "calling testb");
+			String callTo = "p";
+			Log.v("nebula", "contactsTab: " + "calling " + callTo);
 			List<String> callee = new ArrayList<String>();
-			callee.add("testb");
+			callee.add(callTo);
 
 			SIPManager.doCall(callee);
 			break;
@@ -151,7 +152,7 @@ public class ContactsTab extends ExpandableListActivity implements
 			// intent = new Intent(ContactsTab.this, Delete.class);
 			// startActivity(intent);
 			break;
-		case R.id.iSignout:						
+		case R.id.iSignout:
 			SIPManager.doLogout();
 			myIdentity = NebulaApplication.getInstance().getMyIdentity();
 			myIdentity.setMyUserName(null);

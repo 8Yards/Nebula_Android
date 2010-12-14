@@ -126,7 +126,7 @@ public class RTPReceiverThread extends Thread {
 			if(part == null) {
 				InetSocketAddress nullSocket = null;
 				part = new Participant((InetSocketAddress) packet.getSocketAddress(), nullSocket, pkt.getSsrc());
-				part.unexpected = true;
+				part.unexpected = false;
 				rtpSession.partDb.addParticipant(1,part);
 			}
 

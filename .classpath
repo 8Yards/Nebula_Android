@@ -2,10 +2,10 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="src_others"/>
-	<classpathentry kind="lib" path="lib/jain-sip-api-1.2.jar" sourcepath="/jain-sip"/>
-	<classpathentry kind="lib" path="lib/jain-sip-ri-1.2.85.jar" sourcepath="/jain-sip"/>
-	<classpathentry kind="lib" path="lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="src" path="gen"/>
 	<classpathentry kind="con" path="com.android.ide.eclipse.adt.ANDROID_FRAMEWORK"/>
+	<classpathentry kind="lib" path="/home/nina/eclipse1/Nebula_Android/lib/jain-sip-api-1.2.jar"/>
+	<classpathentry kind="lib" path="/home/nina/eclipse1/Nebula_Android/lib/jain-sip-ri-1.2.85.jar"/>
+	<classpathentry kind="lib" path="/home/nina/eclipse1/Nebula_Android/lib/log4j-1.2.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

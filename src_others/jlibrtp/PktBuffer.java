@@ -91,6 +91,7 @@ public class PktBuffer {
 		PktBufNode newNode = new PktBufNode(aPkt);
 		if(aPkt.getSsrc() != SSRC) {
 			System.out.println("PktBuffer.addPkt() SSRCs don't match!");
+			return -1;
 		}
 		
 		int retVal = 0;

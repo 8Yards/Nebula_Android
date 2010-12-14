@@ -1,6 +1,6 @@
 /*
  * author - michel
- * refactor - michel, prajwol
+ * refactor - prajwol, michel
  */
 package org.nebula.client.rtp;
 
@@ -8,11 +8,11 @@ import java.util.Iterator;
 
 import jlibrtp.Participant;
 import jlibrtp.RTPSession;
+
+import org.sipdroid.codecs.G711;
+
 import android.app.Service;
 import android.content.Intent;
-import android.media.AudioFormat;
-import android.media.AudioRecord;
-import android.media.MediaRecorder;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
@@ -23,7 +23,7 @@ public class RTPSender extends Service {
 	// TODO:: check the thread-safety of this variable
 	private boolean isRecording;
 	private RTPSession rtpSender = null;
-	private SenderConfiguration config = new SenderConfiguration();
+	private RTPSenderConfiguration config = new RTPSenderConfiguration();
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -57,16 +57,9 @@ public class RTPSender extends Service {
 		return i;
 	}
 
-	/*
-	 * Send the audio buffer through RTP
-	 * 
-	 * @param buffer
-	 * 
-	 * @param size
-	 */
 	protected void sendRTP(byte[] buffer, int size) {
 		int i = size;
-		int maxUnitSize = 1480;
+		int maxUnitSize = 160;
 		byte[] currentBuffer = new byte[maxUnitSize];
 
 		// send the pieces
@@ -86,19 +79,18 @@ public class RTPSender extends Service {
 		new Thread(new Runnable() {
 			public void run() {
 				isRecording = true;
-				// TODO:: check if new AudioRecord is necessary or not
 				config.audioRecord.startRecording();
 
 				Log.v("nebula", "rtpSender: recording...");
 				while (isRecording) {
 					int bufferReadResult = config.audioRecord.read(
-							config.buffer, 0, config.bufferSize);
-					sendRTP(config.buffer, bufferReadResult);
-					Log
-							.v("nebula", "rtpSender: sent - "
-									+ bufferReadResult);
-				}
+							config.buffer, 0, config.frameSize);
 
+					byte[] aLawBuffer = new byte[bufferReadResult];
+					G711.linear2alaw(config.buffer, 0, aLawBuffer,
+							bufferReadResult);
+					sendRTP(aLawBuffer, bufferReadResult);
+				}
 				config.audioRecord.stop();
 				Log.v("nebula", "rtpSender: recording stopped.");
 			}
@@ -115,20 +107,6 @@ public class RTPSender extends Service {
 		public RTPSender getService() {
 			return RTPSender.this;
 		}
-	}
-
-	private class SenderConfiguration {
-		public int frequency = 11025;
-		public int channelConfiguration = AudioFormat.CHANNEL_CONFIGURATION_MONO;
-		public int audioEncoding = AudioFormat.ENCODING_PCM_16BIT;
-
-		public int bufferSize = AudioRecord.getMinBufferSize(frequency,
-				channelConfiguration, audioEncoding);
-		public AudioRecord audioRecord = new AudioRecord(
-				MediaRecorder.AudioSource.MIC, frequency, channelConfiguration,
-				audioEncoding, bufferSize);
-
-		public byte[] buffer = new byte[bufferSize];
 	}
 
 	public RTPSession getRtpSender() {

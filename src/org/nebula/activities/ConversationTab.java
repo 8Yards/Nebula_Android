@@ -9,6 +9,7 @@ import java.util.List;
 
 import org.nebula.R;
 import org.nebula.client.sip.SIPManager;
+import org.nebula.models.MyIdentity;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -32,11 +33,13 @@ public class ConversationTab extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Log.v("nebula", "conversationTab: " + "calling testb");
+		Log.v("nebula", "conversationTab: " + "calling nina");
 		List<String> callee = new ArrayList<String>();
-		callee.add("testb");
+		callee.add("nina");
 
 		SIPManager.doCall(callee);
+		
+//		SIPManager.doRefer("user", "192.16.124.211");
 		return true;
 	}
 }

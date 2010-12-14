@@ -15,6 +15,10 @@ public class SDPUtils {
 		Pattern p1 = Pattern.compile(
 				"Content-type: application/sdp\r\n(.*?)--8Yards",
 				Pattern.MULTILINE | Pattern.DOTALL);
+
+		//Pattern p1 = Pattern.compile("\r\n\r\n(.*)", Pattern.MULTILINE
+		//		| Pattern.DOTALL);
+
 		Matcher m1 = p1.matcher(content);
 		if (m1.find()) {
 			return m1.group(1).trim();
@@ -42,7 +46,7 @@ public class SDPUtils {
 				+ " 122456 654221 IN IP4 " + myIdentity.getMyIP() + "\r\n"
 				+ "s=A conversation\r\n" + "c=IN IP4 " + myIdentity.getMyIP()
 				+ "\r\n" + "t=0 0\r\n" + "m=audio " + myIdentity.getMyRTPPort()
-				+ " RTP/AVP 8\r\n" + "a=rtpmap:8 PCMA/16000/1" + "\r\n";
+				+ " RTP/AVP 8\r\n" + "a=rtpmap:8 PCMA/8000/1" + "\r\n";
 	}
 
 	public static String retrieveIP(String sdp) throws Exception {

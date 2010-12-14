@@ -57,12 +57,14 @@ public class NebulaApplication extends Application implements
 			Log.v("nebula", "nebulaAPP: " + "sender service started");
 			startService(new Intent(NebulaApplication.this, RTPSender.class));
 
-			myRTPReceiver = new RTPReceiver(); // TODO:: do we need this??
-
 			// Instantiate RTP Client
 			myRTPClient = new RTPSession(new DatagramSocket(myIdentity
 					.getMyRTPPort()), new DatagramSocket(myIdentity
 					.getMyRTPPort() + 1));
+			myRTPClient.payloadType(8);
+
+			myRTPReceiver = new RTPReceiver(myRTPClient); // TODO:: do we need
+															// this??
 		} catch (Exception e) {
 			// TODO Handle gracefully
 			Log.e("nebula", "nebulaApp: " + e.getMessage());

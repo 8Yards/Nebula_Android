@@ -147,6 +147,10 @@ public class ParticipantDatabase {
 			
 			while(notDone && iter.hasNext()) {
 				Participant part = iter.next();
+				// Prajwol:: move information for the first time
+				if (part.ssrc != -1) {
+					continue;
+				}
 				
 				//System.out.println(part.rtpAddress.getAddress().toString()
 				//		+ " " + part.rtcpAddress.getAddress().toString() 
@@ -170,8 +174,10 @@ public class ParticipantDatabase {
 					part.note = p.note;
 					part.tool = p.tool;
 					part.priv = p.priv;
-					
+					part.track = p.track;
+
 					this.ssrcTable.put(part.ssrc, part);
+					part.track.play();
 					
 					//Report the match back to the application
 					Participant[] partArray = {part};
@@ -182,6 +188,7 @@ public class ParticipantDatabase {
 			
 			// No match? ok
 			this.ssrcTable.put(p.ssrc, p);				
+			p.track.play();
 			return 0;
 		}
 	}
@@ -206,8 +213,8 @@ public class ParticipantDatabase {
 	 */
 	protected Participant getParticipant(long ssrc) {
 		Participant p = null;
-		p = ssrcTable.get(ssrc);
-		return p; 
+		p = ssrcTable.get(Long.valueOf(ssrc));
+		return p;
 	}
 	
 	/**

@@ -143,7 +143,7 @@ public class SIPClient implements SipListener {
 
 		// TODO:: well in production remove this
 		// contactURI = addressFactory.createSipURI(myIdentity.getMyUserName(),
-		// "130.229.153.214");
+		// "130.229.137.196 ");
 
 		contactURI.setPort(sipProvider.getListeningPoint(transport).getPort());
 
@@ -285,7 +285,7 @@ public class SIPClient implements SipListener {
 		if (myIdentity.getSipETag().length() > 0) {
 				publishReq.addHeader(headerFactory.createSIPIfMatchHeader(myIdentity.getSipETag())) ;
 		}
-		
+
 		return publishReq;
 	}
 
@@ -619,8 +619,8 @@ public class SIPClient implements SipListener {
 		try {
 			if (response.getStatusCode() == Response.OK) {
 				if (cseq.getMethod().equals(Request.INVITE)) {
+					Log.e("nebula", "sipClient: " + "sending ACK") ;
 					ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
-					Log.e("nebula", "sipClient: " + "sending ACK");
 					tid.getDialog().sendAck(ackRequest);
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
 					if (tid.getDialog().getState() == DialogState.CONFIRMED) {

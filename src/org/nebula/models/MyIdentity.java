@@ -37,13 +37,43 @@ public class MyIdentity {
 		myRTPPort = Utils.getNextRandomPort();
 
 		// TODO: externalize this
-		mySIPDomain = "192.16.124.217";
-		sipServerIP = "192.16.124.217";
+		mySIPDomain = "192.16.124.211";
+		sipServerIP = "192.16.124.211";
 		sipServerPort = 5060;
 		sipServerName = "Opensips";
 		mcuName = "mcu";
-		
-		restServerIP = "http://192.16.124.217/REST";
+
+		restServerIP = "http://192.16.124.211/REST";
+	}
+
+	/*
+	 * contact nina
+	 */
+	public ConversationThread getThreadById(String threadId) {
+		for (ConversationThread thread : myThreads) {
+			if (thread.getId().equals(threadId)) {
+				return thread;
+			}
+		}
+		return null;
+	}
+
+	public boolean existsThread(String threadId) {
+		for (ConversationThread thread : myThreads) {
+			if (thread.getId().equals(threadId)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/*
+	 * is used when creating thread in the process of invite
+	 */
+	public ConversationThread createThread() {
+		ConversationThread newThread = new ConversationThread();
+		myThreads.add(newThread);
+		return newThread;
 	}
 
 	/*

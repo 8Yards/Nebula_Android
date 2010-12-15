@@ -225,10 +225,10 @@ public class RESTGroupManager extends Resource {
 	 *            id of the group to be dropped
 	 * @return status of the performed operation
 	 */
-	public Status deleteGroup(Group g) throws ClientProtocolException,
+	public Status deleteGroup(int groupId) throws ClientProtocolException,
 			IOException, JSONException {
 
-		Response r = this.delete("deleteGroup", "" + g.getId());
+		Response r = this.delete("deleteGroup", "" + groupId);
 		if ((r.getStatus() >= 200) && (r.getStatus() < 300)) {
 			return new Status(true, "Group dropped successfully");
 		} else {
@@ -242,9 +242,9 @@ public class RESTGroupManager extends Resource {
 	 *            id of the contact to be dropped
 	 * @return status of the performed operation
 	 */
-	public Status deleteContact(Profile p) throws ClientProtocolException,
+	public Status deleteContact(int profileId) throws ClientProtocolException,
 			IOException, JSONException {
-		Response r = this.delete("deleteContact", "" + p.getId());
+		Response r = this.delete("deleteContact", "" + profileId);
 		if ((r.getStatus() >= 200) && (r.getStatus() < 300)) {
 			return new Status(true, "Contact dropped successfully");
 		} else {

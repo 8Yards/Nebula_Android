@@ -49,6 +49,7 @@ public class Profile {
 	}
 	
 	public Profile(JSONObject jsonObject) throws JSONException {
+		this.id = jsonObject.getInt("id");
 		this.address = jsonObject.getString("address");
 		this.domain = jsonObject.getString("domain");
 		this.email_address = jsonObject.getString("email_address");
@@ -56,7 +57,6 @@ public class Profile {
 		this.phoneNumber = jsonObject.getString("phoneNumber");
 		this.status = jsonObject.getString("status");
 		this.username = jsonObject.getString("username");
-
 	}
 
 	public int getId() {

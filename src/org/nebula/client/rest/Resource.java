@@ -419,9 +419,6 @@ public abstract class Resource {
 		String result = Utils.convertStreamToString(instream);
 
 		int status = response.getStatusLine().getStatusCode();
-		System.out.println(result);
-		// prajwol - well, you dont have right to trim the result :@
-
 		return new Response(status, new JSONObject(result));
 	}
 }

@@ -90,6 +90,8 @@ public class ContactsTab extends ExpandableListActivity implements
 	}
 
 	public void reloadContactList() {
+		Log.v("nebula", "contacts_tab:" + " reloading contact list");
+		
 		NebulaApplication.getInstance().reloadMyGroups();
 		List<Group> myGroups = NebulaApplication.getInstance().getMyIdentity()
 				.getMyGroups();
@@ -153,9 +155,8 @@ public class ContactsTab extends ExpandableListActivity implements
 			SIPManager.doCall(callee);
 			break;
 		case R.id.iAddContact:
-			// SIPManager.doRefer("user", "192.16.124.211");
-			// intent = new Intent(ContactsTab.this, AddContact.class);
-			// startActivityForResult(intent, SHOW_SUB_ACTIVITY_ADDCONTACT);
+			 intent = new Intent(ContactsTab.this, AddContact.class);
+			 startActivityForResult(intent, SHOW_SUB_ACTIVITY_ADDCONTACT);
 			break;
 		case R.id.iAddGroup:
 			intent = new Intent(ContactsTab.this, AddGroup.class);
@@ -217,7 +218,6 @@ public class ContactsTab extends ExpandableListActivity implements
 		switch (requestCode) {
 		case SHOW_SUB_ACTIVITY_ADDGROUP:
 			if (resultCode == AddGroup.ADDGROUP_SUCCESSFULL) {
-				Log.v("nebula", "contacts_tab:" + " reloading contact list");
 				reloadContactList();
 			} else {
 				// TODO:: recheck if this is good way
@@ -225,7 +225,6 @@ public class ContactsTab extends ExpandableListActivity implements
 			break;
 		case SHOW_SUB_ACTIVITY_ADDCONTACT:
 			if (resultCode == AddContact.ADDCONTACT_SUCCESS) {
-				Log.v("nebula", "contacts_tab:" + " reloading contact list");
 				reloadContactList();
 			} else {
 				// TODO:: recheck if this is good way

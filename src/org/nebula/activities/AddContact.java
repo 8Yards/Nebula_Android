@@ -5,12 +5,15 @@
 
 package org.nebula.activities;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.nebula.R;
 import org.nebula.client.rest.RESTGroupManager;
 import org.nebula.client.rest.Status;
+import org.nebula.main.NebulaApplication;
 import org.nebula.models.Group;
+import org.nebula.models.MyIdentity;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -27,10 +30,11 @@ public class AddContact extends Activity implements
 
 	public static final int ADDCONTACT_SUCCESS = 1;
 	public static final int ADDCONTACT_FAILURE = 0;
-	
+
+	private MyIdentity myIdentity;
 	private RESTGroupManager groupManager;
-	private List<Group> groups;
 	private String[] groupNames;
+	private Integer[] groupIds;
 	private boolean[] selectedGroups;
 
 	private Status status;
@@ -39,26 +43,29 @@ public class AddContact extends Activity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.add_contact);
 
+		myIdentity = NebulaApplication.getInstance().getMyIdentity();
 		groupManager = new RESTGroupManager();
 	}
 
 	public void doSelectGroups(View v) {
-		try {
-			groups = groupManager.retrieveGroups();
-		} catch (Exception e) {
-			Toast.makeText(v.getContext(),
-					"Groups could not be fetched",
-					Toast.LENGTH_LONG).show();
-			Log.e("nebula", "addcontact: " + e.getMessage());
-			return;
-		}
+		List<Group> groups = myIdentity.getMyGroups();
 
-		groupNames = new String[groups.size()];
-		selectedGroups = new boolean[groups.size()];
-
+		// to remove the "ungrouped" from showing up
+		List<String> groupNamesList = new ArrayList<String>();
+		List<Integer> groupIdsList = new ArrayList<Integer>();
 		for (int i = 0; i < groups.size(); i++) {
-			groupNames[i] = groups.get(i).getGroupName();
+			if (groups.get(i).getGroupName().equals("ungrouped") == false) {
+				groupNamesList.add(groups.get(i).getGroupName());
+				groupIdsList.add(groups.get(i).getId());
+			}
 		}
+
+		groupNames = new String[groupNamesList.size()];
+		groupIds = new Integer[groupIdsList.size()];
+		
+		selectedGroups = new boolean[groupNamesList.size()];
+		groupNamesList.toArray(groupNames);
+		groupIdsList.toArray(groupIds);
 
 		new AlertDialog.Builder(this).setTitle("Select Groups")
 				.setMultiChoiceItems(groupNames, selectedGroups, this)
@@ -101,7 +108,6 @@ public class AddContact extends Activity implements
 			if (!status.isSuccess()) {
 				throw new Exception(status.getMessage());
 			}
-
 		} catch (Exception e) {
 			Toast.makeText(this.getApplicationContext(), e.getMessage(),
 					Toast.LENGTH_LONG).show();
@@ -111,20 +117,23 @@ public class AddContact extends Activity implements
 			return;
 		}
 
-		if(selectedGroups!=null){
-		for (int i = 0; i < selectedGroups.length; i++) {
-			// TODO Remove this try catch and club the job of adding the
-			// new contact
-			// into the mentioned groups also with the REST call above
-			try {
-				if (selectedGroups[i]) {
-					groupManager.insertUserIntoGroup(groups.get(i), nebulaId);
+		if (selectedGroups != null) {
+			for (int i = 0; i < selectedGroups.length; i++) {
+				// TODO Remove this try catch and club the job of adding the
+				// new contact
+				// into the mentioned groups also with the REST call above
+				try {
+					if (selectedGroups[i]) {						
+						groupManager.insertUserIntoGroup(groupIds[i].intValue(),
+								nebulaId);
+					}
+				} catch (Exception e) {
+					// continue to the next
+					// TODO:: inform the user that the contact couldn't be added
+					// to all selected group
+					Log.e("nebula", "addcontact: " + e.getMessage());
 				}
-			} catch (Exception e) {
-				// continue to the next
-				Log.e("nebula", "addcontact: " + e.getMessage());
 			}
-		}
 		}
 		Toast.makeText(this.getApplicationContext(), status.getMessage(),
 				Toast.LENGTH_LONG).show();

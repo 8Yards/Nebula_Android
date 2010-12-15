@@ -45,7 +45,7 @@ public class Profile {
 		this.sipURI = "";
 		this.address = "";
 		this.password = password;
-		email_address = emailAddress;
+		this.email_address = emailAddress;
 	}
 	
 	public Profile(JSONObject jsonObject) throws JSONException {

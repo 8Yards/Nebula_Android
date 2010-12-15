@@ -20,6 +20,7 @@
 		<activity android:name=".activities.AddGroup"></activity>
 		<activity android:name=".activities.AddContact"></activity>
 		<activity android:name=".activities.Delete"></activity>
+		<activity android:name=".activities.Edit"></activity>
 		<activity android:name=".activities.ConversationTab"></activity>
 		
 		<service android:enabled="true" android:name=".client.rtp.RTPSender" />

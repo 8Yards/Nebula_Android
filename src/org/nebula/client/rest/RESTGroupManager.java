@@ -105,14 +105,38 @@ public class RESTGroupManager extends Resource {
 			IOException, JSONException {
 		Map<String, Object> h = new HashMap<String, Object>();
 		h.put("id", g.getId());
+		h.put("name", g.getGroupName());
 		h.put("status", g.getGroupStatus());
-		h.put("membersNumber", g.getGroupStatus());
-		for (int i = 0; i < g.getContacts().size(); i++) {
-			h.put("groupMember" + (i + 1) + "ID", g.getContacts().get(i));
+		h.put("membersNumber", g.getContacts().size());
+
+		int count = 0;
+		for (Profile contact : g.getContacts()) {
+			h.put("groupMember" + (++count) + "ID", contact.getId());
 		}
+
 		Response r = this.put("modifyGroup", h);
-		if (r.getStatus() == 201) {
+		if (r.getStatus() == 200) {
 			return new Status(true, "Group modified successfully");
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
+	}
+
+	public Status modifyContact(Profile p, String nickname)
+			throws ClientProtocolException, IOException, JSONException {
+		// TODO:: remove this once marco writes the code in server
+		if (true) {
+			return new Status(true, "Contact modified successfully");
+		}
+
+		Map<String, Object> h = new HashMap<String, Object>();
+		h.put("contactID", p.getId());
+		if (!nickname.equals(""))
+			h.put("contactNickame", nickname);
+
+		Response r = this.put("modifyContactSimple", h);
+		if (r.getStatus() == 200) {
+			return new Status(true, "Contact modified successfully");
 		} else {
 			return new Status(false, r.getResult().getString("result"));
 		}
@@ -130,8 +154,8 @@ public class RESTGroupManager extends Resource {
 			h.put("groups" + (i + 1) + "ID", groupList.get(i).getId());
 		}
 		Response r = this.put("modifyContact", h);
-		if (r.getStatus() == 201) {
-			return new Status(true, "Group retrieved successfully");
+		if (r.getStatus() == 200) {
+			return new Status(true, "Contact modified successfully");
 		} else {
 			return new Status(false, r.getResult().getString("result"));
 		}

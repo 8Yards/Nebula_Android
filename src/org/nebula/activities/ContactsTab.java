@@ -46,6 +46,7 @@ public class ContactsTab extends ExpandableListActivity implements
 	private static final int SHOW_SUB_ACTIVITY_ADDGROUP = 1;
 	private static final int SHOW_SUB_ACTIVITY_ADDCONTACT = 2;
 	private static final int SHOW_SUB_ACTIVITY_DELETE = 3;
+	private static final int SHOW_SUB_ACTIVITY_EDIT = 4;
 
 	private List<GroupRow> groups = new ArrayList<GroupRow>();
 	private List<List<ContactRow>> contacts = new ArrayList<List<ContactRow>>();
@@ -164,8 +165,8 @@ public class ContactsTab extends ExpandableListActivity implements
 			startActivityForResult(intent, SHOW_SUB_ACTIVITY_ADDGROUP);
 			break;
 		case R.id.iEdit:
-			// Intent intent = new Intent(ContactsTab.this, Editcontacts.class);
-			// startActivity(intent);
+			intent = new Intent(ContactsTab.this, Edit.class);
+			startActivityForResult(intent, SHOW_SUB_ACTIVITY_EDIT);
 			break;
 		case R.id.iDelete:
 			intent = new Intent(ContactsTab.this, Delete.class);
@@ -234,6 +235,13 @@ public class ContactsTab extends ExpandableListActivity implements
 		case SHOW_SUB_ACTIVITY_DELETE:
 			if (resultCode == Delete.DELETEGROUP_SUCCESSFUL
 					|| resultCode == Delete.DELETECONTACT_SUCCESSFUL) {
+				reloadContactList();
+			} else {
+			}
+			break;
+		case SHOW_SUB_ACTIVITY_EDIT:
+			if (resultCode == Edit.EDITGROUP_SUCCESSFUL
+					|| resultCode == Edit.EDITCONTACT_SUCCESSFUL) {
 				reloadContactList();
 			} else {
 			}

@@ -1,6 +1,5 @@
 /*
- * author: saad ali
- * rearchitecture and programming: saad ali
+ * author: saad ali, prajwol
  */
 package org.nebula.activities;
 
@@ -170,7 +169,7 @@ public class Delete extends Activity implements OnItemSelectedListener,
 		contactNamesList.toArray(itemNames);
 		contactIdsList.toArray(itemIds);
 
-		new AlertDialog.Builder(this).setTitle("Select Groups")
+		new AlertDialog.Builder(this).setTitle("Select Contacts")
 				.setMultiChoiceItems(itemNames, selectedItems, this)
 				.setPositiveButton("OK", new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int which) {

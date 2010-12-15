@@ -21,7 +21,7 @@ public class Group {
 		this.groupName = "";
 		this.id = 0;
 		this.groupStatus = "";
-		this.contacts = null;
+		this.contacts = new ArrayList<Profile>();
 	}
 	
 	public Group(int id, String groupName,  String groupStatus) {
@@ -29,6 +29,7 @@ public class Group {
 		this.id = id;
 		this.groupName = groupName;
 		this.groupStatus = groupStatus;
+		this.contacts = new ArrayList<Profile>();
 	}
 	
 	public Group(JSONObject groupObj, String groupName) throws JSONException {

@@ -45,6 +45,7 @@ public class ContactsTab extends ExpandableListActivity implements
 		OnItemSelectedListener {
 	private static final int SHOW_SUB_ACTIVITY_ADDGROUP = 1;
 	private static final int SHOW_SUB_ACTIVITY_ADDCONTACT = 2;
+	private static final int SHOW_SUB_ACTIVITY_DELETE = 3;
 
 	private List<GroupRow> groups = new ArrayList<GroupRow>();
 	private List<List<ContactRow>> contacts = new ArrayList<List<ContactRow>>();
@@ -167,8 +168,8 @@ public class ContactsTab extends ExpandableListActivity implements
 			// startActivity(intent);
 			break;
 		case R.id.iDelete:
-			// intent = new Intent(ContactsTab.this, Delete.class);
-			// startActivity(intent);
+			intent = new Intent(ContactsTab.this, Delete.class);
+			startActivityForResult(intent, SHOW_SUB_ACTIVITY_DELETE);
 			break;
 		case R.id.iSignout:
 			SIPManager.doLogout();
@@ -228,6 +229,13 @@ public class ContactsTab extends ExpandableListActivity implements
 				reloadContactList();
 			} else {
 				// TODO:: recheck if this is good way
+			}
+			break;
+		case SHOW_SUB_ACTIVITY_DELETE:
+			if (resultCode == Delete.DELETEGROUP_SUCCESSFUL
+					|| resultCode == Delete.DELETECONTACT_SUCCESSFUL) {
+				reloadContactList();
+			} else {
 			}
 			break;
 		default:

@@ -45,8 +45,6 @@ import org.nebula.models.MyIdentity;
 import org.nebula.utils.Base64;
 import org.nebula.utils.Utils;
 
-import android.util.Log;
-
 /*
  * Class used by Profiles, Contacts, Groups classes
  * It gives all the common methods to send requests and receive responses
@@ -151,6 +149,7 @@ public abstract class Resource {
 			requestURL = requestURL + "?"
 					+ new UrlEncodedFormEntity(convertToList(params));
 
+		System.out.println(requestURL);
 		HttpGet httpget = new HttpGet(requestURL);
 		return send_and_receive(httpget);
 	}
@@ -261,12 +260,12 @@ public abstract class Resource {
 	 * 
 	 * @return Response response from the server
 	 */
-	protected Response put(String method, HashMap<String, Object> options)
+	protected Response put(String method, Map<String, Object> options)
 			throws ClientProtocolException, IOException, JSONException {
 		String requestURL = this.url;
 
-		if (this.data.containsKey("id"))
-			requestURL = requestURL + this.data.get("id") + "/";
+		if (options.containsKey("id"))
+			requestURL = requestURL + options.get("id") + "/";
 
 		requestURL += method;
 
@@ -301,12 +300,45 @@ public abstract class Resource {
 	 * 
 	 * @param id the id of the element being deleted
 	 * 
+	 * @param method method to be called
+	 * 
 	 * @return Response response from the server
 	 */
-	protected Response delete(String id) throws ClientProtocolException,
-			IOException, JSONException {
-		String requestURL = this.url + id + "/";
+	protected Response delete(String method, String id)
+			throws ClientProtocolException, IOException, JSONException {
+		String requestURL = this.url + id + "/" + method;
+
 		HttpDelete httpdelete = new HttpDelete(requestURL);
+		return send_and_receive(httpdelete);
+	}
+
+	protected Response delete(String method, Map<String, String> params)
+			throws ClientProtocolException, IOException, JSONException {
+		String requestURL = this.url;
+		if (params.containsKey("id"))
+			requestURL = requestURL + params.get("id") + "/";
+		String optionsStr = "";
+		Iterator it = params.entrySet().iterator();
+		// if it's not the first parameter add initially & to concat them
+		int adds = 0;
+		while (it.hasNext()) {
+			Map.Entry pairs = (Map.Entry) it.next();
+			if (!((String) pairs.getKey()).toLowerCase().equals("id")) {
+
+				if (adds != 0)
+					optionsStr += "&";
+				optionsStr = optionsStr + pairs.getKey() + "="
+						+ pairs.getValue();
+				adds++;
+			}
+		}
+
+		requestURL = requestURL + method;
+		if (!optionsStr.equals(""))
+			requestURL = requestURL + "?" + optionsStr;
+
+		HttpDelete httpdelete = new HttpDelete(requestURL);
+
 		return send_and_receive(httpdelete);
 	}
 
@@ -371,23 +403,25 @@ public abstract class Resource {
 			String password = myIdentity.getMyPassword();
 
 			byte[] concat = new byte[username.length() + password.length() + 1];
-			System.arraycopy(username.getBytes(), 0, concat, 0,
-					username.length());
+			System.arraycopy(username.getBytes(), 0, concat, 0, username
+					.length());
 			System.arraycopy(":".getBytes(), 0, concat, username.length(), 1);
 			System.arraycopy(password.getBytes(), 0, concat,
 					username.length() + 1, password.length());
 
 			String base64 = Base64.encode(username + ":" + password);
-			request.addHeader("Authorization",
-					"Basic " + base64.replace("\r\n", ""));
+			request.addHeader("Authorization", "Basic "
+					+ base64.replace("\r\n", ""));
 		}
 		HttpResponse response = httpclient.execute(request);
+
 		InputStream instream = response.getEntity().getContent();
 		String result = Utils.convertStreamToString(instream);
 
 		int status = response.getStatusLine().getStatusCode();
-
+		System.out.println(result);
 		// prajwol - well, you dont have right to trim the result :@
+
 		return new Response(status, new JSONObject(result));
 	}
 }

@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
@@ -100,6 +101,42 @@ public class RESTGroupManager extends Resource {
 		return myGroups;
 	}
 
+	public Status modifyGroup(Group g) throws ClientProtocolException,
+			IOException, JSONException {
+		Map<String, Object> h = new HashMap<String, Object>();
+		h.put("id", g.getId());
+		h.put("status", g.getGroupStatus());
+		h.put("membersNumber", g.getGroupStatus());
+		for (int i = 0; i < g.getContacts().size(); i++) {
+			h.put("groupMember" + (i + 1) + "ID", g.getContacts().get(i));
+		}
+		Response r = this.put("modifyGroup", h);
+		if (r.getStatus() == 201) {
+			return new Status(true, "Group modified successfully");
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
+	}
+
+	public Status modifyContact(Profile p, String nickname,
+			List<Group> groupList) throws ClientProtocolException, IOException,
+			JSONException {
+		Map<String, Object> h = new HashMap<String, Object>();
+		h.put("contactID", p.getId());
+		h.put("groupsNumber", groupList.size());
+		if (!nickname.equals(""))
+			h.put("contactNickame", nickname);
+		for (int i = 0; i < groupList.size(); i++) {
+			h.put("groups" + (i + 1) + "ID", groupList.get(i).getId());
+		}
+		Response r = this.put("modifyContact", h);
+		if (r.getStatus() == 201) {
+			return new Status(true, "Group retrieved successfully");
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
+	}
+
 	/**
 	 * Insert the Profiles that belongs to group object into it in the DB
 	 * 
@@ -128,10 +165,10 @@ public class RESTGroupManager extends Resource {
 	/**
 	 * Insert a specific user into a group in DB
 	 */
-	public Status insertUserIntoGroup(Group group, String username)
+	public Status insertUserIntoGroup(int groupId, String username)
 			throws ClientProtocolException, IOException, JSONException {
 		HashMap<String, Object> hMGroupUser = new HashMap<String, Object>();
-		hMGroupUser.put("groupID", group.getId());
+		hMGroupUser.put("groupID", groupId);
 		hMGroupUser.put("username", username);
 		Response r = this.post("insertUserIntoGroup", hMGroupUser);
 		// 201 = HTTP status for insertion performed correctly
@@ -177,6 +214,53 @@ public class RESTGroupManager extends Resource {
 		// 201 = HTTP status for insertion performed correctly
 		if (r.getStatus() == 201) {
 			return new Status(true, "Profile added successfully");
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
+	}
+
+	/**
+	 * 
+	 * @param id
+	 *            id of the group to be dropped
+	 * @return status of the performed operation
+	 */
+	public Status deleteGroup(Group g) throws ClientProtocolException,
+			IOException, JSONException {
+
+		Response r = this.delete("deleteGroup", "" + g.getId());
+		if ((r.getStatus() >= 200) && (r.getStatus() < 300)) {
+			return new Status(true, "Group dropped successfully");
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
+	}
+
+	/**
+	 * 
+	 * @param id
+	 *            id of the contact to be dropped
+	 * @return status of the performed operation
+	 */
+	public Status deleteContact(Profile p) throws ClientProtocolException,
+			IOException, JSONException {
+		Response r = this.delete("deleteContact", "" + p.getId());
+		if ((r.getStatus() >= 200) && (r.getStatus() < 300)) {
+			return new Status(true, "Contact dropped successfully");
+		} else {
+			return new Status(false, r.getResult().getString("result"));
+		}
+	}
+
+	// TODO: retrieve usertouser.id
+	public Status deleteContactFromGroup(Profile p, Group g)
+			throws ClientProtocolException, IOException, JSONException {
+		Map<String, String> hM = new HashMap<String, String>();
+		hM.put("contactID", "" + p.getId());
+		hM.put("groupID", "" + g.getId());
+		Response r = this.delete("deleteContactFromGroup", hM);
+		if ((r.getStatus() >= 200) && (r.getStatus() < 300)) {
+			return new Status(true, "Contact dropped successfully");
 		} else {
 			return new Status(false, r.getResult().getString("result"));
 		}

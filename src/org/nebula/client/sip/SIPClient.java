@@ -1,6 +1,5 @@
 /*
- * author: michel hognurand
- * rearchitecture: prajwol kumar nakarmi, nina mulkijanyan, michel hognurand
+ * author: michel hognurand, prajwol kumar nakarmi, nina mulkijanyan
  * 
  * version 1 - basic signalling
  * version 2 - extending Service
@@ -225,14 +224,20 @@ public class SIPClient implements SipListener {
 		return this.response;
 	}
 
-	/*
-	 * contact - nin B-)
-	 */
 	private Request createRequest(String toSIPUser, String toSIPDomain,
-			String reqType, SipURI requestURI
+			String reqType, SipURI requestURI) throws ParseException,
+			InvalidArgumentException, Exception {
+		return createRequest(false, toSIPUser, toSIPDomain, reqType, requestURI);
+	}
 
-	) throws ParseException, InvalidArgumentException, Exception {
+	private Request createRequest(boolean isSameDialog, String toSIPUser,
+			String toSIPDomain, String reqType, SipURI requestURI)
+			throws ParseException, InvalidArgumentException, Exception {
 		CallIdHeader callIdHeader = getNewCallIdHeader();
+		if (isSameDialog == true) {
+			callIdHeader.setCallId(dialog.getCallId().getCallId());
+		}
+
 		CSeqHeader cSeqHeader = getCSeqHeader(reqType);
 		FromHeader fromHeader = (FromHeader) getHeader(myIdentity
 				.getMyUserName(), myIdentity.getMySIPDomain(), true);
@@ -282,10 +287,11 @@ public class SIPClient implements SipListener {
 				"application", "pidf+xml"));
 		publishReq.setHeader(headerFactory.createExpiresHeader(expires));
 		publishReq.setHeader(headerFactory.createEventHeader("presence"));
-	
-		//replace the previous publish messages
+
+		// replace the previous publish messages
 		if (myIdentity.getSipETag().length() > 0) {
-				publishReq.addHeader(headerFactory.createSIPIfMatchHeader(myIdentity.getSipETag())) ;
+			publishReq.addHeader(headerFactory
+					.createSIPIfMatchHeader(myIdentity.getSipETag()));
 		}
 
 		return publishReq;
@@ -600,15 +606,16 @@ public class SIPClient implements SipListener {
 		ClientTransaction tid = responseReceivedEvent.getClientTransaction();
 		CSeqHeader cseq = (CSeqHeader) response.getHeader(CSeqHeader.NAME);
 
-		if (tid == null) {
-			// RFC3261: MUST respond to every 2xx
-			if (ackRequest != null && tid.getDialog() != null) {
+		// RFC3261: MUST respond to every 2xx
+		if (tid != null && tid.getDialog() != null) {
+			if (ackRequest != null) {
 				try {
 					tid.getDialog().sendAck(ackRequest);
 				} catch (SipException se) {
 					Log.e("nebula", se.getMessage());
 				}
 			}
+		} else {
 			return;
 		}
 
@@ -621,7 +628,7 @@ public class SIPClient implements SipListener {
 		try {
 			if (response.getStatusCode() == Response.OK) {
 				if (cseq.getMethod().equals(Request.INVITE)) {
-					Log.e("nebula", "sipClient: " + "sending ACK") ;
+					Log.e("nebula", "sipClient: " + "sending ACK");
 					ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
 					tid.getDialog().sendAck(ackRequest);
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
@@ -636,24 +643,26 @@ public class SIPClient implements SipListener {
 					tid.getDialog().notify();
 					// tid.notify() ;
 				} else if (cseq.getMethod().equals(Request.PUBLISH)) {
-					SIPETagHeader sipETag = (SIPETagHeader) response.getHeader("SIP-ETag") ;
+					SIPETagHeader sipETag = (SIPETagHeader) response
+							.getHeader("SIP-ETag");
 					myIdentity.setSipETag(sipETag.getETag());
-				} 
+				}
 			}
 		} catch (Exception ex) {
 			Log.e("nebula", "sipClient: " + ex.getMessage());
 		}
 	}
-	
+
 	/*
 	 * contact nina
 	 */
 	public Request refer(String referSIPUser, String referSIPDomain,
 			String threadId, String oldConversationId) throws Exception {
 		// Create the request.
-		Request request = createRequest(myIdentity.getMcuName(), myIdentity
-				.getMySIPDomain(), Request.REFER, addressFactory.createSipURI(
-				myIdentity.getMcuName(), myIdentity.getMySIPDomain()));
+		Request request = createRequest(true, myIdentity.getMcuName(),
+				myIdentity.getMySIPDomain(), Request.REFER, addressFactory
+						.createSipURI(myIdentity.getMcuName(), myIdentity
+								.getMySIPDomain()));
 
 		SipURI referSIP = addressFactory.createSipURI(referSIPUser,
 				referSIPDomain);
@@ -665,8 +674,9 @@ public class SIPClient implements SipListener {
 		// update old conversation and add new one
 		ConversationThread currentThread = myIdentity.getThreadById(threadId);
 
-		String newRcl = currentThread.getConversation(
-				oldConversationId).getRcl() + "," + referSIP.toString();
+		String newRcl = currentThread.getConversation(oldConversationId)
+				.getRcl()
+				+ "," + referSIP.toString();
 
 		Conversation newConversation = currentThread.addConversation(newRcl);
 

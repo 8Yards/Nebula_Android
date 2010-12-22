@@ -11,6 +11,8 @@ import org.nebula.R;
 import org.nebula.client.sip.SIPClient;
 import org.nebula.client.sip.SIPManager;
 import org.nebula.main.NebulaApplication;
+import org.nebula.models.Conversation;
+import org.nebula.models.ConversationThread;
 import org.nebula.models.Group;
 import org.nebula.models.MyIdentity;
 import org.nebula.models.Profile;
@@ -93,7 +95,7 @@ public class ContactsTab extends ExpandableListActivity implements
 
 	public void reloadContactList() {
 		Log.v("nebula", "contacts_tab:" + " reloading contact list");
-		
+
 		NebulaApplication.getInstance().reloadMyGroups();
 		List<Group> myGroups = NebulaApplication.getInstance().getMyIdentity()
 				.getMyGroups();
@@ -116,12 +118,12 @@ public class ContactsTab extends ExpandableListActivity implements
 		expListAdapter.notifyDataSetChanged();
 	}
 
-	public void onGroupClick(View v){
+	public void onGroupClick(View v) {
 		CheckBox cb = (CheckBox) v;
 		LinearLayout groupRow = (LinearLayout) v.getParent();
 		String groupName = (String) ((TextView) groupRow
 				.findViewById(R.id.tvGroupName)).getText();
-		
+
 		for (int i = 0; i < groups.size(); i++) {
 			GroupRow g = groups.get(i);
 			if (g.getName().equals(groupName)) {
@@ -130,7 +132,7 @@ public class ContactsTab extends ExpandableListActivity implements
 					individualContact.setChecked(cb.isChecked());
 				}
 				expListAdapter.notifyDataSetChanged();
-				
+
 				return;
 			}
 		}
@@ -146,19 +148,24 @@ public class ContactsTab extends ExpandableListActivity implements
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		Intent intent;
+		ConversationThread thread;
+		Conversation conversation;
 
 		switch (item.getItemId()) {
 		case R.id.iInstantTalk:
-			String callTo = "p";
-			Log.v("nebula", "contactsTab: " + "calling " + callTo);
-			List<String> callee = new ArrayList<String>();
-			callee.add(callTo);
-
-			SIPManager.doCall(callee);
+			String rclList = "p" + "@" + myIdentity.getMySIPDomain();
+			thread = myIdentity.createThread();
+			conversation = thread.addConversation(rclList
+					.toString());
+			SIPManager.doCall(rclList, thread.getId(), conversation.getId());
 			break;
 		case R.id.iAddContact:
-			 intent = new Intent(ContactsTab.this, AddContact.class);
-			 startActivityForResult(intent, SHOW_SUB_ACTIVITY_ADDCONTACT);
+			thread = myIdentity.getMyThreads().get(0);
+			conversation = thread.getMyConversations().get(0);
+			SIPManager.doRefer("z", myIdentity.getMySIPDomain(),
+					thread.getId(), conversation.getId());
+			// intent = new Intent(ContactsTab.this, AddContact.class);
+			// startActivityForResult(intent, SHOW_SUB_ACTIVITY_ADDCONTACT);
 			break;
 		case R.id.iAddGroup:
 			intent = new Intent(ContactsTab.this, AddGroup.class);

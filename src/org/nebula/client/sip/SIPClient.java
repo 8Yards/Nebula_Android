@@ -7,6 +7,8 @@
 
 package org.nebula.client.sip;
 
+import gov.nist.javax.sip.header.SIPHeader;
+
 import java.io.IOException;
 import java.io.StringReader;
 import java.text.ParseException;
@@ -47,11 +49,11 @@ import javax.sip.header.FromHeader;
 import javax.sip.header.HeaderAddress;
 import javax.sip.header.HeaderFactory;
 import javax.sip.header.MaxForwardsHeader;
+import javax.sip.header.ReferToHeader;
 import javax.sip.header.SIPETagHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.header.ViaHeader;
-import javax.sip.header.ReferToHeader;
 import javax.sip.message.MessageFactory;
 import javax.sip.message.Request;
 import javax.sip.message.Response;
@@ -62,9 +64,9 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.nebula.main.NebulaApplication;
 import org.nebula.main.NebulaEventHandler;
-import org.nebula.models.MyIdentity;
 import org.nebula.models.Conversation;
 import org.nebula.models.ConversationThread;
+import org.nebula.models.MyIdentity;
 import org.nebula.utils.SDPUtils;
 import org.nebula.utils.Utils;
 import org.w3c.dom.Document;
@@ -76,7 +78,6 @@ import org.xml.sax.SAXException;
 
 import android.util.Log;
 
-import gov.nist.javax.sip.header.SIPHeader;
 /**
  * Class for the SIP Client
  */
@@ -115,6 +116,8 @@ public class SIPClient implements SipListener {
 
 	private ListeningPoint localUDPListeningPoint;
 	private String transport = "udp";
+
+	private long seqCount = 1L;
 
 	public SIPClient() throws Exception {
 		myIdentity = NebulaApplication.getInstance().getMyIdentity();
@@ -315,13 +318,8 @@ public class SIPClient implements SipListener {
 		return subscribeReq;
 	}
 
-	public Request invite(List<String> toSIPUsers) throws ParseException,
-			InvalidArgumentException, Exception {
-		return invite(toSIPUsers, myIdentity.getMySIPDomain());
-	}
-
 	// contact - prajwol
-	public Request invite(List<String> toSIPUsers, String toSIPDomain)
+	public Request invite(String rclList, String threadId, String convesationId)
 			throws ParseException, InvalidArgumentException, Exception {
 		// do you know that we always invite mcu :):) --myIdentity.getMcuName()
 
@@ -331,36 +329,23 @@ public class SIPClient implements SipListener {
 				myIdentity.getMcuName(), myIdentity.getMySIPDomain()));
 		inviteReq.setExpires(headerFactory.createExpiresHeader(3600));
 
-		// TODO:: do actual XML
-		StringBuilder rclList = new StringBuilder();
-		for (int i = 0; i < toSIPUsers.size(); i++) {
-			if (i > 0) {
-				rclList.append(",");
-			}
-			rclList.append(toSIPUsers.get(i) + "@"
-					+ myIdentity.getMySIPDomain());
-		}
-
 		// TODO:: add the MIME in elegant way
 		String myMIMEContent = "--8Yards" + "\r\n"
 				+ "Content-type: application/sdp" + "\r\n" + "" + "\r\n"
 				+ SDPUtils.getMySDP() + "\r\n" + "--8Yards" + "\r\n"
 				+ "Content-type: application/resource-lists+xml" + "\r\n"
 				+ rclList.toString() + "\r\n" + "--8Yards--";
-		Log.v("nebula", "sipClient: " + myMIMEContent);
+		// Log.v("nebula", "sipClient: " + myMIMEContent);
 
 		inviteReq
 				.setContent(myMIMEContent.getBytes(), headerFactory
 						.createContentTypeHeader("multipart",
 								"mixed; boundary=8Yards"));
 
-		ConversationThread thread = myIdentity.createThread();
-		Conversation conversation = thread.addConversation(rclList.toString());
-
 		// add thread and conversation parameters
 		ToHeader toHeader = (ToHeader) inviteReq.getHeader(SIPHeader.TO);
-		toHeader.setParameter(THREAD_PARAMETER, thread.getId());
-		toHeader.setParameter(CONVERSATION_PARAMETER, conversation.getId());
+		toHeader.setParameter(THREAD_PARAMETER, threadId);
+		toHeader.setParameter(CONVERSATION_PARAMETER, conversationId);
 		inviteReq.setHeader(toHeader);
 
 		return inviteReq;
@@ -433,7 +418,7 @@ public class SIPClient implements SipListener {
 
 	private CSeqHeader getCSeqHeader(String reqType) throws ParseException,
 			InvalidArgumentException {
-		return headerFactory.createCSeqHeader(1L, reqType);
+		return headerFactory.createCSeqHeader(seqCount++, reqType);
 	}
 
 	private CallIdHeader getNewCallIdHeader() {
@@ -442,8 +427,8 @@ public class SIPClient implements SipListener {
 
 	// contact - nina, prajwol
 	public void processRequest(RequestEvent requestReceivedEvent) {
-		Log.v("nebula", "sipclient:"
-				+ requestReceivedEvent.getRequest().getMethod());
+		// Log.v("nebula", "sipclient:" +
+		// requestReceivedEvent.getRequest().getMethod());
 
 		try {
 			Request request = requestReceivedEvent.getRequest();
@@ -453,11 +438,9 @@ public class SIPClient implements SipListener {
 				serverTransaction = sipProvider
 						.getNewServerTransaction(request);
 			}
-
 			String method = request.getMethod();
 			if (method.equals(Request.NOTIFY)) {
 				processNotify(request, serverTransaction);
-
 			} else if (method.equals(Request.INVITE)) {
 				processInvite(request, serverTransaction);
 			} else if (!method.equals(Request.ACK)) {
@@ -465,11 +448,12 @@ public class SIPClient implements SipListener {
 			}
 		} catch (Exception e) {
 			// we have been lazy here and yeah. lazy :|
-			Log.e("nebula", "sipclient:" + e.getMessage());
+			Log.e("nebula", "sipclient 469:" + e.getMessage());
 		}
 	}
 
 	// contact - nina, prajwol
+	// TODO:: check where is the null coming from
 	private void processNotify(Request request,
 			ServerTransaction serverTransaction) throws ParseException,
 			SipException, InvalidArgumentException,
@@ -553,6 +537,7 @@ public class SIPClient implements SipListener {
 			ServerTransaction serverTransaction) throws Exception {
 
 		if (myIdentity.getMyStatus().equals("Online")) {
+//			dialog = serverTransaction.getDialog();
 			Response response = messageFactory.createResponse(Response.OK,
 					request);
 			response.addHeader(createContactHeader());
@@ -560,39 +545,49 @@ public class SIPClient implements SipListener {
 			String requestContent = new String(request.getRawContent());
 			String requestSDP = SDPUtils.getSDP(requestContent);
 			String requestRCL = SDPUtils.getRCL(requestContent);
-			String mySDP = SDPUtils.getMySDP();
-
-			// TODO:: add the MIME in elegant way
-			String myMIMEContent = "--8Yards" + "\r\n"
-					+ "Content-type: application/sdp" + "\r\n" + "" + "\r\n"
-					+ mySDP + "\r\n" + "--8Yards" + "\r\n"
-					+ "Content-type: application/resource-lists+xml" + "\r\n"
-					+ requestRCL + "\r\n" + "--8Yards--";
-
-			response.setContent(myMIMEContent.getBytes(), headerFactory
-					.createContentTypeHeader("multipart",
-							"mixed; boundary=8Yards"));
-
-			serverTransaction.sendResponse(response);
 
 			// add new thread and conversation
 			ToHeader toHeader = (ToHeader) request.getHeader(SIPHeader.TO);
 			String threadId = toHeader.getParameter(THREAD_PARAMETER);
 			String convId = toHeader.getParameter(CONVERSATION_PARAMETER);
+			Log.v("nebula", threadId + ", " + convId);
+			for (ConversationThread iterable_element : myIdentity
+					.getMyThreads()) {
+				Log.v("nebula", "thread " + iterable_element.getId()
+						+ " exists");
+			}
+
 			ConversationThread thread;
+			boolean isReinvite = false;
 
 			if (myIdentity.existsThread(threadId)) {
+				isReinvite = true;
 				thread = myIdentity.getThreadById(threadId);
 			} else {
+				isReinvite = false;
 				thread = myIdentity.createThread(threadId);
+
+				// TODO:: add the MIME in elegant way
+				String myMIMEContent = "--8Yards" + "\r\n"
+						+ "Content-type: application/sdp" + "\r\n" + ""
+						+ "\r\n" + SDPUtils.getMySDP() + "\r\n" + "--8Yards"
+						+ "\r\n"
+						+ "Content-type: application/resource-lists+xml"
+						+ "\r\n" + requestRCL + "\r\n" + "--8Yards--";
+
+				response.setContent(myMIMEContent.getBytes(), headerFactory
+						.createContentTypeHeader("multipart",
+								"mixed; boundary=8Yards"));
 			}
 			thread.addConversation(convId, requestRCL);
+
+			serverTransaction.sendResponse(response);
 
 			if (eventHandler != null) {
 				// TODO Good SDP Parsing
 				eventHandler.processEvent(NOTIFY_INVITE, SDPUtils
 						.retrieveIP(requestSDP), SDPUtils
-						.retrievePort(requestSDP));
+						.retrievePort(requestSDP), isReinvite);
 			}
 		} else {
 			// TODO:: common handle this
@@ -612,7 +607,7 @@ public class SIPClient implements SipListener {
 				try {
 					tid.getDialog().sendAck(ackRequest);
 				} catch (SipException se) {
-					Log.e("nebula", se.getMessage());
+					Log.e("nebula", "sip_client 619: " + se.getMessage());
 				}
 			}
 		} else {
@@ -628,7 +623,6 @@ public class SIPClient implements SipListener {
 		try {
 			if (response.getStatusCode() == Response.OK) {
 				if (cseq.getMethod().equals(Request.INVITE)) {
-					Log.e("nebula", "sipClient: " + "sending ACK");
 					ackRequest = tid.getDialog().createAck(cseq.getSeqNumber());
 					tid.getDialog().sendAck(ackRequest);
 				} else if (cseq.getMethod().equals(Request.CANCEL)) {
@@ -649,7 +643,7 @@ public class SIPClient implements SipListener {
 				}
 			}
 		} catch (Exception ex) {
-			Log.e("nebula", "sipClient: " + ex.getMessage());
+			Log.e("nebula", "sipClient 656: " + ex.getMessage());
 		}
 	}
 
@@ -663,14 +657,12 @@ public class SIPClient implements SipListener {
 				myIdentity.getMySIPDomain(), Request.REFER, addressFactory
 						.createSipURI(myIdentity.getMcuName(), myIdentity
 								.getMySIPDomain()));
-
 		SipURI referSIP = addressFactory.createSipURI(referSIPUser,
 				referSIPDomain);
 		Address referAddress = addressFactory.createAddress(referSIP);
 		ReferToHeader referToHeader = headerFactory
 				.createReferToHeader(referAddress);
 		request.addHeader(referToHeader);
-
 		// update old conversation and add new one
 		ConversationThread currentThread = myIdentity.getThreadById(threadId);
 
@@ -686,7 +678,6 @@ public class SIPClient implements SipListener {
 		toHeader.setParameter(CONVERSATION_PARAMETER, newConversation.getId());
 		toHeader.setParameter(OLD_CONVERSATION_PARAMETER, oldConversationId);
 		request.setHeader(toHeader);
-
 		return request;
 	}
 

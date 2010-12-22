@@ -13,6 +13,7 @@ import jlibrtp.RTPSession;
 
 import org.sipdroid.codecs.G711;
 
+import android.media.AudioTrack;
 import android.util.Log;
 
 public class RTPReceiver implements RTPAppIntf {
@@ -54,9 +55,6 @@ public class RTPReceiver implements RTPAppIntf {
 
 		G711.alaw2linear(data, linData, linData.length);
 		participant.track.write(linData, 0, linData.length);
-		Log.v("jlibrtp2", participant.getSSRC() + " playing");
-
-		Log.v("nebula", "rtpReceiver: received - " + data.length);
 	}
 
 	// interface method

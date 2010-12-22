@@ -80,11 +80,14 @@ public class SIPManager {
 	}
 
 	// contact- prajwol, michel
-	public static int doCall(List<String> toUsers) {
+	public static int doCall(String rclList,
+			String threadId, String conversationId) {
 		try {
+			Log.v("nebula", "sipManager: " + "calling " + rclList);
+			
 			SIPClient sip = NebulaApplication.getInstance().getMySIPClient();
-			Log.v("nebula", "sipManager: " + "calling " + toUsers.get(0));
-			Response response = sip.send(sip.invite(toUsers));
+			Response response = sip.send(sip.invite(rclList.toString(),
+					threadId, conversationId));
 			if (response.getStatusCode() == Response.OK) {
 				String requestContent = new String(response.getRawContent());
 				NebulaApplication.getInstance().establishRTP(
@@ -104,8 +107,6 @@ public class SIPManager {
 	 * contact nina
 	 */
 	public static int doLogout() {
-		Log.v("nebula", "sip_manager: logout called");
-
 		try {
 			doPublish("Offline"); // :P
 
@@ -116,9 +117,8 @@ public class SIPManager {
 			Response resp = sip.send(sip.register(0));
 			if (resp.getStatusCode() == Response.OK) {
 				return LOGOUT_SUCCESS;
-			}
-			else {
-				throw new Exception("Logout did not succeed");	
+			} else {
+				throw new Exception("Logout did not succeed");
 			}
 		} catch (Exception e) {
 			Log.e("nebula", "sip_manager: logout error: " + e.getMessage());
@@ -128,8 +128,6 @@ public class SIPManager {
 
 	public static int doRefer(String referSIPUser, String referSIPDomain,
 			String threadId, String oldConversationId) {
-		Log.v("nebula", "sipmanager: refer called");
-
 		try {
 			SIPClient sip = NebulaApplication.getInstance().getMySIPClient();
 			Response resp = sip.send(sip.refer(referSIPUser, referSIPDomain,

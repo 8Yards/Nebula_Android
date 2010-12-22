@@ -13,10 +13,7 @@ import org.nebula.client.rtp.RTPReceiver;
 import org.nebula.client.rtp.RTPSender;
 import org.nebula.client.rtp.RTPSender.SenderBinder;
 import org.nebula.client.sip.SIPClient;
-import org.nebula.client.sip.SIPManager;
-import org.nebula.models.Group;
 import org.nebula.models.MyIdentity;
-import org.nebula.models.Profile;
 
 import android.app.Application;
 import android.content.ComponentName;
@@ -64,7 +61,7 @@ public class NebulaApplication extends Application implements
 			myRTPClient.payloadType(8);
 
 			myRTPReceiver = new RTPReceiver(myRTPClient); // TODO:: do we need
-															// this??
+			// this??
 		} catch (Exception e) {
 			// TODO Handle gracefully
 			Log.e("nebula", "nebulaApp: " + e.getMessage());
@@ -79,8 +76,10 @@ public class NebulaApplication extends Application implements
 			sendBroadcast(new Intent(params[0].toString()).putExtra("params",
 					params));
 		} else if (eventName.equals(SIPClient.NOTIFY_INVITE)) {
-			establishRTP(params[1].toString(), Integer.valueOf(
-					params[2].toString()).intValue());
+			if (!Boolean.getBoolean(params[3].toString())) {
+				establishRTP(params[1].toString(), Integer.valueOf(
+						params[2].toString()).intValue());
+			}
 		}
 	}
 
@@ -97,12 +96,12 @@ public class NebulaApplication extends Application implements
 	}
 
 	private void renewMyPresenceSubscriptions() {
-		for (Group individualGroup : myIdentity.getMyGroups()) {
-			for (Profile individualProfile : individualGroup.getContacts()) {
-				SIPManager.doSubscribe(individualProfile.getUsername(),
-						myIdentity.getMySIPDomain());
-			}
-		}
+		// for (Group individualGroup : myIdentity.getMyGroups()) {
+		// for (Profile individualProfile : individualGroup.getContacts()) {
+		// SIPManager.doSubscribe(individualProfile.getUsername(),
+		// myIdentity.getMySIPDomain());
+		// }
+		// }
 	}
 
 	public void establishRTP(String destAddressRTP, int destPortRTP) {

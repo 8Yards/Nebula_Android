@@ -17,8 +17,11 @@ import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 
 public class Main extends TabActivity {
-	private static final int SHOW_SUB_ACTIVITY_LOGIN = 1;
+	public static final int SHOW_SUB_ACTIVITY_LOGIN = 1;
+	public static final String CONTACTS_TAB = "contacts";
+	public static final String CONVERSATION_TAB = "conversation";
 
+	private TabHost tabHost;
 	private MyIdentity myIdentity = null;
 
 	public void onCreate(Bundle savedInstanceState) {
@@ -53,26 +56,25 @@ public class Main extends TabActivity {
 		} else {
 			setContentView(R.layout.main);
 			NebulaApplication.getInstance().reloadMyGroups();
-			
-			TabHost tabHost = (TabHost) findViewById(android.R.id.tabhost);
 
-			TabSpec contactSpec = tabHost
-					.newTabSpec("contacts")
-					.setIndicator(
-							"Contacts",
-							getResources()
-									.getDrawable(R.drawable.ic_tab_albums))
+			tabHost = (TabHost) findViewById(android.R.id.tabhost);
+
+			TabSpec contactSpec = tabHost.newTabSpec(CONTACTS_TAB)
+					.setIndicator("Contacts",
+							getResources().getDrawable(R.drawable.contacts))
 					.setContent(new Intent(Main.this, ContactsTab.class));
 
-			TabSpec conversationSpec = tabHost
-					.newTabSpec("conversation")
-					.setIndicator(
-							"Conversation",
-							getResources().getDrawable(
-									R.drawable.ic_tab_artists))
+			TabSpec conversationSpec = tabHost.newTabSpec(CONVERSATION_TAB)
+					.setIndicator("Conversation",
+							getResources().getDrawable(R.drawable.groups))
 					.setContent(new Intent(Main.this, ConversationTab.class));
+
 			tabHost.addTab(contactSpec);
 			tabHost.addTab(conversationSpec);
 		}
+	}
+
+	public void setTabByTag(String tabTag) {
+		tabHost.setCurrentTabByTag(tabTag);
 	}
 }

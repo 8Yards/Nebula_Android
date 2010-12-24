@@ -8,12 +8,17 @@ import java.net.DatagramSocket;
 import jlibrtp.Participant;
 import jlibrtp.RTPSession;
 
+import org.nebula.client.rest.RESTConversationManager;
 import org.nebula.client.rest.RESTGroupManager;
 import org.nebula.client.rtp.RTPReceiver;
 import org.nebula.client.rtp.RTPSender;
 import org.nebula.client.rtp.RTPSender.SenderBinder;
 import org.nebula.client.sip.SIPClient;
+import org.nebula.client.sip.SIPManager;
+import org.nebula.models.ConversationThread;
+import org.nebula.models.Group;
 import org.nebula.models.MyIdentity;
+import org.nebula.models.Profile;
 
 import android.app.Application;
 import android.content.ComponentName;
@@ -71,15 +76,39 @@ public class NebulaApplication extends Application implements
 
 	public void processEvent(Object... params) {
 		String eventName = params[0].toString();
-		Log.v("nebula", "nebulaApp:" + eventName + "(" + params.length + ")");
 		if (eventName.equals(SIPClient.NOTIFY_PRESENCE)) {
 			sendBroadcast(new Intent(params[0].toString()).putExtra("params",
 					params));
 		} else if (eventName.equals(SIPClient.NOTIFY_INVITE)) {
-			if (!Boolean.getBoolean(params[3].toString())) {
+			Log.v("nebula", "nebulaApp:" + eventName + "(" + params.length + ")");
+			String threadId = (String) params[3];
+			String convId = (String) params[4];
+			String requestRCL = (String) params[5];
+
+			ConversationThread thread;
+			boolean shouldEstablishRTP = false;
+
+			if (myIdentity.existsThread(threadId)) {
+				thread = myIdentity.getThreadById(threadId);
+
+				if (!thread.existsConversation(convId)) {
+					thread.addConversation(convId, requestRCL);
+					shouldEstablishRTP = false;
+				} else {
+					shouldEstablishRTP = true;
+				}
+			} else {
+				thread = myIdentity.createThread(threadId);
+				thread.addConversation(convId, requestRCL);
+				shouldEstablishRTP = true;
+			}
+
+			if (shouldEstablishRTP == true) {
 				establishRTP(params[1].toString(), Integer.valueOf(
 						params[2].toString()).intValue());
 			}
+
+			sendBroadcast(new Intent(params[0].toString()));			
 		}
 	}
 
@@ -95,13 +124,24 @@ public class NebulaApplication extends Application implements
 		}
 	}
 
+	public void reloadConversation() {
+		RESTConversationManager rC = new RESTConversationManager();
+
+		try {
+			myIdentity.setMyThreads(rC.retrieveAll());
+		} catch (Exception e) {
+			// do nothing here since the old conversation is preserved
+			Log.e("nebula", e.getMessage());
+		}
+	}
+
 	private void renewMyPresenceSubscriptions() {
-		// for (Group individualGroup : myIdentity.getMyGroups()) {
-		// for (Profile individualProfile : individualGroup.getContacts()) {
-		// SIPManager.doSubscribe(individualProfile.getUsername(),
-		// myIdentity.getMySIPDomain());
-		// }
-		// }
+		for (Group individualGroup : myIdentity.getMyGroups()) {
+			for (Profile individualProfile : individualGroup.getContacts()) {
+				SIPManager.doSubscribe(individualProfile.getUsername(),
+						myIdentity.getMySIPDomain());
+			}
+		}
 	}
 
 	public void establishRTP(String destAddressRTP, int destPortRTP) {

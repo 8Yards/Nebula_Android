@@ -3,11 +3,11 @@
  */
 package org.nebula.client.sip;
 
-import java.util.List;
-
 import javax.sip.message.Response;
 
 import org.nebula.main.NebulaApplication;
+import org.nebula.models.Conversation;
+import org.nebula.models.ConversationThread;
 import org.nebula.models.MyIdentity;
 import org.nebula.utils.SDPUtils;
 
@@ -80,14 +80,18 @@ public class SIPManager {
 	}
 
 	// contact- prajwol, michel
-	public static int doCall(String rclList,
-			String threadId, String conversationId) {
+	public static int doCall(ConversationThread thread,
+			Conversation conversation) {
 		try {
-			Log.v("nebula", "sipManager: " + "calling " + rclList);
-			
+			Log
+					.v("nebula", "sipManager: " + "calling "
+							+ conversation.getRcl());
+
 			SIPClient sip = NebulaApplication.getInstance().getMySIPClient();
-			Response response = sip.send(sip.invite(rclList.toString(),
-					threadId, conversationId));
+			Response response = sip
+					.send(sip.invite(conversation.getRcl(), thread
+							.getThreadName(), conversation
+							.getConversationName()));
 			if (response.getStatusCode() == Response.OK) {
 				String requestContent = new String(response.getRawContent());
 				NebulaApplication.getInstance().establishRTP(
@@ -127,11 +131,14 @@ public class SIPManager {
 	}
 
 	public static int doRefer(String referSIPUser, String referSIPDomain,
-			String threadId, String oldConversationId) {
+			String threadId, String oldConversationId, String newConversationId) {
 		try {
+			Log.v("seqTrace", "doRefer:" + referSIPDomain + ","
+					+ referSIPDomain + "," + threadId + "," + oldConversationId
+					+ "," + newConversationId);
 			SIPClient sip = NebulaApplication.getInstance().getMySIPClient();
 			Response resp = sip.send(sip.refer(referSIPUser, referSIPDomain,
-					threadId, oldConversationId));
+					threadId, oldConversationId, newConversationId));
 			if (resp.getStatusCode() == Response.OK) {
 				return REFER_SUCCESS;
 			} else {
@@ -139,6 +146,7 @@ public class SIPManager {
 			}
 		} catch (Exception e) {
 			Log.e("nebula", "sip_manager: refer error " + e.getMessage());
+			e.printStackTrace(System.err);
 			return REFER_FAILURE;
 		}
 	}

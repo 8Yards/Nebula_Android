@@ -36,18 +36,13 @@ public class Group {
 		this.groupName = groupName;
 		this.id = groupObj.getInt("id");
 		this.groupStatus = groupObj.getString("status");
-
-		List<Profile> profiles = new ArrayList<Profile>();
-		JSONObject profileObj = null;
+		this.contacts = new ArrayList<Profile>();
 
 		int profilesCount = groupObj.length() - 2; // :P there are two keys more
 		for (int i = 0; i < profilesCount; i++) {
-			profileObj = groupObj.getJSONObject("" + i);
-			Profile prof = new Profile(profileObj);
-			profiles.add(prof);
-		}
-
-		this.contacts = profiles;
+			JSONObject profileObj = groupObj.getJSONObject("" + i);
+			this.contacts.add(new Profile(profileObj));
+		}		
 	}
 
 	public String getGroupName() {

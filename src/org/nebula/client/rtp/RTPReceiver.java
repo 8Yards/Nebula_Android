@@ -13,7 +13,6 @@ import jlibrtp.RTPSession;
 
 import org.sipdroid.codecs.G711;
 
-import android.media.AudioTrack;
 import android.util.Log;
 
 public class RTPReceiver implements RTPAppIntf {

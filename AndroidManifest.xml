@@ -22,6 +22,7 @@
 		<activity android:name=".activities.Delete"></activity>
 		<activity android:name=".activities.Edit"></activity>
 		<activity android:name=".activities.ConversationTab"></activity>
+		<activity android:name=".activities.Volume"></activity>
 		
 		<service android:enabled="true" android:name=".client.rtp.RTPSender" />
 

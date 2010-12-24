@@ -8,6 +8,7 @@ import java.net.DatagramSocket;
 import jlibrtp.Participant;
 import jlibrtp.RTPSession;
 
+import org.nebula.client.localdb.NebulaLocalDB;
 import org.nebula.client.rest.RESTConversationManager;
 import org.nebula.client.rest.RESTGroupManager;
 import org.nebula.client.rtp.RTPReceiver;
@@ -32,6 +33,7 @@ public class NebulaApplication extends Application implements
 		NebulaEventHandler {
 	private static NebulaApplication singleton;
 
+	private NebulaLocalDB myLocalDB = null;
 	private MyIdentity myIdentity = null;
 	private SIPClient mySIPClient = null;
 	private RTPSession myRTPClient = null;
@@ -48,6 +50,7 @@ public class NebulaApplication extends Application implements
 		singleton = this;
 
 		myIdentity = new MyIdentity();
+		myLocalDB = new NebulaLocalDB(this);
 
 		try {
 			myIdentity.loadConfiguration();
@@ -178,6 +181,10 @@ public class NebulaApplication extends Application implements
 		}
 	};
 
+	public NebulaLocalDB getMyLocalDB() {
+		return myLocalDB;
+	}
+	
 	public MyIdentity getMyIdentity() {
 		return myIdentity;
 	}

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout
+android:id="@+id/widget49"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+xmlns:android="http://schemas.android.com/apk/res/android">
+	<TextView
+		android:id="@+id/tvUserName"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Username"
+		android:layout_x="50px"
+		android:layout_y="80px">
+	</TextView>
+	
+	<EditText
+		android:id="@+id/etUserID"
+		android:layout_width="226px"
+		android:layout_height="50px"
+		android:text=""
+		android:textSize="18sp"
+		android:layout_x="45px"
+		android:layout_y="99px">
+	</EditText>
+	
+	<TextView
+		android:id="@+id/tvPassword"
+		android:layout_width="wrap_content"
+		android:layout_height="19px"
+		android:text="Password"
+		android:layout_x="52px"
+		android:layout_y="149px">
+	</TextView>
+	
+	<EditText
+		android:id="@+id/etPassword"
+		android:layout_width="226px"
+		android:layout_height="50px"
+		android:text=""
+		android:textSize="18sp"
+		android:password="true"
+		android:layout_x="45px"
+		android:layout_y="167px">
+	</EditText>
+	
+	<Button
+		android:id="@+id/bSignIn"
+		android:layout_width="200px"
+		android:layout_height="40px"
+		android:text="Sign in"
+		android:layout_x="60px"
+		android:layout_y="249px"
+		android:onClick="doSignInToNebula">
+	</Button>
+	
+	<ImageView
+		android:id="@+id/ivNebula"
+		android:layout_width="226px"
+		android:layout_height="73px"
+		android:src="@drawable/nebula"
+		android:layout_x="46px"
+		android:layout_y="3px">
+	</ImageView>
+	
+	<TextView
+		android:id="@+id/tvNoAccount"
+		android:layout_width="210px"
+		android:layout_height="wrap_content"
+		android:text="Dont have Nebula Account yet?"
+		android:layout_x="58px"
+		android:layout_y="285px">
+	</TextView>
+	
+	<Button
+		android:id="@+id/bCreateAccount"
+		android:layout_width="200px"
+		android:layout_height="40px"
+		android:text="Create Account"
+		android:layout_x="60px"
+		android:layout_y="319px"
+		android:onClick="doRegisterToNebula">
+	</Button>
+	
+	<TextView
+		android:id="@+id/tvCreateNewAccount"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Create a new Account"
+		android:layout_x="88px"
+		android:layout_y="300px">
+	</TextView>
+	
+	<CheckBox
+		android:id="@+id/cbRemember"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="Remember Password"
+		android:layout_x="63px"
+		android:layout_y="206px">
+	</CheckBox>
+</AbsoluteLayout>

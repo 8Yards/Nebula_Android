@@ -1,0 +1,13 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/iMute"
+    	android:title="Mute"
+        android:icon="@drawable/mute" />
+        
+    <item android:id="@+id/iVolume"
+        android:title="Volume" 
+        android:icon="@drawable/unmute" />
+             
+    <item android:id="@+id/iSignout"
+        android:title="Signout" 
+        android:icon="@drawable/signout" />
+</menu>

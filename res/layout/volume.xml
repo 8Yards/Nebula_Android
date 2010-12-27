@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
+   android:orientation="vertical"
+   android:layout_width="fill_parent"
+   android:layout_height="fill_parent">
+
+	<SeekBar
+	   android:id="@+id/sbVolume"
+	   android:layout_height="wrap_content"
+	   android:layout_margin="10px"
+	   android:max="100"
+	   android:progress="50"
+	   android:layout_x="55px"
+	   android:layout_width="200px" android:layout_y="40px"/>
+	   
+	<TextView 
+	   android:id="@+id/tvVolumeValue"
+	   android:layout_width="wrap_content"
+	   android:layout_height="wrap_content"
+	   android:text="50"
+	   android:layout_y="70px" android:layout_x="149px"/>
+	
+	<TextView 
+	   android:id="@+id/tvVolumeSettings" 
+	   android:text="Volume Settings" 
+	   android:layout_y="5px" 
+	   android:ellipsize="none"
+	   android:textSize="15px" 
+	   android:layout_x="6px" 
+	   android:layout_height="wrap_content" 
+	   android:layout_width="201px">
+	 </TextView>
+	 
+	 <Button 
+	   android:id="@+id/bBackVolume"
+	   android:text="Back" 
+	   android:onClick="doBackVolume" 
+	   android:layout_y="110px" android:layout_x="180px" android:layout_width="80px" android:layout_height="51px">
+	</Button>
+	
+</AbsoluteLayout>

@@ -19,12 +19,18 @@ public class Conversation {
 	private int id;
 	private Date date;
 	private List<String> callee;
+	
+	public void setCallee(List<String> callee) {
+		this.callee = callee;
+	}
+
 	private String conversationName;
 
 	private ConversationThread thread;
 	private MyIdentity myIdentity = NebulaApplication.getInstance()
 			.getMyIdentity();
 
+	
 	public Conversation(JSONObject convObj, String conversationName) throws JSONException, ParseException {
 		this.callee = new ArrayList<String>();
 		this.id = convObj.getInt("id");

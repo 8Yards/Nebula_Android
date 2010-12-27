@@ -193,7 +193,7 @@ public class ContactsTab extends ExpandableListActivity implements
 			startActivityForResult(intent, SHOW_SUB_ACTIVITY_ADDCONTACT);
 			break;
 		case R.id.iAddGroup:
-			intent = new Intent(ContactsTab.this, AddGroup.class);
+			intent = new Intent(ContactsTab.this, GPSHandler.class);
 			startActivityForResult(intent, SHOW_SUB_ACTIVITY_ADDGROUP);
 			break;
 		case R.id.iEdit:

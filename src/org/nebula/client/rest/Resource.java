@@ -45,6 +45,8 @@ import org.nebula.models.MyIdentity;
 import org.nebula.utils.Base64;
 import org.nebula.utils.Utils;
 
+import android.util.Log;
+
 /*
  * Class used by Profiles, Contacts, Groups classes
  * It gives all the common methods to send requests and receive responses
@@ -417,7 +419,7 @@ public abstract class Resource {
 
 		InputStream instream = response.getEntity().getContent();
 		String result = Utils.convertStreamToString(instream);
-
+		Log.e("GPS", "MESSAGE: " + result);
 		int status = response.getStatusLine().getStatusCode();
 		return new Response(status, new JSONObject(result));
 	}

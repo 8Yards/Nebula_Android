@@ -18,6 +18,8 @@ import org.json.JSONObject;
 import org.nebula.models.Conversation;
 import org.nebula.models.ConversationThread;
 
+import android.util.Log;
+
 public class RESTConversationManager extends Resource {
 
 	private static double[] distances ={0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10,20, 50, 100, 250, 500 };
@@ -57,6 +59,8 @@ public class RESTConversationManager extends Resource {
 		int percentage = 100 / (distances.length);
 		int index = value / percentage;
 		System.out.println("total: "+ distances.length);
+		if (index == distances.length)
+			return index-1;
 		return index;
 	}
 	
@@ -122,6 +126,8 @@ public class RESTConversationManager extends Resource {
 	public float[][] distanceFromContact() throws JSONException,
 	ClientProtocolException, IOException {
 		Response r = this.get("distanceFromContact");
+		Log.e("GPS", "Message: "+r.getResult());
+		Log.e("GPS", "Status: "+r.getStatus());
 		float[][] values = new float[r.getResult().length()][2];
 		// scan the data for the name of the groups
 		int i = 0;
@@ -130,7 +136,7 @@ public class RESTConversationManager extends Resource {
 			// retrieve the JSON object and instantiates a new Group with it
 			String number = r.getResult().getString(distance);
 			values[i][0] = (float)Double.parseDouble(distance);
-			values[i][1] = (float)Double.parseDouble(number);
+			values[i][1] = (float)Integer.parseInt(number);
 			
 			i++;
 		}

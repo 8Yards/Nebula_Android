@@ -5,11 +5,11 @@
 package org.nebula.activities;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.nebula.R;
 import org.nebula.client.rest.RESTConversationManager;
-import org.nebula.client.rest.Status;
 import org.nebula.client.sip.SIPClient;
 import org.nebula.client.sip.SIPManager;
 import org.nebula.main.NebulaApplication;
@@ -21,8 +21,11 @@ import org.nebula.models.Profile;
 import org.nebula.ui.ContactRow;
 import org.nebula.ui.ContactsTabExpandableListAdapter;
 import org.nebula.ui.GroupRow;
+import org.nebula.utils.NebulaTask;
+import org.nebula.utils.Utils;
 
 import android.app.ExpandableListActivity;
+import android.app.ProgressDialog;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -87,8 +90,13 @@ public class ContactsTab extends ExpandableListActivity implements
 				contacts);
 		setListAdapter(expListAdapter);
 
+		ProgressDialog pd = ProgressDialog.show(this, "",
+				"Loading. Please wait...", true);
+
 		NebulaApplication.getInstance().reloadMyGroups();
 		reloadContactList();
+
+		pd.cancel();
 	}
 
 	@Override
@@ -126,6 +134,7 @@ public class ContactsTab extends ExpandableListActivity implements
 			}
 			contacts.add(children);
 		}
+		Collections.sort(groups);
 		expListAdapter.notifyDataSetChanged();
 	}
 
@@ -170,19 +179,49 @@ public class ContactsTab extends ExpandableListActivity implements
 			}
 			members.add(myIdentity.getMyUserName());
 
-			ConversationThread thread = myIdentity.createThread();
-			Conversation conversation = thread.addConversation(members);
-
-			RESTConversationManager conversationManager = new RESTConversationManager();
+			final ConversationThread thread = myIdentity.createThread();
+			final Conversation conversation = thread.addConversation(members);
 			try {
-				Status status = conversationManager
-						.addNewConversation(conversation);
-				if (!status.isSuccess()) {
-					throw new Exception(status.getMessage());
-				} else {
-					SIPManager.doCall(thread, conversation);
-					((Main) getParent()).setTabByTag(Main.CONVERSATION_TAB);
-				}
+				new NebulaTask() {
+					protected Long doInBackground(Object... params) {
+						Conversation c = (Conversation) params[0];
+
+						RESTConversationManager conversationManager = new RESTConversationManager();
+
+						org.nebula.client.rest.Status status;
+						try {
+							status = conversationManager.addNewConversation(c);
+
+							if (!status.isSuccess()) {
+								runOnUiThread(new Runnable() {
+									public void run() {
+										notifyUser("The conversation could not be saved on remote");
+									}
+								});
+							}
+						} catch (Exception e) {
+							runOnUiThread(new Runnable() {
+								public void run() {
+									notifyUser("The conversation could not be saved on remote");
+								}
+							});
+						}
+
+						return null;
+					}
+				}.execute(conversation);
+
+				new NebulaTask() {
+					protected Long doInBackground(Object... params) {
+						ConversationThread thread = (ConversationThread) params[0];
+						Conversation conversation = (Conversation) params[1];
+						SIPManager.doCall(thread, conversation);
+
+						return null;
+					}
+				}.execute(thread, conversation);
+
+				((Main) getParent()).setTabByTag(Main.CONVERSATION_TAB);
 			} catch (Exception e) {
 				Toast.makeText(getApplicationContext(), e.getMessage(),
 						Toast.LENGTH_LONG).show();
@@ -212,6 +251,10 @@ public class ContactsTab extends ExpandableListActivity implements
 			break;
 		}
 		return true;
+	}
+
+	private void notifyUser(String msg) {
+		Utils.notifyUser(this, msg);
 	}
 
 	public List<String> retrieveCheckedContacts() {
@@ -246,11 +289,31 @@ public class ContactsTab extends ExpandableListActivity implements
 
 	public void onItemSelected(AdapterView<?> parent, View view, int pos,
 			long id) {
-		int status = SIPManager.doPublish(parent.getItemAtPosition(pos)
-				.toString());
-		Log.v("nebula", "contacts_tab: "
-				+ (status == SIPManager.PUBLISH_SUCCESSFUL ? "publish success"
-						: "publish failure"));
+		new NebulaTask() {
+			protected Long doInBackground(Object... params) {
+				AdapterView<?> parent = (AdapterView<?>) params[0];
+				int pos = (Integer) params[1];
+				String myStatus = parent.getItemAtPosition(pos).toString();
+				myIdentity
+						.setMyStatus(myStatus);
+
+				runOnUiThread(new Runnable() {
+					public void run() {
+						expListAdapter.notifyDataSetChanged();
+					}
+				});
+				
+				int status = SIPManager.doPublish(myStatus);
+				Log
+				.v(
+						"nebula",
+						"contacts_tab: "
+								+ (status == SIPManager.PUBLISH_SUCCESSFUL ? "publish success"
+										: "publish failure"));
+				
+				return null;
+			}
+		}.execute(parent, pos);
 	}
 
 	public void onNothingSelected(AdapterView<?> arg0) {
@@ -263,6 +326,7 @@ public class ContactsTab extends ExpandableListActivity implements
 		switch (requestCode) {
 		case SHOW_SUB_ACTIVITY_ADDGROUP:
 			if (resultCode == AddGroup.ADDGROUP_SUCCESSFULL) {
+				//TODO should not REST reload
 				NebulaApplication.getInstance().reloadMyGroups();
 				reloadContactList();
 			} else {
@@ -271,6 +335,7 @@ public class ContactsTab extends ExpandableListActivity implements
 			break;
 		case SHOW_SUB_ACTIVITY_ADDCONTACT:
 			if (resultCode == AddContact.ADDCONTACT_SUCCESS) {
+				//TODO should not REST reload
 				NebulaApplication.getInstance().reloadMyGroups();
 				reloadContactList();
 			} else {
@@ -280,6 +345,7 @@ public class ContactsTab extends ExpandableListActivity implements
 		case SHOW_SUB_ACTIVITY_DELETE:
 			if (resultCode == Delete.DELETEGROUP_SUCCESSFUL
 					|| resultCode == Delete.DELETECONTACT_SUCCESSFUL) {
+				//TODO should not REST reload
 				NebulaApplication.getInstance().reloadMyGroups();
 				reloadContactList();
 			} else {
@@ -288,6 +354,7 @@ public class ContactsTab extends ExpandableListActivity implements
 		case SHOW_SUB_ACTIVITY_EDIT:
 			if (resultCode == Edit.EDITGROUP_SUCCESSFUL
 					|| resultCode == Edit.EDITCONTACT_SUCCESSFUL) {
+				//TODO should not REST reload
 				NebulaApplication.getInstance().reloadMyGroups();
 				reloadContactList();
 			} else {
@@ -301,10 +368,19 @@ public class ContactsTab extends ExpandableListActivity implements
 	public class PresenceReceiver extends BroadcastReceiver {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			Object[] params = (Object[]) intent.getExtras().get("params");
-			String sipURI = params[1].toString().split("sip:")[1].split("@")[0];
-			String status = params[2].toString();
-			updateStatus(sipURI, status);
+			new NebulaTask() {
+				protected Long doInBackground(Object... intents) {
+					Intent intent = (Intent) intents[0];
+					Object[] params = (Object[]) intent.getExtras().get(
+							"params");
+					String sipURI = params[1].toString().split("sip:")[1]
+							.split("@")[0];
+					String status = params[2].toString();
+					updateStatus(sipURI, status);
+
+					return null;
+				}
+			}.execute(intent);
 		}
 	}
 
@@ -316,14 +392,24 @@ public class ContactsTab extends ExpandableListActivity implements
 	}
 
 	public void updateStatus(String username, String status) {
-		for (List<ContactRow> contactList : contacts) {
-			for (ContactRow contact : contactList) {
-				if (contact.getUserName().equals(username)) {
-					contact.setStatus(status);
-				}
-			}
+		/*
+		 * for (List<ContactRow> contactList : contacts) { for (ContactRow
+		 * contact : contactList) { if (contact.getUserName().equals(username))
+		 * { contact.setStatus(status); } } }
+		 */
+
+		try {
+			NebulaApplication.getInstance().getMyIdentity().getContactByName(
+					username).setStatus(status);
+		} catch (Exception e) {
+			Log.w("nebula", "ContactsTab: contact not found");
 		}
 		// Log.v("presence-update", username + "-" + status);
-		expListAdapter.notifyDataSetChanged();
+
+		runOnUiThread(new Runnable() {
+			public void run() {
+				expListAdapter.notifyDataSetChanged();
+			}
+		});
 	}
 }

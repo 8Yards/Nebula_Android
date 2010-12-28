@@ -2,6 +2,8 @@
 
 package org.nebula.activities;
 
+import org.nebula.R;
+
 import android.app.Activity;
 import android.os.Bundle;
 

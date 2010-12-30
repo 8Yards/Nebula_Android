@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.nebula.models.Group;
 import org.nebula.models.Profile;
+import org.nebula.models.Status;
 
 public class RESTGroupManager extends Resource {
 

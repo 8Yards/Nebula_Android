@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.nebula.R;
-import org.nebula.client.sip.SIPClient;
+import org.nebula.client.sip.NebulaSIPConstants;
 import org.nebula.main.NebulaApplication;
 import org.nebula.models.Conversation;
 
@@ -38,10 +38,10 @@ public class ConversationTabExpandableListAdapter extends
 		this.inflater = LayoutInflater.from(context);
 
 		this.iconHolder = new HashMap<String, Integer>();
-		this.iconHolder.put(SIPClient.PRESENCE_ONLINE, R.drawable.green);
-		this.iconHolder.put(SIPClient.PRESENCE_BUSY, R.drawable.red);
-		this.iconHolder.put(SIPClient.PRESENCE_OFFLINE, R.drawable.white);
-		this.iconHolder.put(SIPClient.PRESENCE_AWAY, R.drawable.orange);
+		this.iconHolder.put(NebulaSIPConstants.PRESENCE_ONLINE, R.drawable.green);
+		this.iconHolder.put(NebulaSIPConstants.PRESENCE_BUSY, R.drawable.red);
+		this.iconHolder.put(NebulaSIPConstants.PRESENCE_OFFLINE, R.drawable.white);
+		this.iconHolder.put(NebulaSIPConstants.PRESENCE_AWAY, R.drawable.orange);
 	}
 
 	public View getGroupView(int groupPosition, boolean isExpanded,
@@ -52,15 +52,14 @@ public class ConversationTabExpandableListAdapter extends
 			v = inflater.inflate(R.layout.conversation_row, parent, false);
 		}
 
-		ConversationRow currentConversation = (ConversationRow) conversations
+		ConversationRow currentConversationRow = (ConversationRow) conversations
 				.get(groupPosition);
+		Conversation currentConversation = currentConversationRow.getConversation();
 
 		DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd - HH:mm:ss");
-		String conversationName = dateFormat.format(currentConversation
-				.getConversation().getDate());
+		String conversationName = dateFormat.format(currentConversation.getDate());
 
-		Conversation conversation = currentConversation.getConversation();
-		// v.setTag(conversation);
+//		v.setTag(currentConversation);
 
 		TextView threadName = (TextView) v
 				.findViewById(R.id.tvConversationName);
@@ -68,7 +67,7 @@ public class ConversationTabExpandableListAdapter extends
 		// threadName.setTag(conversation);
 		// threadName.setOnLongClickListener(ConversationTab.getInstance());
 
-		if (conversation.equals(NebulaApplication.getInstance().getMyIdentity()
+		if (currentConversation.equals(NebulaApplication.getInstance().getMyIdentity()
 				.getCurrentConversation())) {
 			threadName.setBackgroundColor(Color.rgb(0x35, 0x6A, 0xA0));
 		} else {
@@ -76,7 +75,7 @@ public class ConversationTabExpandableListAdapter extends
 		}
 
 		Button b = (Button) v.findViewById(R.id.bInviteMembers);
-		b.setTag(currentConversation.getConversation());
+		b.setTag(currentConversation);
 		return v;
 	}
 

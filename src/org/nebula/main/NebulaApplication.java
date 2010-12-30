@@ -14,7 +14,8 @@ import org.nebula.client.rest.RESTGroupManager;
 import org.nebula.client.rtp.RTPReceiver;
 import org.nebula.client.rtp.RTPSender;
 import org.nebula.client.rtp.RTPSender.SenderBinder;
-import org.nebula.client.sip.SIPClient;
+import org.nebula.client.sip.NebulaSIPConstants;
+import org.nebula.client.sip.SIPHandler;
 import org.nebula.client.sip.SIPManager;
 import org.nebula.models.ConversationThread;
 import org.nebula.models.Group;
@@ -31,14 +32,18 @@ import android.util.Log;
 
 public class NebulaApplication extends Application implements
 		NebulaEventHandler {
-	private static NebulaApplication singleton;
 
-	private NebulaLocalDB myLocalDB = null;
+	private static NebulaApplication singleton;
 	private MyIdentity myIdentity = null;
-	private SIPClient mySIPClient = null;
+
+	private SIPHandler mySIPHandler = null;
+
+	private boolean isRTPInitialized = false;
 	private RTPSession myRTPClient = null;
 	private RTPSender myRTPSender = null;
 	private RTPReceiver myRTPReceiver = null;
+
+	private NebulaLocalDB myLocalDB = null;
 
 	public static NebulaApplication getInstance() {
 		return singleton;
@@ -54,8 +59,7 @@ public class NebulaApplication extends Application implements
 
 		try {
 			myIdentity.loadConfiguration();
-			mySIPClient = new SIPClient();
-			mySIPClient.setEventHandler(this);
+			mySIPHandler = new SIPHandler(this);
 
 			bindService(new Intent(NebulaApplication.this, RTPSender.class),
 					senderConnection, Context.BIND_AUTO_CREATE);
@@ -68,8 +72,7 @@ public class NebulaApplication extends Application implements
 					.getMyRTPPort() + 1));
 			myRTPClient.payloadType(8);
 
-			myRTPReceiver = new RTPReceiver(myRTPClient); // TODO:: do we need
-			// this??
+			myRTPReceiver = new RTPReceiver(myRTPClient);
 		} catch (Exception e) {
 			// TODO Handle gracefully
 			Log.e("nebula", "nebulaApp: " + e.getMessage());
@@ -79,11 +82,10 @@ public class NebulaApplication extends Application implements
 
 	public void processEvent(Object... params) {
 		String eventName = params[0].toString();
-		if (eventName.equals(SIPClient.NOTIFY_PRESENCE)) {
+		if (eventName.equals(NebulaSIPConstants.NOTIFY_PRESENCE)) {
 			sendBroadcast(new Intent(params[0].toString()).putExtra("params",
 					params));
-		} else if (eventName.equals(SIPClient.NOTIFY_INVITE)) {
-			Log.v("nebula", "nebulaApp:" + eventName + "(" + params.length + ")");
+		} else if (eventName.equals(NebulaSIPConstants.NOTIFY_INVITE)) {
 			String threadId = (String) params[3];
 			String convId = (String) params[4];
 			String requestRCL = (String) params[5];
@@ -111,7 +113,7 @@ public class NebulaApplication extends Application implements
 						params[2].toString()).intValue());
 			}
 
-			sendBroadcast(new Intent(params[0].toString()));			
+			sendBroadcast(new Intent(params[0].toString()));
 		}
 	}
 
@@ -148,7 +150,15 @@ public class NebulaApplication extends Application implements
 	}
 
 	public void establishRTP(String destAddressRTP, int destPortRTP) {
-		myRTPSender.setRtpSender(myRTPClient);
+
+		if (!isRTPInitialized) {
+			isRTPInitialized = true;
+			myRTPSender.setRtpSender(myRTPClient);
+			myRTPSender.startRecordingAndSending();
+
+			myRTPClient.RTPSessionRegister(myRTPReceiver, null, null);
+			myRTPReceiver.startPlaying();
+		}
 
 		Log.v("nebula", "nebulaApp: desc ip/prt = " + destAddressRTP + "/"
 				+ destPortRTP);
@@ -157,16 +167,8 @@ public class NebulaApplication extends Application implements
 		int participants = myRTPSender.numberOfReceivers();
 		myRTPClient.addParticipant(p);
 
-		// TODO:: Need to wait for addParticipant.. check if this is
-		// necessary
 		while (participants == myRTPSender.numberOfReceivers()) {
 		}
-
-		myRTPClient.RTPSessionRegister(myRTPReceiver, null, null);
-
-		// Start Recording and Playing RTP
-		myRTPSender.startRecordingAndSending();
-		myRTPReceiver.startPlaying();
 	}
 
 	private ServiceConnection senderConnection = new ServiceConnection() {
@@ -184,7 +186,7 @@ public class NebulaApplication extends Application implements
 	public NebulaLocalDB getMyLocalDB() {
 		return myLocalDB;
 	}
-	
+
 	public MyIdentity getMyIdentity() {
 		return myIdentity;
 	}
@@ -193,11 +195,7 @@ public class NebulaApplication extends Application implements
 		this.myIdentity = myIdentity;
 	}
 
-	public SIPClient getMySIPClient() {
-		return mySIPClient;
-	}
-
-	public void setMySIPClient(SIPClient mySIPClient) {
-		this.mySIPClient = mySIPClient;
+	public SIPHandler getMySIPHandler() {
+		return mySIPHandler;
 	}
 }

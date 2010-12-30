@@ -9,7 +9,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.nebula.R;
-import org.nebula.client.sip.SIPClient;
+import org.nebula.client.sip.NebulaSIPConstants;
+import org.nebula.client.sip.SIPHandler;
 
 import android.content.Context;
 import android.graphics.Color;
@@ -36,10 +37,10 @@ public class ContactsTabExpandableListAdapter extends BaseExpandableListAdapter 
 		this.inflater = LayoutInflater.from(context);
 
 		this.iconHolder = new HashMap<String, Integer>();
-		this.iconHolder.put(SIPClient.PRESENCE_ONLINE, R.drawable.green);
-		this.iconHolder.put(SIPClient.PRESENCE_BUSY, R.drawable.red);
-		this.iconHolder.put(SIPClient.PRESENCE_OFFLINE, R.drawable.white);
-		this.iconHolder.put(SIPClient.PRESENCE_AWAY, R.drawable.orange);
+		this.iconHolder.put(NebulaSIPConstants.PRESENCE_ONLINE, R.drawable.green);
+		this.iconHolder.put(NebulaSIPConstants.PRESENCE_BUSY, R.drawable.red);
+		this.iconHolder.put(NebulaSIPConstants.PRESENCE_OFFLINE, R.drawable.white);
+		this.iconHolder.put(NebulaSIPConstants.PRESENCE_AWAY, R.drawable.orange);
 	}
 
 	public View getGroupView(int groupPosition, boolean isExpanded,

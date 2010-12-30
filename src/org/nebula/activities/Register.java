@@ -7,10 +7,11 @@ package org.nebula.activities;
 
 import org.nebula.R;
 import org.nebula.client.rest.RESTProfileManager;
-import org.nebula.client.rest.Status;
 import org.nebula.main.NebulaApplication;
 import org.nebula.models.MyIdentity;
 import org.nebula.models.Profile;
+import org.nebula.models.Status;
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
@@ -18,8 +19,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 public class Register extends Activity {
-	public static final int REGISTER_SUCCESSFULL = 1;
-	public static final int REGISTER_FAILURE = 0;
+	public static final int REGISTER_SUCCESSFULL = 11;
+	public static final int REGISTER_FAILURE = 10;
 
 	private EditText fullName;
 	private EditText userName;

@@ -6,8 +6,8 @@ package org.nebula.activities;
 
 import org.nebula.R;
 import org.nebula.client.rest.RESTGroupManager;
-import org.nebula.client.rest.Status;
 import org.nebula.models.Group;
+import org.nebula.models.Status;
 
 import android.app.Activity;
 import android.os.Bundle;

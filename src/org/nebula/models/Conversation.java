@@ -20,24 +20,26 @@ public class Conversation {
 	private Date date;
 	private List<String> callee;
 	private String conversationName;
+	private String callId = "";
 
 	private ConversationThread thread;
 	private MyIdentity myIdentity = NebulaApplication.getInstance()
 			.getMyIdentity();
 
-	public Conversation(JSONObject convObj, String conversationName) throws JSONException, ParseException {
+	public Conversation(JSONObject convObj, String conversationName)
+			throws JSONException, ParseException {
 		this.callee = new ArrayList<String>();
 		this.id = convObj.getInt("id");
 		this.conversationName = conversationName;
 		this.setDate(convObj.getString("date"));
-		
+
 		JSONObject calleeElement = convObj.getJSONObject("callees");
 		for (int i = 0; i < calleeElement.length(); i++) {
 			JSONObject user = calleeElement.getJSONObject("" + i);
 			callee.add(user.getString("username"));
 		}
 	}
-	
+
 	public Conversation(String conversationName) {
 		this.conversationName = conversationName;
 		this.date = new Date();
@@ -99,12 +101,21 @@ public class Conversation {
 	}
 
 	public String getRcl() {
+		return getRcl(true);
+	}
+
+	public String getRcl(boolean appendDomain) {
 		StringBuilder res = new StringBuilder("");
 		for (String member : callee) {
 			if (!res.toString().equals("")) {
 				res.append(",");
 			}
-			res.append(member + "@" + myIdentity.getMySIPDomain());
+
+			res.append(member);
+
+			if (appendDomain) {
+				res.append("@" + myIdentity.getMySIPDomain());
+			}
 		}
 		return res.toString();
 	}
@@ -130,5 +141,17 @@ public class Conversation {
 
 	public void setThread(ConversationThread thread) {
 		this.thread = thread;
+	}
+
+	public String getCallId() {
+		return callId;
+	}
+
+	public void setCallId(String callId) {
+		this.callId = callId;
+	}
+
+	public String toString() {
+		return this.thread.getThreadName() + conversationName;
 	}
 }

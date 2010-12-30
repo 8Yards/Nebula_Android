@@ -6,7 +6,7 @@
 package org.nebula.activities;
 
 import org.nebula.R;
-import org.nebula.client.sip.SIPManager;
+import org.nebula.client.sip.NebulaSIPConstants;
 import org.nebula.main.NebulaApplication;
 import org.nebula.models.MyIdentity;
 
@@ -35,7 +35,7 @@ public class Main extends TabActivity {
 		super.onActivityResult(requestCode, resultCode, data);
 		switch (requestCode) {
 		case (SHOW_SUB_ACTIVITY_LOGIN):
-			if (resultCode == SIPManager.LOGIN_SUCCESSFUL
+			if (resultCode == NebulaSIPConstants.REGISTER_SUCCESSFUL
 					|| resultCode == Register.REGISTER_SUCCESSFULL) {
 				loadUI();
 			} else {

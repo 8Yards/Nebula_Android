@@ -10,6 +10,7 @@ import java.util.HashMap;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 import org.nebula.models.Profile;
+import org.nebula.models.Status;
 
 public class RESTProfileManager extends Resource {
 

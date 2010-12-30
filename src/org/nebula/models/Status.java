@@ -1,4 +1,4 @@
-package org.nebula.client.rest;
+package org.nebula.models;
 
 public class Status {
 	private boolean isSuccess;

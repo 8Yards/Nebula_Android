@@ -10,8 +10,7 @@ import java.util.List;
 import org.nebula.R;
 import org.nebula.R.drawable;
 import org.nebula.client.rest.RESTConversationManager;
-import org.nebula.client.rest.Status;
-import org.nebula.client.sip.SIPClient;
+import org.nebula.client.sip.NebulaSIPConstants;
 import org.nebula.client.sip.SIPManager;
 import org.nebula.main.NebulaApplication;
 import org.nebula.models.Conversation;
@@ -19,6 +18,7 @@ import org.nebula.models.ConversationThread;
 import org.nebula.models.Group;
 import org.nebula.models.MyIdentity;
 import org.nebula.models.Profile;
+import org.nebula.models.Status;
 import org.nebula.ui.ContactRow;
 import org.nebula.ui.ConversationRow;
 import org.nebula.ui.ConversationTabExpandableListAdapter;
@@ -75,13 +75,13 @@ public class ConversationTab extends ExpandableListActivity implements
 		if (presenceReceiver == null) {
 			presenceReceiver = new PresenceReceiver();
 			registerReceiver(presenceReceiver, new IntentFilter(
-					SIPClient.NOTIFY_PRESENCE));
+					NebulaSIPConstants.NOTIFY_PRESENCE));
 		}
 
 		if (refreshReceiver == null) {
 			refreshReceiver = new InviteReceiver();
 			registerReceiver(refreshReceiver, new IntentFilter(
-					SIPClient.NOTIFY_INVITE));
+					NebulaSIPConstants.NOTIFY_INVITE));
 		}
 		reloadConversationList();
 		super.onResume();
@@ -183,8 +183,7 @@ public class ConversationTab extends ExpandableListActivity implements
 			} else {
 				SIPManager.doRefer(itemNames[which], myIdentity
 						.getMySIPDomain(), thread.getThreadName(),
-						currentConversation.getConversationName(),
-						newConversation.getConversationName());
+						currentConversation, newConversation);
 				reloadConversationList();
 			}
 		} catch (Exception e) {

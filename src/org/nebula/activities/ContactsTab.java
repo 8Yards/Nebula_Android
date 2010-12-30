@@ -9,8 +9,7 @@ import java.util.List;
 
 import org.nebula.R;
 import org.nebula.client.rest.RESTConversationManager;
-import org.nebula.client.rest.Status;
-import org.nebula.client.sip.SIPClient;
+import org.nebula.client.sip.NebulaSIPConstants;
 import org.nebula.client.sip.SIPManager;
 import org.nebula.main.NebulaApplication;
 import org.nebula.models.Conversation;
@@ -18,6 +17,7 @@ import org.nebula.models.ConversationThread;
 import org.nebula.models.Group;
 import org.nebula.models.MyIdentity;
 import org.nebula.models.Profile;
+import org.nebula.models.Status;
 import org.nebula.ui.ContactRow;
 import org.nebula.ui.ContactsTabExpandableListAdapter;
 import org.nebula.ui.GroupRow;
@@ -96,13 +96,13 @@ public class ContactsTab extends ExpandableListActivity implements
 		if (presenceReceiver == null) {
 			presenceReceiver = new PresenceReceiver();
 			registerReceiver(presenceReceiver, new IntentFilter(
-					SIPClient.NOTIFY_PRESENCE));
+					NebulaSIPConstants.NOTIFY_PRESENCE));
 		}
 
 		if (refreshReceiver == null) {
 			refreshReceiver = new InviteReceiver();
 			registerReceiver(refreshReceiver, new IntentFilter(
-					SIPClient.NOTIFY_INVITE));
+					NebulaSIPConstants.NOTIFY_INVITE));
 		}
 		super.onResume();
 	}
@@ -248,9 +248,12 @@ public class ContactsTab extends ExpandableListActivity implements
 			long id) {
 		int status = SIPManager.doPublish(parent.getItemAtPosition(pos)
 				.toString());
-		Log.v("nebula", "contacts_tab: "
-				+ (status == SIPManager.PUBLISH_SUCCESSFUL ? "publish success"
-						: "publish failure"));
+		Log
+				.v(
+						"nebula",
+						"contacts_tab: "
+								+ (status == NebulaSIPConstants.PUBLISH_SUCCESSFUL ? "publish success"
+										: "publish failure"));
 	}
 
 	public void onNothingSelected(AdapterView<?> arg0) {

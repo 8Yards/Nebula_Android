@@ -17,6 +17,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.nebula.models.Conversation;
 import org.nebula.models.ConversationThread;
+import org.nebula.models.Status;
 
 public class RESTConversationManager extends Resource {
 

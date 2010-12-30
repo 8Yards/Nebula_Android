@@ -9,6 +9,7 @@ import java.util.Map;
 import org.nebula.R;
 import org.nebula.client.localdb.NebulaLocalDB;
 import org.nebula.client.localdb.NebulaSettingsManager;
+import org.nebula.client.sip.NebulaSIPConstants;
 import org.nebula.client.sip.SIPManager;
 
 import android.app.Activity;
@@ -52,13 +53,13 @@ public class Login extends Activity {
 				.getText().toString());
 		setResult(status);
 
-		if (status == SIPManager.LOGIN_SUCCESSFUL) {
+		if (status == NebulaSIPConstants.REGISTER_SUCCESSFUL) {
 			settingsManager
 					.storeLoginParameters(userName.getText().toString(),
 							password.getText().toString(), rememberPassword
 									.isChecked());
 			finish();
-		} else if (status == SIPManager.LOGIN_FAILURE) {
+		} else if (status == NebulaSIPConstants.REGISTER_FAILURE) {
 			showAlert("Invalid credentials or Need internet connection");
 		}
 	}

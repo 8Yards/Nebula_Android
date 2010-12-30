@@ -18,7 +18,7 @@ import org.nebula.models.Conversation;
 import org.nebula.models.ConversationThread;
 import org.nebula.models.MyIdentity;
 import org.nebula.models.Status;
-import org.nebula.utils.SDPUtils;
+import org.nebula.utils.SIPUtils;
 
 import android.util.Log;
 
@@ -87,8 +87,8 @@ public class SIPManager {
 			Status response = sip.sendInvite(thread, conversation);
 			if (response.isSuccess() == true) {
 				NebulaApplication.getInstance().establishRTP(
-						SDPUtils.retrieveIP(response.getMessage()),
-						SDPUtils.retrievePort(response.getMessage()));
+						SIPUtils.retrieveIP(response.getMessage()),
+						SIPUtils.retrievePort(response.getMessage()));
 				return CALL_SUCCESS;
 			} else {
 				throw new Exception("Call didn't succeed");

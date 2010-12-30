@@ -57,7 +57,7 @@ import org.nebula.models.Conversation;
 import org.nebula.models.ConversationThread;
 import org.nebula.models.MyIdentity;
 import org.nebula.models.Status;
-import org.nebula.utils.SDPUtils;
+import org.nebula.utils.SIPUtils;
 import org.nebula.utils.Utils;
 
 import android.util.Log;
@@ -265,7 +265,7 @@ public class SIPHandler implements SipListener {
 		// TODO:: add the MIME in elegant way
 		String myMIMEContent = "--8Yards" + "\r\n"
 				+ "Content-type: application/sdp" + "\r\n" + "" + "\r\n"
-				+ SDPUtils.getMySDP() + "\r\n" + "--8Yards" + "\r\n"
+				+ SIPUtils.getMySDP() + "\r\n" + "--8Yards" + "\r\n"
 				+ "Content-type: application/resource-lists+xml" + "\r\n"
 				+ rclList.toString() + "\r\n" + "--8Yards--";
 

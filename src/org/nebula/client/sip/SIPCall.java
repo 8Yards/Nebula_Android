@@ -20,6 +20,7 @@ import javax.sip.TransactionState;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.CSeqHeader;
 import javax.sip.header.EventHeader;
+import javax.sip.header.SIPETagHeader;
 import javax.sip.header.SubscriptionStateHeader;
 import javax.sip.header.ToHeader;
 import javax.sip.message.Request;
@@ -29,7 +30,6 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.nebula.main.NebulaApplication;
 import org.nebula.models.MyIdentity;
-import org.nebula.utils.SIPUtils;
 import org.nebula.utils.SIPUtils;
 import org.xml.sax.SAXException;
 
@@ -71,14 +71,20 @@ public class SIPCall {
 		}
 
 		CSeqHeader cseq = (CSeqHeader) lastResponse.getHeader(CSeqHeader.NAME);
-		if (lastResponse.getStatusCode() == Response.OK
-				&& cseq.getMethod().equals(Request.INVITE)) {
-			try {
-				dialog.sendAck(dialog.createAck(cseq.getSeqNumber()));
-			} catch (SipException e) {
-				// dont do anything here
-			} catch (InvalidArgumentException e) {
-				// dont do anything here
+		if (lastResponse.getStatusCode() == Response.OK) {
+
+			if (cseq.getMethod().equals(Request.INVITE)) {
+				try {
+					dialog.sendAck(dialog.createAck(cseq.getSeqNumber()));
+				} catch (SipException e) {
+					// dont do anything here
+				} catch (InvalidArgumentException e) {
+					// dont do anything here
+				}
+			} else if (cseq.getMethod().equals(Request.PUBLISH)) {
+				SIPETagHeader sipETag = (SIPETagHeader) lastResponse
+						.getHeader("SIP-ETag");
+				myIdentity.setSipETag(sipETag.getETag());
 			}
 		}
 	}
@@ -90,9 +96,19 @@ public class SIPCall {
 		dialog = ct.getDialog();
 
 		if (dialog != null) {
-			Log.v("nebula-sip", "SIPCall.sendRequest: new call added");
 			mySipHandler.addCall(this);
+
+			if (r.getMethod() == Request.SUBSCRIBE) {
+				mySipHandler.getKeyToCall().put(
+						NebulaSIPConstants.SUBSCRIBE_NOTIFY_CALLID,
+						dialog.getCallId().getCallId());
+			}
 		}
+
+		Log.v("nebula-sip", "sendRequest: call size: "
+				+ mySipHandler.getCallCount());
+		Log.v("nebula-sip", "sendRequest: key size: "
+				+ mySipHandler.getKeyToCall().size());
 
 		lastResponse = null;
 		ct.sendRequest();
@@ -142,7 +158,7 @@ public class SIPCall {
 			return;
 		}
 
-		if (request.getContentLength().equals(0)) {
+		if (request.getContentLength().getContentLength() == 0) {
 			return;
 		}
 		// --till here
@@ -185,7 +201,7 @@ public class SIPCall {
 							"mixed; boundary=8Yards"));
 		}
 
-		mySipHandler.getConversationToCall().put(threadId + convId,
+		mySipHandler.getKeyToCall().put(threadId + convId,
 				dialog.getCallId().getCallId());
 
 		serverTransaction.sendResponse(response);

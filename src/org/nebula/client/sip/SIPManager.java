@@ -4,13 +4,15 @@
 package org.nebula.client.sip;
 
 import static org.nebula.client.sip.NebulaSIPConstants.BYE_SUCCESS;
-import static org.nebula.client.sip.NebulaSIPConstants.CALL_SUCCESS;
 import static org.nebula.client.sip.NebulaSIPConstants.CALL_FAILURE;
+import static org.nebula.client.sip.NebulaSIPConstants.CALL_SUCCESS;
 import static org.nebula.client.sip.NebulaSIPConstants.PUBLISH_SUCCESSFUL;
-import static org.nebula.client.sip.NebulaSIPConstants.REFER_SUCCESS;
+import static org.nebula.client.sip.NebulaSIPConstants.PUBLISH_FAILURE;
 import static org.nebula.client.sip.NebulaSIPConstants.REFER_FAILURE;
+import static org.nebula.client.sip.NebulaSIPConstants.REFER_SUCCESS;
 import static org.nebula.client.sip.NebulaSIPConstants.REGISTER_FAILURE;
 import static org.nebula.client.sip.NebulaSIPConstants.REGISTER_SUCCESSFUL;
+import static org.nebula.client.sip.NebulaSIPConstants.SUBSCRIBE_FAILURE;
 import static org.nebula.client.sip.NebulaSIPConstants.SUBSCRIBE_SUCCESSFUL;
 
 import org.nebula.main.NebulaApplication;
@@ -47,35 +49,33 @@ public class SIPManager {
 	}
 
 	public static int doSubscribe(String toUserName, String toDomain) {
-		// try {
-		// SIPHandler sip = NebulaApplication.getInstance().getMySIPHandler();
-		// Response response = sip.send(sip.subscribe(toUserName, toDomain));
-		// if (response.getStatusCode() == 200) {
-		// return SUBSCRIBE_SUCCESSFUL;
-		// } else {
-		// throw new Exception("Subscribe didn't succeed");
-		// }
-		// } catch (Exception e) {
-		// Log.e("nebula", "sip_manager:" + e.getMessage());
-		// return SUBSCRIBE_FAILURE;
-		// }
-		return SUBSCRIBE_SUCCESSFUL;
+		try {
+			SIPHandler sip = NebulaApplication.getInstance().getMySIPHandler();
+			Status response = sip.sendSubscribe(toUserName, toDomain);
+			if (response.isSuccess() == true) {
+				return SUBSCRIBE_SUCCESSFUL;
+			} else {
+				throw new Exception("Subscribe didn't succeed");
+			}
+		} catch (Exception e) {
+			Log.e("nebula", "sipManager.doSubscribe:" + e.getMessage());
+			return SUBSCRIBE_FAILURE;
+		}
 	}
 
 	public static int doPublish(String status) {
-		// try {
-		// SIPHandler sip = NebulaApplication.getInstance().getMySIPHandler();
-		// Response response = sip.send(sip.publish(status, 3600));
-		// if (response.getStatusCode() == 200) {
-		// return PUBLISH_SUCCESSFUL;
-		// } else {
-		// throw new Exception("Publish didn't succeed");
-		// }
-		// } catch (Exception e) {
-		// Log.e("nebula", "sip_manager:" + e.getMessage());
-		// return PUBLISH_FAILURE;
-		// }
-		return PUBLISH_SUCCESSFUL;
+		try {
+			SIPHandler sip = NebulaApplication.getInstance().getMySIPHandler();
+			Status response = sip.sendPublish(status, 3600);
+			if (response.isSuccess() == true) {
+				return PUBLISH_SUCCESSFUL;
+			} else {
+				throw new Exception("Publish didn't succeed");
+			}
+		} catch (Exception e) {
+			Log.e("nebula", "sipManager.doPublish:" + e.getMessage());
+			return PUBLISH_FAILURE;
+		}
 	}
 
 	// contact- prajwol, michel

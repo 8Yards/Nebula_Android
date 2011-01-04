@@ -55,8 +55,6 @@ public class Main extends TabActivity {
 			startActivityForResult(myIntent, SHOW_SUB_ACTIVITY_LOGIN);
 		} else {
 			setContentView(R.layout.main);
-			NebulaApplication.getInstance().reloadMyGroups();
-
 			tabHost = (TabHost) findViewById(android.R.id.tabhost);
 
 			TabSpec contactSpec = tabHost.newTabSpec(CONTACTS_TAB)

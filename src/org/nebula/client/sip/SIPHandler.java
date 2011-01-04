@@ -78,8 +78,7 @@ public class SIPHandler implements SipListener {
 
 	private SIPCall lastCall;
 	private Map<String, SIPCall> myCalls;
-	// SORRY:: bad patch
-	private Map<String, String> conversationToCall;
+	private Map<String, String> keyToCall;
 
 	public SIPHandler(NebulaEventHandler eventHandler) throws Exception {
 		this.eventHandler = eventHandler;
@@ -102,11 +101,11 @@ public class SIPHandler implements SipListener {
 		sipProvider.addSipListener(this);
 
 		myCalls = new HashMap<String, SIPCall>();
-		conversationToCall = new HashMap<String, String>();
+		keyToCall = new HashMap<String, String>();
+		keyToCall.put(NebulaSIPConstants.SUBSCRIBE_NOTIFY_CALLID, "fake");
 	}
 
 	public void processRequest(RequestEvent requestReceivedEvent) {
-		Log.v("nebula-sip", "processRequest 1");
 		ServerTransaction st = requestReceivedEvent.getServerTransaction();
 		if (st == null) {
 			// doesn't belong to any existing dialog
@@ -167,7 +166,6 @@ public class SIPHandler implements SipListener {
 			lastCall = new SIPCall();
 			Response resp = lastCall
 					.sendRequest(createRegisterRequest(lastCall));
-			lastCall = null;
 			if (resp.getStatusCode() == Response.OK) {
 				return new Status(true, "Register Success");
 			} else {
@@ -176,6 +174,8 @@ public class SIPHandler implements SipListener {
 		} catch (Exception e) {
 			return new Status(false, "SIPHandler.sendRegister: "
 					+ e.getMessage());
+		} finally {
+			lastCall = null;
 		}
 	}
 
@@ -187,8 +187,8 @@ public class SIPHandler implements SipListener {
 					conversation.getRcl(), thread.getThreadName(), conversation
 							.getConversationName()));
 			if (resp.getStatusCode() == Response.OK) {
-				conversationToCall.put(conversation.toString(), lastCall
-						.getDialog().getCallId().getCallId());
+				keyToCall.put(conversation.toString(), lastCall.getDialog()
+						.getCallId().getCallId());
 				return new Status(true, new String(resp.getRawContent()));
 			} else {
 				throw new Exception("Invite Failure");
@@ -204,7 +204,7 @@ public class SIPHandler implements SipListener {
 			String threadId, Conversation oldConversation,
 			Conversation newConversation) {
 		try {
-			String callId = conversationToCall.get(oldConversation.toString());
+			String callId = keyToCall.get(oldConversation.toString());
 
 			lastCall = myCalls.get(callId);
 			Response resp = lastCall.sendRequest(createReferRequest(lastCall,
@@ -212,12 +212,53 @@ public class SIPHandler implements SipListener {
 							.getConversationName(), newConversation
 							.getConversationName()));
 			if (resp.getStatusCode() == Response.OK) {
-				conversationToCall.remove(oldConversation.toString());
-				conversationToCall.put(newConversation.toString(), lastCall
-						.getDialog().getCallId().getCallId());
+				keyToCall.remove(oldConversation.toString());
+				keyToCall.put(newConversation.toString(), lastCall.getDialog()
+						.getCallId().getCallId());
 				return new Status(true, new String(resp.getRawContent()));
 			} else {
 				throw new Exception("Refer Failure");
+			}
+		} catch (Exception e) {
+			return new Status(false, "SIPHandler.sendRefer: " + e.getMessage());
+		} finally {
+			lastCall = null;
+		}
+	}
+
+	public Status sendSubscribe(String toSIPUser, String toSIPDomain) {
+		try {
+			lastCall = myCalls.get(keyToCall
+					.get(NebulaSIPConstants.SUBSCRIBE_NOTIFY_CALLID));
+			if (lastCall == null) {
+				lastCall = new SIPCall();
+			}
+
+			Response resp = lastCall.sendRequest(createSubscribeRequest(
+					lastCall, toSIPUser, toSIPDomain));
+			if (resp.getStatusCode() == Response.OK) {
+				return new Status(true, "Subscribe Success");
+			} else {
+				throw new Exception("Subscribe Failure");
+			}
+		} catch (Exception e) {
+			return new Status(false, "SIPHandler.sendSubscribe: "
+					+ e.getMessage());
+		} finally {
+			lastCall = null;
+		}
+	}
+
+	public Status sendPublish(String status, int expires) {
+		try {
+			lastCall = new SIPCall();
+
+			Response resp = lastCall.sendRequest(createPublishRequest(lastCall,
+					status, expires));
+			if (resp.getStatusCode() == Response.OK) {
+				return new Status(true, "Publish Success");
+			} else {
+				throw new Exception("Publish Failure");
 			}
 		} catch (Exception e) {
 			return new Status(false, "SIPHandler.sendRefer: " + e.getMessage());
@@ -316,21 +357,68 @@ public class SIPHandler implements SipListener {
 		return request;
 	}
 
+	private Request createSubscribeRequest(SIPCall call, String toSIPUser,
+			String toSIPDomain) throws ParseException,
+			InvalidArgumentException, Exception {
+		Request subscribeReq = createRequest(call, toSIPUser, toSIPDomain,
+				Request.SUBSCRIBE, addressFactory.createSipURI(toSIPUser,
+						toSIPDomain));
+		subscribeReq.setExpires(headerFactory.createExpiresHeader(3600));
+		subscribeReq.addHeader(headerFactory.createEventHeader("presence"));
+		subscribeReq.addHeader(headerFactory.createAcceptHeader("application",
+				"pidf+xml"));
+		subscribeReq.addHeader(headerFactory
+				.createSubscriptionStateHeader("active"));
+
+		return subscribeReq;
+	}
+
+	private Request createPublishRequest(SIPCall call, String status,
+			int expires) throws ParseException, InvalidArgumentException,
+			Exception {
+		Request publishReq = createRequest(call, myIdentity.getMyUserName(),
+				myIdentity.getMySIPDomain(), Request.PUBLISH, addressFactory
+						.createSipURI(myIdentity.getMyUserName(), myIdentity
+								.getMySIPDomain()));
+
+		byte[] doc = SIPUtils.getPidfPresenceStatus(status, myIdentity
+				.getMySIPURI(), createContactHeader().getAddress().getURI()
+				.toString());
+
+		publishReq.setContent(doc, headerFactory.createContentTypeHeader(
+				"application", "pidf+xml"));
+		publishReq.setHeader(headerFactory.createExpiresHeader(expires));
+		publishReq.setHeader(headerFactory.createEventHeader("presence"));
+
+		// replace the previous publish messages
+		if (myIdentity.getSipETag().length() > 0) {
+			publishReq.addHeader(headerFactory
+					.createSIPIfMatchHeader(myIdentity.getSipETag()));
+		}
+
+		return publishReq;
+	}
+
 	private Request createRequest(SIPCall call, String toSIPUser,
 			String toSIPDomain, String reqType, SipURI requestURI)
 			throws ParseException, InvalidArgumentException, Exception {
 
 		CallIdHeader callIdHeader = null;
+		String fromTag = null;
+		String toTag = null;
 		if (call.getDialog() == null) {
 			callIdHeader = sipProvider.getNewCallId();
+			fromTag = String.valueOf(new Random().nextLong());
 		} else {
 			callIdHeader = call.getDialog().getCallId();
+			fromTag = call.getDialog().getLocalTag();
 		}
 		CSeqHeader cSeqHeader = getCSeqHeader(call.getSeqCount(), reqType);
 
 		FromHeader fromHeader = (FromHeader) getHeader(myIdentity
-				.getMyUserName(), myIdentity.getMySIPDomain(), true);
-		ToHeader toHeader = (ToHeader) getHeader(toSIPUser, toSIPDomain, false);
+				.getMyUserName(), myIdentity.getMySIPDomain(), true, fromTag);
+		ToHeader toHeader = (ToHeader) getHeader(toSIPUser, toSIPDomain, false,
+				toTag);
 		List<ViaHeader> viaHeaders = getViaHeaders();
 		MaxForwardsHeader maxForwards = getMaxForwardsHeader();
 
@@ -386,15 +474,14 @@ public class SIPHandler implements SipListener {
 	}
 
 	private HeaderAddress getHeader(String sipName, String sipDomain,
-			boolean isFrom) throws ParseException {
+			boolean isFrom, String tag) throws ParseException {
 		SipURI address = addressFactory.createSipURI(sipName, sipDomain);
 		Address nameAddress = addressFactory.createAddress(address);
 		nameAddress.setDisplayName(sipName);
 		if (isFrom == true) {
-			return headerFactory.createFromHeader(nameAddress, String
-					.valueOf(new Random().nextLong()));
+			return headerFactory.createFromHeader(nameAddress, tag);
 		} else {
-			return headerFactory.createToHeader(nameAddress, null);
+			return headerFactory.createToHeader(nameAddress, tag);
 		}
 	}
 
@@ -413,6 +500,10 @@ public class SIPHandler implements SipListener {
 	private MaxForwardsHeader getMaxForwardsHeader()
 			throws InvalidArgumentException {
 		return headerFactory.createMaxForwardsHeader(70);
+	}
+
+	public int getCallCount() {
+		return myCalls.size();
 	}
 
 	private SIPCall getCallByDialog(Dialog dialog) {
@@ -438,8 +529,8 @@ public class SIPHandler implements SipListener {
 		myCalls.remove(id);
 	}
 
-	public Map<String, String> getConversationToCall() {
-		return conversationToCall;
+	public Map<String, String> getKeyToCall() {
+		return keyToCall;
 	}
 
 	public SipProvider getSipProvider() {

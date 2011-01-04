@@ -11,6 +11,7 @@ import static org.nebula.client.sip.NebulaSIPConstants.TUPLE_ELEMENT;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.text.ParseException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -19,6 +20,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.FactoryConfigurationError;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.nebula.client.sip.NebulaSIPConstants;
 import org.nebula.main.NebulaApplication;
 import org.nebula.models.MyIdentity;
 import org.w3c.dom.Document;
@@ -131,5 +133,29 @@ public class SIPUtils {
 		}
 
 		return null;
+	}
+	
+	public static byte[] getPidfPresenceStatus(String status, String entity, String contact) throws ParseException {
+		String res = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>"
+				+ "<presence xmlns=\"urn:ietf:params:xml:ns:pidf\" xmlns:dm=\"urn:ietf:params:xml:ns:pidf:data-model\" xmlns:rpid=\"urn:ietf:params:xml:ns:pidf:rpid\" "
+				+ "entity=\""
+				+ entity
+				+ "\">"
+				+ "<dm:person id=\"p9206\">";
+
+		// TODO:: check and produce XML well :S
+		if (status.equals(NebulaSIPConstants.PRESENCE_ONLINE)) {
+			res += "<rpid:activities/>";
+		} else {
+			res += "<rpid:activities>" + "<rpid:busy/>" + "</rpid:activities>";
+		}
+
+		res += "</dm:person>" + "<tuple id=\"t6222\">" + "<status>"
+				+ "<basic>open</basic>" + "</status>" + "<contact>"
+				+ contact
+				+ "</contact>" + "<note>" + status + "</note>" + "</tuple>"
+				+ "</presence>";
+
+		return res.getBytes();
 	}
 }

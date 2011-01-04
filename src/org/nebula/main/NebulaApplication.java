@@ -143,8 +143,8 @@ public class NebulaApplication extends Application implements
 	private void renewMyPresenceSubscriptions() {
 		for (Group individualGroup : myIdentity.getMyGroups()) {
 			for (Profile individualProfile : individualGroup.getContacts()) {
-				SIPManager.doSubscribe(individualProfile.getUsername(),
-						myIdentity.getMySIPDomain());
+				SIPManager.doSubscribe(individualProfile
+						.getUsername(), myIdentity.getMySIPDomain());
 			}
 		}
 	}

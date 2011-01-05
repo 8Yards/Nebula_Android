@@ -15,15 +15,17 @@ import java.util.Map;
 import org.apache.http.client.ClientProtocolException;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.nebula.main.NebulaApplication;
 import org.nebula.models.Conversation;
 import org.nebula.models.ConversationThread;
+import org.nebula.models.MyIdentity;
 
 import android.location.Location;
 import android.util.Log;
 
 public class RESTConversationManager extends Resource {
 
-	private double[] distances ={0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1, 2, 5, 10,20, 50, 100, 250, 500 };
+	private double[] distances ={0.02, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10,20, 50, 100, 250, 500 };
 	
 	public double getDistancesValue(int index){
 		if(index>= distances.length)
@@ -127,6 +129,7 @@ public class RESTConversationManager extends Resource {
 			for (int i = 0; i < callee.length(); i++) {
 				callees.add(callee.getString("" + i));
 			}
+			
 			conversation.setCallee(callees);
 			return new Status(true, "Conversation added successfully");
 		} else {
@@ -168,7 +171,8 @@ public class RESTConversationManager extends Resource {
 			i = getDistancesIndex(Double.parseDouble(distance));
 			if (i==-1)
 				Log.e("INDEX", "-1   Value searched:  " +Double.parseDouble(distance));
-			if(i<=distances[distances.length-1]){
+			if(i<distances.length){
+				Log.e("MARCO", ""+i+"/ MAX = "+ distances.length);
 				values[i][0] = (float)distances[i];
 				values[i][1] = (float)Integer.parseInt(number);
 			}

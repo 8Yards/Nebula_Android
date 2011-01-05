@@ -24,6 +24,8 @@ public class ConversationRow implements Comparable<ConversationRow> {
 	}
 
 	public int compareTo(ConversationRow other) {
+		if(other==null)
+			return 1;
 		return -conversation.getDate().compareTo(other.getConversation().getDate());
 	}
 

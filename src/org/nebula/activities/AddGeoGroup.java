@@ -104,12 +104,11 @@ public class AddGeoGroup extends Activity implements OnSeekBarChangeListener{
 	}
 
 	public void addSpacialConversation(View v){
-		Log.e("CREATION", "Handler called");
 		ConversationThread convThread = myIdentity.createThread();
 		double distance = usersPosition[rC.returnIndex(seekBar.getProgress())][0];
 		Conversation conv = new Conversation(myIdentity.createNewConversationName());
 		convThread.addConversation(conv);
-		Log.e("CREATION", "Convesation Created");
+		Log.e("nebula", "GEO Convesation Created");
 		try {
 			rC.createSpatialConversation(conv, distance);
 		} catch (ClientProtocolException e) {
@@ -125,9 +124,8 @@ public class AddGeoGroup extends Activity implements OnSeekBarChangeListener{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Log.e("CREATION", "JSON done");
+		Log.e("nebula", "JSON GEO parsing done");
 
-		Log.e("CREATION", "Completed");
 		finish();
 	}
 

@@ -114,6 +114,10 @@ public class NebulaApplication extends Application implements
 			}
 
 			sendBroadcast(new Intent(params[0].toString()));
+		} else if (eventName.equals(NebulaSIPConstants.NOTIFY_BYE)) {
+			String callId = (String) params[1]; 
+			mySIPHandler.removeCallById(callId);
+			terminateRTP(callId);
 		}
 	}
 
@@ -170,6 +174,13 @@ public class NebulaApplication extends Application implements
 		while (participants == myRTPSender.numberOfReceivers()) {
 		}
 	}
+	
+	private void terminateRTP(String callId) {
+		// TODO Auto-generated method stub
+		
+	}
+
+
 
 	private ServiceConnection senderConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName name, IBinder binder) {

@@ -9,6 +9,7 @@ import gov.nist.javax.sip.header.SIPHeader;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -161,11 +162,11 @@ public class SIPHandler implements SipListener {
 	public void processTransactionTerminated(TransactionTerminatedEvent arg0) {
 	}
 
-	public Status sendRegister() {
+	public Status sendRegister(int timeout) {
 		try {
 			lastCall = new SIPCall();
 			Response resp = lastCall
-					.sendRequest(createRegisterRequest(lastCall));
+					.sendRequest(createRegisterRequest(lastCall, timeout));
 			if (resp.getStatusCode() == Response.OK) {
 				return new Status(true, "Register Success");
 			} else {
@@ -177,6 +178,10 @@ public class SIPHandler implements SipListener {
 		} finally {
 			lastCall = null;
 		}
+	}
+	
+	public Status sendRegister() {
+		return sendRegister(3600);
 	}
 
 	public Status sendInvite(ConversationThread thread,
@@ -264,6 +269,45 @@ public class SIPHandler implements SipListener {
 			return new Status(false, "SIPHandler.sendRefer: " + e.getMessage());
 		} finally {
 			lastCall = null;
+		}
+	}
+
+	public Status sendByeToAll() {
+		try {
+			for (Iterator<SIPCall> iter = myCalls.values().iterator(); iter.hasNext();) {
+				SIPCall call = iter.next();
+				if (call.getDialog().getCallId().getCallId().equals(keyToCall
+						.get(NebulaSIPConstants.SUBSCRIBE_NOTIFY_CALLID))) {
+					continue;
+				}
+				try {
+					call.sendBye();
+				}
+				catch(Exception e){
+					Log.e("nebula", "SIPHandler.sendByeToAll: " + call.getDialog().getCallId().getCallId() + " " + e.getMessage()) ;
+				}
+			}
+			return new Status(true, "ByeToAll success");
+		}
+		catch(Exception e) {
+			return new Status(false, "SIPHandler.sendByToAll: " + e.getMessage());
+		}
+	}
+	
+	public Status sendBye(String callId) {
+		try {
+			if (callId.equals(keyToCall.get(NebulaSIPConstants.SUBSCRIBE_NOTIFY_CALLID))) {
+				return new Status(false, "SIPHandler.sendBye: the dialog is SUBSCRIBE_NOTIFY dialog");
+			}
+			SIPCall call = myCalls.get(callId);
+			
+			call.sendBye();
+			myCalls.remove(callId);
+			
+			return new Status(true, "Bye Success");
+		}
+		catch(Exception e) {
+			return new Status(false, "SIPHandler.sendBye: " + e.getMessage());
 		}
 	}
 
@@ -525,7 +569,7 @@ public class SIPHandler implements SipListener {
 		myCalls.put(call.getDialog().getCallId().getCallId(), call);
 	}
 
-	private void removeCallById(String id) {
+	public void removeCallById(String id) {
 		myCalls.remove(id);
 	}
 

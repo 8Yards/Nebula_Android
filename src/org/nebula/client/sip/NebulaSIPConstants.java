@@ -3,6 +3,7 @@ package org.nebula.client.sip;
 public class NebulaSIPConstants {
 	public static final String NOTIFY_PRESENCE = "NOTIFY_PRESENCE_EVENT";
 	public static final String NOTIFY_INVITE = "NOTIFY_INVITE_EVENT";
+	public static final String NOTIFY_BYE = "NOTIFY_BYE_EVENT";
 	public static final String SUBSCRIBE_NOTIFY_CALLID = "nebula_subscribe_notify";
 	
 

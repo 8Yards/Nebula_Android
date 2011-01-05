@@ -3,6 +3,7 @@ package org.nebula.client.sip;
 import static org.nebula.client.sip.NebulaSIPConstants.CONVERSATION_PARAMETER;
 import static org.nebula.client.sip.NebulaSIPConstants.NOTIFY_INVITE;
 import static org.nebula.client.sip.NebulaSIPConstants.NOTIFY_PRESENCE;
+import static org.nebula.client.sip.NebulaSIPConstants.NOTIFY_BYE;
 import static org.nebula.client.sip.NebulaSIPConstants.THREAD_PARAMETER;
 import gov.nist.javax.sip.header.SIPHeader;
 
@@ -56,6 +57,8 @@ public class SIPCall {
 			processNotify(request, st);
 		} else if (method.equals(Request.INVITE)) {
 			processInvite(request, st);
+		} else if (method.equals(Request.BYE)) {
+			processBye(request, st);
 		}
 	}
 
@@ -89,7 +92,12 @@ public class SIPCall {
 		}
 	}
 
-	public synchronized Response sendRequest(Request request) throws Exception {
+	public Response sendRequest(Request request) throws Exception {
+		return sendRequest(request, 10000);
+	}
+
+	public synchronized Response sendRequest(Request request, int timeout)
+			throws Exception {
 		Request r = (Request) request.clone();
 		ClientTransaction ct = mySipHandler.getSipProvider()
 				.getNewClientTransaction(request);
@@ -105,14 +113,15 @@ public class SIPCall {
 			}
 		}
 
-		Log.v("nebula-sip", "sendRequest: call size: "
-				+ mySipHandler.getCallCount());
-		Log.v("nebula-sip", "sendRequest: key size: "
-				+ mySipHandler.getKeyToCall().size());
-
 		lastResponse = null;
-		ct.sendRequest();
-		wait(10000);
+
+		if (request.getMethod() == Request.BYE
+				|| request.getMethod() == Request.REFER) {
+			dialog.sendRequest(ct);
+		} else {
+			ct.sendRequest();
+		}
+		wait(timeout);
 
 		if (lastResponse == null) {
 			throw new Exception("No response");
@@ -125,7 +134,7 @@ public class SIPCall {
 			r.addHeader(ah);
 			ct.terminate();
 			registerTryCount++;
-			return sendRequest(r);
+			return sendRequest(r, timeout);
 		}
 
 		Response resp = (Response) lastResponse.clone();
@@ -212,6 +221,24 @@ public class SIPCall {
 					SIPUtils.retrievePort(requestSDP), threadId, convId,
 					requestRCL);
 		}
+	}
+
+	private void processBye(Request request, ServerTransaction serverTransaction)
+			throws Exception {
+		Response response = mySipHandler.getMessageFactory().createResponse(
+				Response.OK, request);
+		response.addHeader(mySipHandler.createContactHeader());
+		serverTransaction.sendResponse(response);
+
+		mySipHandler.getEventHandler().processEvent(NOTIFY_BYE,
+				dialog.getCallId().getCallId());
+	}
+
+	public Response sendBye() throws SipException, Exception {
+		Response response = sendRequest(dialog.createRequest(Request.BYE), 0);
+		mySipHandler.getEventHandler().processEvent(NOTIFY_BYE,
+				dialog.getCallId().getCallId());
+		return response;
 	}
 
 	public Dialog getDialog() {

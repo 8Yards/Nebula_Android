@@ -6,66 +6,170 @@
 	android:layout_width="fill_parent" 
 	android:layout_height="fill_parent"
 	xmlns:android="http://schemas.android.com/apk/res/android">
-
+	
+	<RadioGroup
+		android:id="@+id/QueGroup1"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:orientation="horizontal"
+		android:layout_x="0px"
+		android:layout_y="36px">
+		
+		<RadioButton
+			android:layout_height="wrap_content"
+			android:onClick="doShowGroup" 
+			android:id="@+id/rbAddGroup" 
+			android:text="Add Group" 
+			android:layout_width="140px">
+		</RadioButton>
+		
+		<RadioButton
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content"
+			android:onClick="doShowSpatial" 
+			android:text="Add Spatial Group" 
+			android:id="@+id/rbAddSpatial">
+		</RadioButton>
+		
+	</RadioGroup>
+	
 	<TextView 
 		android:id="@+id/tvAddGroup" 
 		android:layout_width="wrap_content"
 		android:layout_height="wrap_content" 
-		android:text="Add Group"
+		android:text="Add Group or Spatial Group"
 		android:textStyle="bold" 
 		android:layout_x="5px" 
 		android:layout_y="8px">
 	</TextView>
 
-	<TextView 
-		android:id="@+id/tvGroupName" 
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content" 
-		android:text="Group Name"
-		android:layout_y="56px" 
-		android:layout_x="15px">
-	</TextView>
+	<AbsoluteLayout
+		android:layout_x="36px" 
+		android:id="@+id/abGroup" 
+		android:layout_width="250px" 
+		android:layout_height="250px" 
+		android:layout_y="50px" 
+		android:visibility="invisible">
+		<TextView 
+			android:id="@+id/tvGroupName" 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" 
+			android:text="Group Name"
+			android:layout_y="56px" 
+			android:layout_x="25px">
+		</TextView>
 
-	<EditText 
-		android:id="@+id/etGroupName" 
-		android:layout_width="178px"
-		android:layout_height="wrap_content" 
-		android:textSize="18sp"
-		android:layout_x="9px"
-		 android:layout_y="82px">
-	</EditText>
+		<EditText 
+			android:id="@+id/etGroupName" 
+			android:layout_height="wrap_content" 
+			android:textSize="18sp"
+			android:layout_width="200px" 
+			android:layout_x="20px" 
+			android:layout_y="75px">
+		</EditText>
 
-	<Button 
-		android:id="@+id/bAddSpatial" 
-		android:layout_width="150px"
-		android:layout_height="40px" 
-		android:text="Spatial Group" 
-		android:layout_x="24px"
-		android:layout_y="150px" 
-		android:onClick="doCreateSpatial">
-	</Button>
+		<Button 
+			android:id="@+id/bAdd" 
+			android:layout_width="70px"
+			android:layout_height="40px" 
+			android:text="Add" 
+			android:layout_y="149px" 
+			android:onClick="doAddGroup" 
+			android:layout_x="55px">
+		</Button>
 
-	<Button 
-		android:id="@+id/bAdd" 
-		android:layout_width="70px"
-		android:layout_height="40px" 
-		android:text="Add" 
-		android:layout_x="172px"
-		android:layout_y="150px" 
-		android:onClick="doAddGroup">
-	</Button>
+		<Button 
+			android:id="@+id/bBack" 
+			android:layout_width="70px"
+			android:layout_height="40px" 
+			android:text="Back" 
+			android:layout_y="149px" 
+			android:onClick="doBackToMain" 
+			android:layout_x="120px">
+		</Button>
+	</AbsoluteLayout>
 
-	<Button 
-		android:id="@+id/bBack" 
-		android:layout_width="70px"
-		android:layout_height="40px" 
-		android:text="Back" 
-		android:layout_x="240px"
-		android:layout_y="150px" 
-		android:onClick="doBackToMain">
-	</Button>
+	<AbsoluteLayout
+		android:layout_x="36px" 
+		android:id="@+id/abSpatial" 
+		android:layout_width="250px" 
+		android:layout_height="250px" 
+		android:layout_y="100px" 
+		android:visibility="invisible">
 
-
-
+		<TextView 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" 
+			android:text="Distance"
+			android:id="@+id/tvdistance" 
+			android:layout_y="50dip" 
+			android:layout_x="28dip">
+		</TextView>
+		
+		<TextView 
+			android:layout_width="wrap_content"
+			android:layout_height="wrap_content" 
+			android:id="@+id/tvUsers" 
+			android:text="Number of Users" 
+			android:layout_y="125dip" 
+			android:layout_x="30dip">
+		</TextView>
+		
+		<Button 
+			android:layout_height="wrap_content" 
+			android:id="@+id/bAdd" 
+			android:text="Add"
+			android:onClick="addSpacialConversation" 
+			android:layout_x="60dip" 
+			android:layout_width="70px" 
+			android:layout_y="199dip">
+		</Button>
+		
+		<Button 
+			android:layout_height="wrap_content" 
+			android:id="@+id/bBack"
+			android:text="Back" 
+			android:onClick="doBackToMain" 
+			android:layout_width="70px" 
+			android:layout_x="125dip" 
+			android:layout_y="199dip">
+		</Button>
+		
+		<EditText 
+			android:layout_height="wrap_content"
+			android:layout_x="25dip" 
+			android:id="@+id/etDistance"
+			android:layout_width="200px" 
+			android:layout_y="70dip" 
+			android:text="0.0   Km">
+		</EditText>
+		
+		<EditText 
+			android:layout_height="wrap_content" 
+			android:id="@+id/etUsers"
+			android:layout_width="200px" 
+			android:layout_x="25dip" 
+			android:layout_y="145dip" 
+			android:text="0   Users">
+		</EditText>
+		
+		<SeekBar 
+			android:id="@+id/sbVolume" 
+			android:layout_height="wrap_content"
+			android:layout_margin="10px" 
+			android:max="100" 
+			android:progress="50"
+			android:layout_width="200px" 
+			android:layout_x="20px" 
+			android:layout_y="0px"/>
+			
+		<TextView 
+			android:id="@+id/tvVolumeValue"
+			android:layout_width="wrap_content" 
+			android:layout_height="wrap_content"
+			android:text="" 
+			android:layout_x="110px" 
+			android:layout_y="30px"/>
+	</AbsoluteLayout>
 
 </AbsoluteLayout>

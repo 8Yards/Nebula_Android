@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- author: saad,sujan rearchitecture and refactor: saad -->
+
+<AbsoluteLayout android:id="@+id/widget0"
+	android:layout_width="fill_parent" android:layout_height="fill_parent"
+	xmlns:android="http://schemas.android.com/apk/res/android">
+
+	<TextView android:id="@+id/tvAddGroup" android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:text="Spatial Group"
+		android:textStyle="bold" android:layout_x="5px" android:layout_y="8px">
+	</TextView>
+
+
+
+	<TextView android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:text="Distance"
+		android:id="@+id/tvdistance" android:layout_x="25dip"
+		android:layout_y="100dip"></TextView>
+	<TextView android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_y="180dip"
+		android:layout_x="25dip" android:id="@+id/tvUsers" android:text="Number of Users"></TextView>
+	<Button android:layout_height="wrap_content" android:layout_x="185dip"
+		android:layout_y="261dip" android:id="@+id/bAdd" android:text="Add"
+		android:layout_width="60px"
+		android:onClick="addSpacialConversation"></Button>
+	<Button android:layout_height="wrap_content" android:id="@+id/bBack"
+		android:text="Back" android:layout_width="60px" android:layout_x="245dip"
+		android:layout_y="261dip" android:onClick="doBackToMain"></Button>
+	<EditText android:layout_height="wrap_content"
+		android:layout_x="25dip" android:layout_y="120dip" android:id="@+id/etDistance"
+		android:layout_width="200px"></EditText>
+	<EditText android:layout_height="wrap_content" android:id="@+id/etUsers"
+		android:layout_width="200px" android:layout_x="25dip"
+		android:layout_y="200dip"></EditText>
+	<SeekBar android:id="@+id/sbVolume" android:layout_height="wrap_content"
+		android:layout_margin="10px" android:max="100" android:progress="50"
+		android:layout_x="55px" android:layout_width="200px" android:layout_y="40px" />
+	<TextView android:id="@+id/tvVolumeValue"
+		android:layout_width="wrap_content" android:layout_height="wrap_content"
+		android:text="50" android:layout_y="70px" android:layout_x="149px" />
+</AbsoluteLayout>

@@ -4,10 +4,12 @@
 package org.nebula.main;
 
 import java.net.DatagramSocket;
+import java.util.Enumeration;
 
 import jlibrtp.Participant;
 import jlibrtp.RTPSession;
 
+import org.nebula.client.gps.NebulaLocationListener;
 import org.nebula.client.localdb.NebulaLocalDB;
 import org.nebula.client.rest.RESTConversationManager;
 import org.nebula.client.rest.RESTGroupManager;
@@ -26,19 +28,25 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.IBinder;
 import android.util.Log;
 
 public class NebulaApplication extends Application implements
 		NebulaEventHandler {
 	private static NebulaApplication singleton;
-
+	private long MILLIS_FREQUENCY_UPDATE = 5000;
+	private long METERS_DISTANCE_UPDATE = 10;
 	private NebulaLocalDB myLocalDB = null;
 	private MyIdentity myIdentity = null;
 	private SIPClient mySIPClient = null;
 	private RTPSession myRTPClient = null;
 	private RTPSender myRTPSender = null;
 	private RTPReceiver myRTPReceiver = null;
+
+	private LocationManager mlocManager;
+	private NebulaLocationListener mlocListener;
 
 	public static NebulaApplication getInstance() {
 		return singleton;
@@ -70,6 +78,12 @@ public class NebulaApplication extends Application implements
 
 			myRTPReceiver = new RTPReceiver(myRTPClient); // TODO:: do we need
 			// this??
+			
+			
+			mlocManager = (LocationManager)getSystemService(Context.LOCATION_SERVICE);
+			mlocListener = new NebulaLocationListener(this.getApplicationContext());
+			mlocManager.requestLocationUpdates( LocationManager.GPS_PROVIDER, MILLIS_FREQUENCY_UPDATE, METERS_DISTANCE_UPDATE, mlocListener);
+			
 		} catch (Exception e) {
 			// TODO Handle gracefully
 			Log.e("nebula", "nebulaApp: " + e.getMessage());

@@ -36,6 +36,16 @@
 	</EditText>
 
 	<Button 
+		android:id="@+id/bAddSpatial" 
+		android:layout_width="150px"
+		android:layout_height="40px" 
+		android:text="Spatial Group" 
+		android:layout_x="24px"
+		android:layout_y="150px" 
+		android:onClick="doCreateSpatial">
+	</Button>
+
+	<Button 
 		android:id="@+id/bAdd" 
 		android:layout_width="70px"
 		android:layout_height="40px" 
@@ -54,5 +64,8 @@
 		android:layout_y="150px" 
 		android:onClick="doBackToMain">
 	</Button>
+
+
+
 
 </AbsoluteLayout>

@@ -13,6 +13,7 @@ import org.nebula.models.MyIdentity;
 import android.app.TabActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TabHost;
 import android.widget.TabHost.TabSpec;
 
@@ -37,6 +38,7 @@ public class Main extends TabActivity {
 		case (SHOW_SUB_ACTIVITY_LOGIN):
 			if (resultCode == SIPManager.LOGIN_SUCCESSFUL
 					|| resultCode == Register.REGISTER_SUCCESSFULL) {
+		
 				loadUI();
 			} else {
 				System.exit(-1);
@@ -71,6 +73,9 @@ public class Main extends TabActivity {
 
 			tabHost.addTab(contactSpec);
 			tabHost.addTab(conversationSpec);
+			
+			
+			
 		}
 	}
 

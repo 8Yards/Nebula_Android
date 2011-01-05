@@ -95,11 +95,11 @@ public class MyIdentity {
 		return newThread;
 	}
 
-	public String createNewConversationId() {
+	public String createNewConversationName() {
 		return myUserName + seqNo++;
 	}
 
-	public String createNewThreadId() {
+	public String createNewThreadName() {
 		return myUserName + simpleDateFormat.format(calendar.getTime());
 	}
 

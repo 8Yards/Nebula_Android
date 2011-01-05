@@ -421,7 +421,7 @@ public abstract class Resource {
 
 		InputStream instream = response.getEntity().getContent();
 		String result = Utils.convertStreamToString(instream);
-
+		Log.e("MARCO",result);
 		int status = response.getStatusLine().getStatusCode();
 		return new Response(status, new JSONObject(result));
 	}

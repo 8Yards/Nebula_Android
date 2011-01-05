@@ -4,7 +4,7 @@
 	
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-permission android:name="android.permission.RECORD_AUDIO" />
-	
+	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<application android:icon="@drawable/icon" android:label="@string/app_name"
 		android:name=".main.NebulaApplication" android:debuggable="true">
 		<activity android:name=".activities.Main" android:label="@string/app_name" android:screenOrientation="portrait">
@@ -23,9 +23,10 @@
 		<activity android:name=".activities.Edit" android:screenOrientation="portrait"></activity>
 		<activity android:name=".activities.ConversationTab" android:screenOrientation="portrait"></activity>
 		<activity android:name=".activities.Volume" android:screenOrientation="portrait"></activity>
+		<activity android:name=".activities.AddGeoGroup" android:screenOrientation="portrait"></activity>
 		
 		<service android:enabled="true" android:name=".client.rtp.RTPSender" />
-
+		
 	</application>
 
 </manifest> 

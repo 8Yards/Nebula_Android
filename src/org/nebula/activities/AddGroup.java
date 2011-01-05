@@ -1,6 +1,7 @@
 /*
  * author: saad ali
  * rearchitecture and programming: saad ali
+ * added spatial group UI : Marco
  */
 package org.nebula.activities;
 
@@ -11,6 +12,7 @@ import org.nebula.models.Group;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -66,6 +68,12 @@ public class AddGroup extends Activity {
 		}
 	}
 
+	public void doCreateSpatial(View v){
+		Intent GPS = new Intent(this, AddGeoGroup.class);
+		this.startActivity(GPS);
+		finish();
+	}
+	
 	public void doBackToMain(View v) {
 		setResult(ADDGROUP_FAILURE);
 		finish();

@@ -134,7 +134,8 @@ public class ContactsTab extends ExpandableListActivity implements
 			}
 			contacts.add(children);
 		}
-		Collections.sort(groups);
+		//TODO sort groups AND contacts
+		//Collections.sort(groups);
 		expListAdapter.notifyDataSetChanged();
 	}
 

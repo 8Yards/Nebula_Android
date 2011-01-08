@@ -395,7 +395,7 @@ public abstract class Resource {
 			throws ClientProtocolException, IOException, JSONException {
 		HttpClient httpclient = new DefaultHttpClient();
 
-		Log.v("nebula", request.toString());
+		Log.v("nebula", request.getMethod()+"-"+request.getURI());
 		
 		if (myIdentity == null) {
 			return null;

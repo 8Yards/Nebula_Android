@@ -38,7 +38,7 @@ public class AddGroup extends Activity {
 			return;
 		}
 		
-		ProgressDialog.show(this, "", "Loading. Please wait...", true);
+		ProgressDialog pd = ProgressDialog.show(this, "", "Loading. Please wait...", true);
 		
 		RESTGroupManager groupManager = new RESTGroupManager();
 		Group newGroup = new Group(0, groupName.getText().toString(),
@@ -58,6 +58,7 @@ public class AddGroup extends Activity {
 				finish();
 			}
 		} catch (Exception e) {
+			pd.cancel();
 			setResult(ADDGROUP_FAILURE);
 			Log.e("nebula", e.getMessage());
 			Toast.makeText(getApplicationContext(), e.getMessage(),

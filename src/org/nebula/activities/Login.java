@@ -4,12 +4,17 @@
  */
 package org.nebula.activities;
 
+import java.io.IOException;
 import java.util.Map;
 
+import org.apache.http.client.ClientProtocolException;
+import org.json.JSONException;
 import org.nebula.R;
 import org.nebula.client.localdb.NebulaLocalDB;
 import org.nebula.client.localdb.NebulaSettingsManager;
+import org.nebula.client.rest.RESTSystemManager;
 import org.nebula.client.sip.SIPManager;
+import org.nebula.main.NebulaApplication;
 import org.nebula.utils.NebulaTask;
 
 import android.app.Activity;
@@ -18,6 +23,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -65,15 +71,41 @@ public class Login extends Activity {
 				setResult(status);
 
 				if (status == SIPManager.LOGIN_SUCCESSFUL) {
+					new NebulaTask() {
+						protected Long doInBackground(Object...params) {
+							RESTSystemManager rsm = new RESTSystemManager();
+							try {
+								String reflectorName = rsm.reflectorName();
+								Log.v("nebula", "reflector: "+reflectorName);
+								NebulaApplication.getInstance().getMyIdentity().setMcuName(reflectorName);
+							} catch (Exception e) {
+								Log.e("nebula", e.getMessage());
+								System.exit(-1);
+							}
+							
+							return null;
+						}
+					}.execute();
 					settingsManager
 							.storeLoginParameters(userName,
 								password, rememberPassword);
 					finish();
-				} else if (status == SIPManager.LOGIN_FAILURE) {
-					
+				} else if (status == SIPManager.LOGIN_NOCONNECTION) {
 					runOnUiThread(new Runnable() {
 						public void run() {
-								showAlert("Invalid credentials or Need internet connection");
+								showAlert("No connection");
+						}
+					});
+				} else if (status == SIPManager.LOGIN_TIMEOUT) {
+					runOnUiThread(new Runnable() {
+						public void run() {
+								showAlert("Connection timeout");
+						}
+					});
+				} else if (status == SIPManager.LOGIN_FAILURE) {
+					runOnUiThread(new Runnable() {
+						public void run() {
+								showAlert("Invalid credentials");
 						}
 					});
 				}

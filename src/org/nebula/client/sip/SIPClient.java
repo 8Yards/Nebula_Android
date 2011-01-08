@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.Random;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -163,7 +164,7 @@ public class SIPClient implements SipListener {
 	 * 
 	 * @result response SIP response
 	 */
-	public synchronized Response send(Request request) throws Exception {
+	public synchronized Response send(Request request) throws SipException, TimeoutException, Exception  {
 		Request r = (Request) request.clone();
 		Tid = sipProvider.getNewClientTransaction(request);
 		dialog = Tid.getDialog();
@@ -173,7 +174,7 @@ public class SIPClient implements SipListener {
 		wait(5000);// TODO: check this/ handle waiting times in timeout
 
 		if (this.response == null) {
-			throw new Exception("Response timeout");
+			throw new TimeoutException("Response timeout");
 		}
 
 		if (response.getStatusCode() == Response.UNAUTHORIZED) {

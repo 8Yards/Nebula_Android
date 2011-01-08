@@ -3,11 +3,13 @@
  */
 package org.nebula.main;
 
+import java.io.IOException;
 import java.net.DatagramSocket;
 
 import jlibrtp.Participant;
 import jlibrtp.RTPSession;
 
+import org.nebula.R;
 import org.nebula.client.localdb.NebulaLocalDB;
 import org.nebula.client.rest.RESTConversationManager;
 import org.nebula.client.rest.RESTGroupManager;
@@ -20,12 +22,14 @@ import org.nebula.models.ConversationThread;
 import org.nebula.models.Group;
 import org.nebula.models.MyIdentity;
 import org.nebula.models.Profile;
+import org.nebula.utils.NebulaTask;
 
 import android.app.Application;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -83,6 +87,16 @@ public class NebulaApplication extends Application implements
 			sendBroadcast(new Intent(params[0].toString()).putExtra("params",
 					params));
 		} else if (eventName.equals(SIPClient.NOTIFY_INVITE)) {
+			new NebulaTask() {
+				protected Long doInBackground(Object...params) {
+					Context parent = (Context)params[0];
+					MediaPlayer mp = MediaPlayer.create(parent, R.raw.phone);
+				    mp.start();
+					
+					return null;
+				}
+			}.execute(this);
+			
 			Log.v("nebula", "nebulaApp:" + eventName + "(" + params.length + ")");
 			String threadId = (String) params[3];
 			String convId = (String) params[4];

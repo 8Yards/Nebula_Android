@@ -56,8 +56,6 @@ public class AddContact extends Activity implements
 			return;
 		}
 
-		ProgressDialog.show(this, "", "Loading. Please wait...", true);
-
 		// to remove the "ungrouped" from showing up
 		List<String> groupNamesList = new ArrayList<String>();
 		List<Integer> groupIdsList = new ArrayList<Integer>();
@@ -97,6 +95,8 @@ public class AddContact extends Activity implements
 	}
 
 	public void doAddContact(View v) {
+		ProgressDialog pd = ProgressDialog.show(this, "", "Loading. Please wait...", true);
+		
 		String contactName = ((EditText) findViewById(R.id.etContactName))
 				.getText().toString();
 		String nebulaId = ((EditText) findViewById(R.id.etNebulaID)).getText()
@@ -118,6 +118,7 @@ public class AddContact extends Activity implements
 				throw new Exception(status.getMessage());
 			}
 		} catch (Exception e) {
+			pd.cancel();
 			Toast.makeText(this.getApplicationContext(), e.getMessage(),
 					Toast.LENGTH_LONG).show();
 			Log.e("nebula", "Add Contact: REST server error");
@@ -137,6 +138,7 @@ public class AddContact extends Activity implements
 								groupIds[i].intValue(), nebulaId);
 					}
 				} catch (Exception e) {
+					pd.cancel();
 					// continue to the next
 					// TODO:: inform the user that the contact couldn't be added
 					// to all selected group

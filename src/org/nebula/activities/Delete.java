@@ -114,15 +114,17 @@ public class Delete extends Activity implements OnItemSelectedListener,
 				}).show();
 	}
 
-	public void doDeleteGroup(View v) {
+	public void doDeleteGroup(View v) throws InterruptedException {
 		if (removeGroup.length() == 0) {
 			Toast.makeText(getApplication(), "Please select Group Name",
 					Toast.LENGTH_LONG).show();
 			return;
 		}
 		
-		ProgressDialog.show(this, "", "Loading. Please wait...", true);
+		ProgressDialog pd = ProgressDialog.show(this, "", "Loading. Please wait...", true);
 
+		//Thread.sleep(5000);
+		
 		Status status = new Status(false, "Uninitialized status");
 		if (selectedItems != null) {
 			for (int i = 0; i < selectedItems.length; i++) {
@@ -136,6 +138,7 @@ public class Delete extends Activity implements OnItemSelectedListener,
 						}
 					}
 				} catch (Exception e) {
+					pd.cancel();
 					Toast.makeText(this.getApplicationContext(),
 							e.getMessage(), Toast.LENGTH_LONG).show();
 					setResult(DELETEGROUP_FAILURE);

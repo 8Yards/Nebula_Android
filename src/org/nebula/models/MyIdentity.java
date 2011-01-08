@@ -103,7 +103,7 @@ public class MyIdentity {
 		return myUserName + simpleDateFormat.format(calendar.getTime());
 	}
 
-	public Profile getContactByName(String userName) throws Exception {
+	public Profile getContactByName(String userName) {
 		if(userName.equals(myUserName)) {
 			//TODO make it better..
 			Profile myself = new Profile(-1, userName, "", "", "");
@@ -118,7 +118,7 @@ public class MyIdentity {
 					}
 				}
 			}
-			throw new Exception("MyIdentity: contact not found");
+			return null;
 		}
 	}
 

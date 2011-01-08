@@ -3,6 +3,9 @@
  */
 package org.nebula.client.sip;
 
+import java.util.concurrent.TimeoutException;
+
+import javax.sip.SipException;
 import javax.sip.message.Response;
 
 import org.nebula.main.NebulaApplication;
@@ -26,6 +29,8 @@ public class SIPManager {
 	private static final int CALL_SUCCESS = 9;
 	private static final int REFER_SUCCESS = 10;
 	private static final int REFER_FAILURE = 11;
+	public static final int LOGIN_TIMEOUT = 12;
+	public static final int LOGIN_NOCONNECTION = 13;
 
 	public static int doLogin(String userName, String password) {
 		try {
@@ -43,6 +48,12 @@ public class SIPManager {
 				myIdentity.setMyPassword("");
 				throw new Exception("Invalid credentials");
 			}
+		} catch (SipException e) {
+			Log.e("nebula", "sip_manager:" + e.getMessage());
+			return LOGIN_NOCONNECTION;
+		} catch (TimeoutException e) {
+			Log.e("nebula", "sip_manager:" + e.getMessage());
+			return LOGIN_TIMEOUT;
 		} catch (Exception e) {
 			Log.e("nebula", "sip_manager:" + e.getMessage());
 			return LOGIN_FAILURE;

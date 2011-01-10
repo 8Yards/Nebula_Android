@@ -31,6 +31,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.DialogInterface.OnClickListener;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -111,14 +112,20 @@ public class ConversationTab extends ExpandableListActivity implements
 		switch (item.getItemId()) {
 		case R.id.iMute:
 			MenuItem iMute = menu.getItem(0);
+			AudioManager audioManager = (AudioManager) getApplicationContext()
+					.getSystemService(Context.AUDIO_SERVICE);
 			if (iMute.getTitle().equals("Mute")) {
 				iMute.setTitle("Unmute");
 				iMute.setIcon(drawable.unmute);
-				// TODO:: mute it
+				audioManager.setSpeakerphoneOn(false);
+				audioManager.setRingerMode(AudioManager.RINGER_MODE_SILENT);
+				NebulaApplication.getInstance().muteMe();
 			} else {
 				iMute.setTitle("Mute");
 				iMute.setIcon(drawable.mute);
-				// TODO::unmute it
+				audioManager.setSpeakerphoneOn(true);
+				audioManager.setRingerMode(AudioManager.RINGER_MODE_NORMAL);
+				NebulaApplication.getInstance().unMuteMe();
 			}
 			break;
 		case R.id.iVolume:

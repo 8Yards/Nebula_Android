@@ -4,6 +4,7 @@
 
 package org.nebula.client.sip;
 
+import static org.nebula.client.sip.NebulaSIPConstants.REGISTER_SIPEXCEPTION;
 import gov.nist.javax.sip.header.SIPHeader;
 
 import java.text.ParseException;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Random;
+import java.util.concurrent.TimeoutException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -165,13 +167,15 @@ public class SIPHandler implements SipListener {
 	public Status sendRegister(int timeout) {
 		try {
 			lastCall = new SIPCall();
-			Response resp = lastCall
-					.sendRequest(createRegisterRequest(lastCall, timeout));
+			Response resp = lastCall.sendRequest(createRegisterRequest(
+					lastCall, timeout));
 			if (resp.getStatusCode() == Response.OK) {
 				return new Status(true, "Register Success");
 			} else {
 				throw new Exception("Register Failure");
 			}
+		} catch (TimeoutException e) {
+			return new Status(false, "" + REGISTER_SIPEXCEPTION);
 		} catch (Exception e) {
 			return new Status(false, "SIPHandler.sendRegister: "
 					+ e.getMessage());
@@ -179,7 +183,7 @@ public class SIPHandler implements SipListener {
 			lastCall = null;
 		}
 	}
-	
+
 	public Status sendRegister() {
 		return sendRegister(3600);
 	}
@@ -274,39 +278,34 @@ public class SIPHandler implements SipListener {
 
 	public Status sendByeToAll() {
 		try {
-			for (Iterator<SIPCall> iter = myCalls.values().iterator(); iter.hasNext();) {
-				SIPCall call = iter.next();
-				if (call.getDialog().getCallId().getCallId().equals(keyToCall
+			List<String> sendByeTo = new ArrayList<String>();
+			for (Iterator<SIPCall> iter = myCalls.values().iterator(); iter
+					.hasNext();) {
+				String callId = iter.next().getDialog().getCallId().getCallId();
+				if (!callId.equals(keyToCall
 						.get(NebulaSIPConstants.SUBSCRIBE_NOTIFY_CALLID))) {
-					continue;
+					sendByeTo.add(callId);
 				}
-				try {
-					call.sendBye();
-				}
-				catch(Exception e){
-					Log.e("nebula", "SIPHandler.sendByeToAll: " + call.getDialog().getCallId().getCallId() + " " + e.getMessage()) ;
-				}
+			}
+
+			for (String byeTo : sendByeTo) {
+				sendBye(byeTo);
 			}
 			return new Status(true, "ByeToAll success");
-		}
-		catch(Exception e) {
-			return new Status(false, "SIPHandler.sendByToAll: " + e.getMessage());
+		} catch (Exception e) {
+			return new Status(false, "SIPHandler.sendByToAll: "
+					+ e.getMessage());
 		}
 	}
-	
-	public Status sendBye(String callId) {
+
+	private Status sendBye(String callId) {
 		try {
-			if (callId.equals(keyToCall.get(NebulaSIPConstants.SUBSCRIBE_NOTIFY_CALLID))) {
-				return new Status(false, "SIPHandler.sendBye: the dialog is SUBSCRIBE_NOTIFY dialog");
-			}
 			SIPCall call = myCalls.get(callId);
-			
 			call.sendBye();
 			myCalls.remove(callId);
-			
+
 			return new Status(true, "Bye Success");
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			return new Status(false, "SIPHandler.sendBye: " + e.getMessage());
 		}
 	}

@@ -5,7 +5,6 @@ public class NebulaSIPConstants {
 	public static final String NOTIFY_INVITE = "NOTIFY_INVITE_EVENT";
 	public static final String NOTIFY_BYE = "NOTIFY_BYE_EVENT";
 	public static final String SUBSCRIBE_NOTIFY_CALLID = "nebula_subscribe_notify";
-	
 
 	public static final String PIDF_NS_VALUE = "urn:ietf:params:xml:ns:pidf";
 	public static final String PRESENCE_ELEMENT = "presence";
@@ -24,6 +23,7 @@ public class NebulaSIPConstants {
 
 	public static final int REGISTER_FAILURE = 0;
 	public static final int REGISTER_SUCCESSFUL = 1;
+	public static final int REGISTER_SIPEXCEPTION = 12;
 	public static final int SUBSCRIBE_FAILURE = 2;
 	public static final int SUBSCRIBE_SUCCESSFUL = 3;
 	public static final int PUBLISH_FAILURE = 4;

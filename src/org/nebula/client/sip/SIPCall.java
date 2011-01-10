@@ -1,14 +1,15 @@
 package org.nebula.client.sip;
 
 import static org.nebula.client.sip.NebulaSIPConstants.CONVERSATION_PARAMETER;
+import static org.nebula.client.sip.NebulaSIPConstants.NOTIFY_BYE;
 import static org.nebula.client.sip.NebulaSIPConstants.NOTIFY_INVITE;
 import static org.nebula.client.sip.NebulaSIPConstants.NOTIFY_PRESENCE;
-import static org.nebula.client.sip.NebulaSIPConstants.NOTIFY_BYE;
 import static org.nebula.client.sip.NebulaSIPConstants.THREAD_PARAMETER;
 import gov.nist.javax.sip.header.SIPHeader;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.concurrent.TimeoutException;
 
 import javax.sip.ClientTransaction;
 import javax.sip.Dialog;
@@ -17,6 +18,7 @@ import javax.sip.RequestEvent;
 import javax.sip.ResponseEvent;
 import javax.sip.ServerTransaction;
 import javax.sip.SipException;
+import javax.sip.TransactionDoesNotExistException;
 import javax.sip.TransactionState;
 import javax.sip.header.AuthorizationHeader;
 import javax.sip.header.CSeqHeader;
@@ -92,12 +94,15 @@ public class SIPCall {
 		}
 	}
 
-	public Response sendRequest(Request request) throws Exception {
+	public Response sendRequest(Request request) throws TimeoutException,
+			TransactionDoesNotExistException, SipException,
+			InterruptedException, ParseException {
 		return sendRequest(request, 10000);
 	}
 
 	public synchronized Response sendRequest(Request request, int timeout)
-			throws Exception {
+			throws TimeoutException, TransactionDoesNotExistException,
+			SipException, InterruptedException, ParseException {
 		Request r = (Request) request.clone();
 		ClientTransaction ct = mySipHandler.getSipProvider()
 				.getNewClientTransaction(request);
@@ -124,7 +129,7 @@ public class SIPCall {
 		wait(timeout);
 
 		if (lastResponse == null) {
-			throw new Exception("No response");
+			throw new TimeoutException("No response");
 		} else if (lastResponse.getStatusCode() == Response.UNAUTHORIZED
 				&& registerTryCount == 0) {
 			String ha = lastResponse.getHeader("WWW-Authenticate").toString();

@@ -29,7 +29,7 @@ public class RTPReceiver implements RTPAppIntf {
 				enuPart.nextElement().track.stop();
 			}
 		}
-		rtpReceiver.endSession();
+		//rtpReceiver.endSession();
 		Log.v("nebula", "rtpReceiver: stopped");
 	}
 

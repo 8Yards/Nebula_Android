@@ -8,6 +8,8 @@ import java.net.DatagramSocket;
 import jlibrtp.Participant;
 import jlibrtp.RTPSession;
 
+import org.nebula.R;
+import org.nebula.client.gps.NebulaLocationListener;
 import org.nebula.client.localdb.NebulaLocalDB;
 import org.nebula.client.rest.RESTConversationManager;
 import org.nebula.client.rest.RESTGroupManager;
@@ -27,6 +29,8 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.location.LocationManager;
+import android.media.MediaPlayer;
 import android.os.IBinder;
 import android.util.Log;
 
@@ -44,6 +48,11 @@ public class NebulaApplication extends Application implements
 	private RTPReceiver myRTPReceiver = null;
 
 	private NebulaLocalDB myLocalDB = null;
+
+	private LocationManager mlocManager;
+	private NebulaLocationListener mlocListener;
+	private final long MILLIS_FREQUENCY_UPDATE = 5000;
+	private final long METERS_DISTANCE_UPDATE = 10;
 
 	public static NebulaApplication getInstance() {
 		return singleton;
@@ -73,6 +82,13 @@ public class NebulaApplication extends Application implements
 			myRTPClient.payloadType(8);
 
 			myRTPReceiver = new RTPReceiver(myRTPClient);
+
+			mlocManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+			mlocListener = new NebulaLocationListener(this
+					.getApplicationContext());
+			mlocManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
+					MILLIS_FREQUENCY_UPDATE, METERS_DISTANCE_UPDATE,
+					mlocListener);
 		} catch (Exception e) {
 			// TODO Handle gracefully
 			Log.e("nebula", "nebulaApp: " + e.getMessage());
@@ -115,7 +131,7 @@ public class NebulaApplication extends Application implements
 
 			sendBroadcast(new Intent(params[0].toString()));
 		} else if (eventName.equals(NebulaSIPConstants.NOTIFY_BYE)) {
-			String callId = (String) params[1]; 
+			String callId = (String) params[1];
 			mySIPHandler.removeCallById(callId);
 			terminateRTP(callId);
 		}
@@ -123,7 +139,6 @@ public class NebulaApplication extends Application implements
 
 	public void reloadMyGroups() {
 		RESTGroupManager rG = new RESTGroupManager();
-
 		try {
 			myIdentity.setMyGroups(rG.retrieveAllGroupsMembers());
 			renewMyPresenceSubscriptions();
@@ -147,14 +162,13 @@ public class NebulaApplication extends Application implements
 	private void renewMyPresenceSubscriptions() {
 		for (Group individualGroup : myIdentity.getMyGroups()) {
 			for (Profile individualProfile : individualGroup.getContacts()) {
-				SIPManager.doSubscribe(individualProfile
-						.getUsername(), myIdentity.getMySIPDomain());
+				SIPManager.doSubscribe(individualProfile.getUsername(),
+						myIdentity.getMySIPDomain());
 			}
 		}
 	}
 
 	public void establishRTP(String destAddressRTP, int destPortRTP) {
-
 		if (!isRTPInitialized) {
 			isRTPInitialized = true;
 			myRTPSender.setRtpSender(myRTPClient);
@@ -164,8 +178,8 @@ public class NebulaApplication extends Application implements
 			myRTPReceiver.startPlaying();
 		}
 
-		Log.v("nebula", "nebulaApp: desc ip/prt = " + destAddressRTP + "/"
-				+ destPortRTP);
+		// Log.v("nebula", "nebulaApp: desc ip/prt = " + destAddressRTP + "/"
+		// + destPortRTP);
 		Participant p = new Participant(destAddressRTP, destPortRTP,
 				destPortRTP + 1);
 		int participants = myRTPSender.numberOfReceivers();
@@ -173,14 +187,37 @@ public class NebulaApplication extends Application implements
 
 		while (participants == myRTPSender.numberOfReceivers()) {
 		}
+
+		new Thread() {
+			public void run() {
+				try {
+					MediaPlayer mp = MediaPlayer.create(singleton, R.raw.beep);
+					for (int i = 0; i < 2; i++) {
+						if (mp != null) {
+							mp.start();
+							mp.reset();
+							mp = MediaPlayer.create(singleton, R.raw.beep);
+						}
+					}
+					mp.release();
+				} catch (Exception e) {
+					// do nothing here :P
+				}
+			}
+		}.start();
 	}
 	
-	private void terminateRTP(String callId) {
-		// TODO Auto-generated method stub
-		
+	public void muteMe(){
+		myRTPReceiver.stopPlaying();
+	}
+	
+	public void unMuteMe(){
+		myRTPReceiver.startPlaying();
 	}
 
-
+	private void terminateRTP(String callId) {
+		// TODO:: handle this
+	}
 
 	private ServiceConnection senderConnection = new ServiceConnection() {
 		public void onServiceConnected(ComponentName name, IBinder binder) {

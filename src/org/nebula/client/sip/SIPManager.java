@@ -13,8 +13,14 @@ import static org.nebula.client.sip.NebulaSIPConstants.REFER_FAILURE;
 import static org.nebula.client.sip.NebulaSIPConstants.REFER_SUCCESS;
 import static org.nebula.client.sip.NebulaSIPConstants.REGISTER_FAILURE;
 import static org.nebula.client.sip.NebulaSIPConstants.REGISTER_SUCCESSFUL;
+import static org.nebula.client.sip.NebulaSIPConstants.REGISTER_SIPEXCEPTION;
 import static org.nebula.client.sip.NebulaSIPConstants.SUBSCRIBE_FAILURE;
 import static org.nebula.client.sip.NebulaSIPConstants.SUBSCRIBE_SUCCESSFUL;
+
+import java.util.Iterator;
+import java.util.concurrent.TimeoutException;
+
+import javax.sip.SipException;
 
 import org.nebula.main.NebulaApplication;
 import org.nebula.models.Conversation;
@@ -44,7 +50,10 @@ public class SIPManager {
 				throw new Exception(response.getMessage());
 			}
 		} catch (Exception e) {
-			Log.e("nebula", "sip_manager:" + e.getMessage());
+			Log.e("nebula", "SIPManager: " + e.getMessage());
+			if (e.getMessage().equals("12")) {// bite me :/
+				return REGISTER_SIPEXCEPTION;
+			}
 			return REGISTER_FAILURE;
 		}
 	}
@@ -100,24 +109,37 @@ public class SIPManager {
 		}
 	}
 
-	/*
-	 * contact nina
-	 */
+	public static int doEndCalls() {
+		try {
+			SIPHandler sip = NebulaApplication.getInstance().getMySIPHandler();
+			Status response = sip.sendByeToAll();
+			if (!response.isSuccess()) {
+				Log.e("nebula", "SIPManager.doLogout: bye error "
+						+ response.getMessage());
+			}
+			return BYE_SUCCESS;
+		} catch (Exception e) {
+			Log.e("nebula", "sipManager.doLogout: " + e.getMessage());
+			return BYE_FAILURE;
+		}
+
+	}
+
 	public static int doLogout() {
-		 try {
-		// doPublish("Offline");
-			 SIPHandler sip = NebulaApplication.getInstance().getMySIPHandler();
-			 Status response = sip.sendByeToAll();
-			 if (!response.isSuccess()) {
-				 Log.e("nebula", "SIPManager.doLogout: bye error " + response.getMessage());
-			 }
-			 sip.sendRegister(0);
-			 return BYE_SUCCESS;
-		 }
-		 catch(Exception e) {
-			 Log.e("nebula", "sipManager.doLogout: " + e.getMessage()) ;
-			 return BYE_FAILURE;
-		 }
+		try {
+			// doPublish("Offline");
+			SIPHandler sip = NebulaApplication.getInstance().getMySIPHandler();
+			Status response = sip.sendByeToAll();
+			if (!response.isSuccess()) {
+				Log.e("nebula", "SIPManager.doLogout: bye error "
+						+ response.getMessage());
+			}
+			sip.sendRegister(0);
+			return BYE_SUCCESS;
+		} catch (Exception e) {
+			Log.e("nebula", "sipManager.doLogout: " + e.getMessage());
+			return BYE_FAILURE;
+		}
 	}
 
 	public static int doRefer(String referSIPUser, String referSIPDomain,

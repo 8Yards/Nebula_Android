@@ -19,7 +19,13 @@ import org.nebula.models.Conversation;
 import org.nebula.models.ConversationThread;
 import org.nebula.models.Status;
 
+import android.location.Location;
+import android.util.Log;
+
 public class RESTConversationManager extends Resource {
+
+	private double[] distances = { 0.02, 0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 20,
+			50, 100, 250, 500 };
 
 	public RESTConversationManager() {
 		super("RESTConversations");
@@ -52,6 +58,33 @@ public class RESTConversationManager extends Resource {
 		}
 	}
 
+	public Status createSpatialConversation(Conversation conversation,
+			double distance) throws ClientProtocolException, IOException,
+			JSONException, ParseException {
+		HashMap<String, Object> hM = new HashMap<String, Object>();
+		hM.put("thread", conversation.getThread().getThreadName());
+		hM.put("conversation", conversation.getConversationName());
+		hM.put("distance", distance);
+
+		Response r = this.post("createSpatialConversation", hM);
+		// 201 = HTTP status code for conversation inserted
+		if (r.getStatus() == 201) {
+			conversation.setId(Integer.parseInt(r.getResult().getString("id")));
+			conversation.setDate(r.getResult().getString("date"));
+			JSONObject callee = r.getResult().getJSONObject("callees");
+
+			List<String> callees = new ArrayList<String>();
+			for (int i = 0; i < callee.length(); i++) {
+				callees.add(callee.getString("" + i));
+			}
+			conversation.addAllCallee(callees);
+
+			return new Status(true, "Conversation added successfully");
+		} else {
+			return new Status(false, "" + r.getResult());
+		}
+	}
+
 	public List<ConversationThread> retrieveAll() throws JSONException,
 			ClientProtocolException, IOException, ParseException {
 		Response r = this.get("retrieveAll");
@@ -63,7 +96,7 @@ public class RESTConversationManager extends Resource {
 				myThreads.add(new ConversationThread(keyObj, key));
 			}
 			return myThreads;
-		}else if(r.getStatus()==201){
+		} else if (r.getStatus() == 201) {
 			return myThreads;
 		}
 		return null;
@@ -81,6 +114,93 @@ public class RESTConversationManager extends Resource {
 			return new Status(true, "Time updated successfully");
 		} else {
 			return new Status(false, r.getResult().getString("result"));
+		}
+	}
+
+	public float[][] distanceFromContact() throws JSONException,
+			ClientProtocolException, IOException {
+		Response r = this.get("distanceFromContact");
+		Log.e("GPS", "Message: " + r.getResult());
+		Log.e("GPS", "Status: " + r.getStatus());
+		if (r.getStatus() != 200) {
+			return null;
+		}
+		float[][] values = new float[distances.length][2];
+		// scan the data for the name of the groups
+		int i = 0;
+
+		for (int h = 0; h < distances.length; h++) {
+			values[h][0] = (float) distances[h];
+			values[h][1] = 0;
+		}
+		// empty
+		if (r.getStatus() == 201)
+			return values;
+		if (r.getStatus() != 200)
+			return null;
+		for (Iterator iterator = r.getResult().keys(); iterator.hasNext();) {
+			String distance = "" + iterator.next();
+			// retrieve the JSON object and instantiates a new Group with it
+			String number = r.getResult().getString(distance);
+			i = getDistancesIndex(Double.parseDouble(distance));
+			if (i == -1)
+				Log.e("INDEX", "-1   Value searched:  "
+						+ Double.parseDouble(distance));
+			if (i < distances.length) {
+				Log.e("MARCO", "" + i + "/ MAX = " + distances.length);
+				values[i][0] = (float) distances[i];
+				values[i][1] = (float) Integer.parseInt(number);
+			}
+
+		}
+		for (int j = 1; j < distances.length; j++) {
+			values[j][1] = values[j][1] + values[j - 1][1];
+		}
+		return values;
+	}
+
+	public double getDistancesValue(int index) {
+		if (index >= distances.length)
+			return -1;
+		return distances[index];
+	}
+
+	public int getDistancesIndex(double value) {
+		for (int i = 0; i < distances.length; i++)
+			if (distances[i] == value)
+				return i;
+		return -1;
+	}
+
+	public int returnIndex(int value) {
+		if (value == 0) {
+			return 0;
+		} else if (value == 100) {
+			return distances.length - 1;
+		}
+
+		float percentage = 100 / (distances.length - 1);
+		int index = (int) Math.ceil(value / percentage) - 1;
+		if (index >= distances.length) {
+			return distances.length - 1;
+		}
+
+		return index;
+	}
+
+	public Status updatePosition(Location loc) throws ClientProtocolException,
+			IOException, JSONException {
+		HashMap<String, Object> hM = new HashMap<String, Object>();
+		double latitude = loc.getLatitude();
+		double longitude = loc.getLongitude();
+		hM.put("latitude", latitude);
+		hM.put("longitude", longitude);
+
+		Response r = this.put("updatePosition", hM);
+		if (r.getStatus() == 201) {
+			return new Status(true, "Position updated successfully");
+		} else {
+			return new Status(false, "" + r.getResult());
 		}
 	}
 

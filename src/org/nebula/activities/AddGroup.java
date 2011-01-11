@@ -121,23 +121,26 @@ public class AddGroup extends Activity implements OnSeekBarChangeListener {
 	}
 
 	public void addSpacialConversation(View v) {
-		if (seekUsersNumber.getText().equals("0   Users")) {
+		if (seekUsersNumber.getText().toString().equals("0   Users")) {
 			Toast.makeText(getApplicationContext(),
 					"No users to create group from", Toast.LENGTH_LONG).show();
 			return;
 		}
 
-		double distance = usersPosition[rC.returnIndex(seekBar.getProgress())][0];
-		ConversationThread thread = myIdentity.createThread();
-		Conversation conversation = thread
-				.addConversation(new ArrayList<String>());
-
 		try {
+			double distance = usersPosition[rC.returnIndex(seekBar
+					.getProgress())][0];
+			ConversationThread thread = myIdentity.createThread();
+			Conversation conversation = thread
+					.addConversation(new ArrayList<String>());
+
 			rC.createSpatialConversation(conversation, distance);
 		} catch (Exception e) {
 			// do nothing here
 			Log.e("nebula-gps", "AddGeoGroup.addSpacialConversation: "
 					+ e.getMessage());
+			Toast.makeText(getApplicationContext(),
+					"Could not perform operation", Toast.LENGTH_LONG).show();
 		}
 
 		finish();
